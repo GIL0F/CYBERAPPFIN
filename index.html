@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[Nome da Empresa]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void: #0A0D10;
+    --panel: #10151A;
+    --panel-2: #141B21;
+    --line: #1E2730;
+    --text-primary: #E4EAEF;
+    --text-muted: #7C8894;
+    --brand: #6EA8FF;      /* accent institucional da empresa */
+    --accent: #F5A623;     /* accent do time atual (muda ao entrar no deck) */
+  }
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  body{
+    background: var(--bg-void);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    position: relative;
+    min-height: 100%;
+  }
+  body.deck-mode{ overflow: hidden; height:100vh; }
+  .mono{ font-family: 'Space Mono', monospace; }
+  a{ color: inherit; }
+
+  .grid-bg{
+    position: fixed; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 48px 48px;
+    opacity: 0.3;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ============ HOME VIEW ============ */
+  #homeView{ position:relative; z-index:1; }
+
+  #siteHeader{
+    position: sticky; top:0; z-index: 40;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 18px 60px;
+    background: rgba(10,13,16,0.85);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  #siteHeader .logo{
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size: 15px;
+    letter-spacing: 0.05em;
+    display:flex; align-items:center; gap:10px;
+    cursor:pointer;
+  }
+  #siteHeader .logo .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--brand); box-shadow: 0 0 8px var(--brand);
+  }
+  #siteHeader nav{ display:flex; gap: 34px; }
+  #siteHeader nav a{
+    font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--text-muted); text-decoration:none;
+    font-family:'Space Mono', monospace;
+    transition: color .2s;
+  }
+  #siteHeader nav a:hover{ color: var(--text-primary); }
+
+  .hero{
+    padding: 130px 60px 100px;
+    max-width: 1200px;
+  }
+  .hero .eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size: 13px; letter-spacing:0.18em; text-transform:uppercase;
+    color: var(--brand); margin-bottom: 20px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .hero .eyebrow::before{ content:""; width:22px; height:1px; background: var(--brand); display:inline-block; }
+  .hero h1{
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size: clamp(2.4rem, 5.4vw, 4.6rem);
+    line-height: 1.05;
+    max-width: 20ch;
+    margin-bottom: 26px;
+  }
+  .hero p{
+    font-size: 1.15rem;
+    color: var(--text-muted);
+    max-width: 62ch;
+    line-height:1.65;
+  }
+
+  section{ padding: 80px 60px; max-width: 1300px; }
+  section .section-eyebrow{
+    font-family:'Space Mono', monospace;
+    font-size: 12px; letter-spacing:0.18em; text-transform:uppercase;
+    color: var(--brand); margin-bottom: 14px;
+  }
+  section h2{
+    font-family:'Space Mono', monospace;
+    font-weight:700;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    margin-bottom: 20px;
+  }
+  #about p{
+    color: var(--text-muted); font-size: 1.05rem; line-height:1.75; max-width: 72ch;
+  }
+
+  #depts .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 18px;
+    margin-top: 34px;
+  }
+  .dept-card{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 26px 24px;
+    cursor: pointer;
+    transition: border-color .2s, transform .2s;
+    position: relative;
+    overflow:hidden;
+  }
+  .dept-card::before{
+    content:"";
+    position:absolute; top:0; left:0; right:0; height:3px;
+    background: var(--card-accent, var(--brand));
+  }
+  .dept-card:hover{ border-color: var(--card-accent, var(--brand)); transform: translateY(-3px); }
+  .dept-card .dept-label{
+    font-family:'Space Mono', monospace;
+    font-size: 11px; letter-spacing:0.1em; text-transform:uppercase;
+    color: var(--card-accent, var(--brand));
+    margin-bottom: 12px;
+  }
+  .dept-card h3{ font-size: 1.15rem; margin-bottom: 10px; }
+  .dept-card p{ color: var(--text-muted); font-size: 0.92rem; line-height:1.55; margin-bottom: 18px; }
+  .dept-card .enter{
+    font-family:'Space Mono', monospace;
+    font-size: 12px; letter-spacing: 0.06em;
+    color: var(--text-primary);
+    display:flex; align-items:center; gap:8px;
+  }
+
+  #siteFooter{
+    padding: 50px 60px 70px;
+    border-top: 1px solid var(--line);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+
+  @media (max-width: 720px){
+    #siteHeader, .hero, section, #siteFooter{ padding-left: 24px; padding-right: 24px; }
+    #siteHeader nav{ display:none; }
+  }
+
+  /* ============ DECK VIEW (apresentação por time) ============ */
+  #appView{ display:none; position: fixed; inset:0; z-index: 100; }
+  body.deck-mode #appView{ display:block; }
+  body.deck-mode #homeView{ display:none; }
+
+  #topbar{
+    position: fixed; top:0; left:0; right:0; z-index: 60;
+    background: rgba(16,21,26,0.9);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+  }
+  #statusbar{
+    height:44px; display:flex; align-items:center; justify-content:space-between;
+    padding: 0 22px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted);
+  }
+  #statusbar .left{ display:flex; align-items:center; gap:10px; cursor:pointer; }
+  #statusbar .dot{
+    width:8px; height:8px; border-radius:50%;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    animation: pulse 2s infinite; transition: background .4s;
+  }
+  @keyframes pulse{ 0%,100%{opacity:1;} 50%{opacity:0.35;} }
+  #statusbar .back{ color: var(--text-primary); }
+  #statusbar .back:hover{ color: var(--accent); }
+  #statusbar .right{ display:flex; align-items:center; gap:18px; }
+
+  #tabs{ display:flex; padding: 0 22px; gap: 4px; overflow-x:auto; }
+  .tab{
+    font-family:'Space Mono', monospace; font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--text-muted);
+    background: none; border: none; padding: 12px 16px 10px; cursor: pointer;
+    border-bottom: 2px solid transparent; white-space: nowrap;
+    transition: color .2s, border-color .2s;
+  }
+  .tab:hover{ color: var(--text-primary); }
+  .tab.active{ color: var(--text-primary); border-bottom-color: var(--accent); }
+
+  #deck{ position:relative; height:100vh; z-index:1; padding-top: 82px; }
+  .slide{
+    position:absolute; inset:0; top:82px;
+    display:flex; flex-direction:column; justify-content:center;
+    padding: 40px 90px 90px;
+    opacity:0; visibility:hidden;
+    transform: translateY(18px);
+    transition: opacity .5s ease, transform .5s ease, visibility .5s;
+  }
+  .slide.active{ opacity:1; visibility:visible; transform: translateY(0); }
+
+  .eyebrow{
+    font-family:'Space Mono', monospace; font-size: 13px; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--accent); margin-bottom: 18px;
+    display:flex; align-items:center; gap:10px; transition: color .4s;
+  }
+  .eyebrow::before{ content:""; display:inline-block; width:22px; height:1px; background: var(--accent); transition: background .4s; }
+
+  h1.title{
+    font-family:'Space Mono', monospace; font-weight:700;
+    font-size: clamp(2.2rem, 4.6vw, 3.8rem); line-height: 1.05;
+    letter-spacing: -0.01em; max-width: 16ch;
+  }
+  h2.title{
+    font-family:'Space Mono', monospace; font-weight:700;
+    font-size: clamp(1.7rem, 3vw, 2.4rem); line-height: 1.15; margin-bottom: 30px;
+  }
+  .kicker{ margin-top: 20px; font-size: 1.1rem; color: var(--text-muted); max-width: 52ch; line-height:1.6; }
+
+  .grid-wrap{ display:grid; grid-template-columns: repeat(var(--cols, 2), 1fr); gap: 16px; max-width: 1100px; }
+  .card{ background: var(--panel); border: 1px solid var(--line); border-radius: 4px; padding: 20px 22px; }
+  .card .num{ font-family:'Space Mono', monospace; font-size: 12px; color: var(--accent); letter-spacing: 0.1em; margin-bottom: 10px; display:block; transition: color .4s; }
+  .card h3{ font-size: 1.02rem; font-weight:700; margin-bottom: 8px; }
+  .card p{ color: var(--text-muted); font-size: 0.9rem; line-height:1.55; }
+
+  ul.plain-list{ list-style:none; max-width: 700px; }
+  ul.plain-list li{ padding: 12px 0; border-bottom: 1px solid var(--line); display:flex; gap:16px; align-items:baseline; font-size: 1.02rem; }
+  ul.plain-list li:last-child{ border-bottom:none; }
+  ul.plain-list li .tag{ font-family:'Space Mono', monospace; font-size: 12px; color: var(--accent); flex-shrink:0; width: 3ch; transition: color .4s; }
+
+  .team-grid{ display:grid; grid-template-columns: repeat(var(--cols,3), 1fr); gap: 14px; max-width: 1000px; }
+  .member{ background: var(--panel); border:1px solid var(--line); border-radius: 4px; padding: 18px; }
+  .member .role{ font-family:'Space Mono', monospace; font-size: 11px; letter-spacing:0.08em; text-transform:uppercase; color: var(--accent); margin-bottom: 6px; transition: color .4s; }
+  .member .name{ font-weight:700; font-size: 1.02rem; }
+
+  .slide.cover{ justify-content:center; align-items:flex-start; }
+  .slide.cover .brand{ font-family:'Space Mono', monospace; font-size: 13px; letter-spacing:0.2em; text-transform:uppercase; color: var(--accent); margin-bottom: 24px; }
+  .slide.closing{ align-items:center; text-align:center; }
+  .slide.closing h1{ max-width: none; }
+
+  #navbar{
+    position: fixed; bottom:0; left:0; right:0; height:60px;
+    display:flex; align-items:center; justify-content:center; gap: 10px; z-index: 50;
+    background: linear-gradient(0deg, rgba(10,13,16,0.9), transparent);
+  }
+  .nav-dot{ width: 30px; height:4px; border-radius:2px; background: var(--line); cursor:pointer; border:none; transition: background .25s; }
+  .nav-dot.active{ background: var(--accent); }
+  .nav-dot:hover{ background: var(--accent); opacity:0.7; }
+
+  #arrows{ position: fixed; right: 24px; top:56%; transform: translateY(-50%); display:flex; flex-direction:column; gap: 10px; z-index:50; }
+  #arrows button{ width: 38px; height:38px; background: var(--panel); border: 1px solid var(--line); color: var(--text-primary); font-size: 15px; cursor:pointer; border-radius: 4px; }
+  #arrows button:hover{ border-color: var(--accent); color: var(--accent); }
+
+  @media (max-width: 720px){
+    .slide{ padding: 30px 24px 80px; }
+    .grid-wrap, .team-grid{ grid-template-columns: 1fr !important; }
+    #arrows{ display:none; }
+  }
+  @media (prefers-reduced-motion: reduce){ .slide{ transition: opacity .01s; transform:none; } }
+</style>
+</head>
+<body>
+<div class="grid-bg"></div>
+
+<!-- ============ HOME (site institucional) ============ -->
+<div id="homeView">
+  <header id="siteHeader">
+    <div class="logo" onclick="window.scrollTo({top:0,behavior:'smooth'})">
+      <span class="dot"></span>
+      <span id="companyNameHeader">[NOME DA EMPRESA]</span>
+    </div>
+    <nav>
+      <a href="#about">Sobre</a>
+      <a href="#depts">Áreas</a>
+      <a href="#contact">Contato</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="eyebrow">Faculdade Impacta · Simulação Empresarial</div>
+    <h1 id="companyNameHero">[Nome da Empresa]</h1>
+    <p id="companyTagline">Descreva aqui, em uma ou duas frases, o que a empresa fictícia faz — ramo de atuação, proposta de valor, mercado.</p>
+  </section>
+
+  <section id="about">
+    <div class="section-eyebrow">Sobre</div>
+    <h2>Quem somos</h2>
+    <p id="aboutText">Texto institucional da empresa: história, missão, porte, onde atua. Edite o conteúdo da variável COMPANY lá no script.</p>
+  </section>
+
+  <section id="depts">
+    <div class="section-eyebrow">Áreas</div>
+    <h2>Nossas áreas</h2>
+    <div class="grid" id="deptGrid"></div>
+  </section>
+
+  <footer id="siteFooter">
+    <span id="footerLeft">[Nome da Empresa] — Projeto acadêmico, Faculdade Impacta</span>
+    <span id="contact">contato@[empresa].com</span>
+  </footer>
+</div>
+
+<!-- ============ APP (modo apresentação por time) ============ -->
+<div id="appView">
+  <div id="topbar">
+    <div id="statusbar">
+      <div class="left back" onclick="goHome()">
+        <span class="dot"></span>
+        <span>← voltar ao site</span>
+      </div>
+      <div class="right">
+        <span id="clock">--:--:--</span>
+        <span id="slidecount" class="mono">01 / 01</span>
+      </div>
+    </div>
+    <div id="tabs"></div>
+  </div>
+
+  <div id="deck"></div>
+
+  <div id="arrows">
+    <button id="prevBtn" aria-label="Slide anterior">↑</button>
+    <button id="nextBtn" aria-label="Próximo slide">↓</button>
+  </div>
+
+  <div id="navbar"></div>
+</div>
+
+<script>
+/* =========================================================================
+   CONTEÚDO — edite aqui.
+
+   COMPANY  → dados institucionais da home (nome, tagline, sobre, contato)
+   TEAMS    → cada time edita SÓ o seu bloco. "blurb" aparece no card da
+              home; "slides" é o conteúdo do modo apresentação do time.
+   ========================================================================= */
+
+const COMPANY = {
+  name: "[Nome da Empresa]",
+  tagline: "Descreva aqui, em uma ou duas frases, o que a empresa fictícia faz — ramo de atuação, proposta de valor, mercado.",
+  about: "Texto institucional da empresa: história, missão, porte, onde atua. Edite este texto com a descrição real definida pela turma.",
+  contact: "contato@[empresa].com"
+};
+
+const TEAMS = {
+
+  network: {
+    label: "Network", accent: "#3ED6C4",
+    blurb: "Infraestrutura, topologia de rede e disponibilidade.",
+    slides: [
+      { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Network", title:"Time de Network", kicker:"Descreva aqui o escopo do time: infraestrutura, topologia, disponibilidade." },
+      { type:"content", eyebrow:"01 · Missão", title:"O que o time entrega", kicker:"Texto sobre a missão do time de rede." },
+      { type:"team", eyebrow:"02 · Equipe", title:"Quem faz parte do time", members:[
+        { role:"Função", name:"Nome do integrante" },
+        { role:"Função", name:"Nome do integrante" }
+      ]},
+      { type:"list", eyebrow:"03 · Processos", title:"Principais processos", items:[
+        { tag:"01", text:"Descreva um processo do time" },
+        { tag:"02", text:"Descreva outro processo" }
+      ]},
+      { type:"grid", eyebrow:"04 · Ferramentas", title:"Stack utilizada", cols:2, cards:[
+        { num:"TOOL / 01", title:"Nome da ferramenta", text:"Para que serve." },
+        { num:"TOOL / 02", title:"Nome da ferramenta", text:"Para que serve." }
+      ]},
+      { type:"closing", eyebrow:"Perguntas", title:"Dúvidas?", kicker:"Network · [Nome da Empresa]" }
+    ]
+  },
+
+  iam: {
+    label: "IAM", accent: "#B18CFF",
+    blurb: "Identidades, acessos e controle de permissões.",
+    slides: [
+      { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Identity & Access Management", title:"Time de IAM", kicker:"Descreva aqui o escopo do time: identidades, acessos, permissões." },
+      { type:"content", eyebrow:"01 · Missão", title:"O que o time entrega", kicker:"Texto sobre a missão do time de IAM." },
+      { type:"team", eyebrow:"02 · Equipe", title:"Quem faz parte do time", members:[
+        { role:"Função", name:"Nome do integrante" },
+        { role:"Função", name:"Nome do integrante" }
+      ]},
+      { type:"list", eyebrow:"03 · Processos", title:"Principais processos", items:[
+        { tag:"01", text:"Descreva um processo do time" },
+        { tag:"02", text:"Descreva outro processo" }
+      ]},
+      { type:"grid", eyebrow:"04 · Ferramentas", title:"Stack utilizada", cols:2, cards:[
+        { num:"TOOL / 01", title:"Nome da ferramenta", text:"Para que serve." },
+        { num:"TOOL / 02", title:"Nome da ferramenta", text:"Para que serve." }
+      ]},
+      { type:"closing", eyebrow:"Perguntas", title:"Dúvidas?", kicker:"IAM · [Nome da Empresa]" }
+    ]
+  },
+
+  grc: {
+    label: "GRC", accent: "#F5C242",
+    blurb: "Políticas, gestão de risco e conformidade.",
+    slides: [
+      { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Governance, Risk & Compliance", title:"Time de GRC", kicker:"Descreva aqui o escopo do time: políticas, riscos, conformidade." },
+      { type:"content", eyebrow:"01 · Missão", title:"O que o time entrega", kicker:"Texto sobre a missão do time de GRC." },
+      { type:"team", eyebrow:"02 · Equipe", title:"Quem faz parte do time", members:[
+        { role:"Função", name:"Nome do integrante" },
+        { role:"Função", name:"Nome do integrante" }
+      ]},
+      { type:"list", eyebrow:"03 · Processos", title:"Principais processos", items:[
+        { tag:"01", text:"Descreva um processo do time" },
+        { tag:"02", text:"Descreva outro processo" }
+      ]},
+      { type:"grid", eyebrow:"04 · Ferramentas", title:"Stack utilizada", cols:2, cards:[
+        { num:"TOOL / 01", title:"Nome da ferramenta", text:"Para que serve." },
+        { num:"TOOL / 02", title:"Nome da ferramenta", text:"Para que serve." }
+      ]},
+      { type:"closing", eyebrow:"Perguntas", title:"Dúvidas?", kicker:"GRC · [Nome da Empresa]" }
+    ]
+  },
+
+  soc: {
+    label: "SOC", accent: "#F5A623",
+    blurb: "Monitoramento, detecção e resposta a incidentes.",
+    slides: [
+      { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Security Operations Center", title:"Time de SOC", kicker:"Time responsável pela segurança operacional da empresa: monitoramento, detecção e resposta a incidentes." },
+      { type:"content", eyebrow:"01 · Missão", title:"O que o SOC entrega", kicker:"Descreva aqui, em 2–3 frases, o objetivo do time: o que vocês monitoram, protegem e para quem." },
+      { type:"team", eyebrow:"02 · Equipe", title:"Quem faz parte do time", members:[
+        { role:"Função", name:"Nome do integrante" },
+        { role:"Função", name:"Nome do integrante" },
+        { role:"Função", name:"Nome do integrante" }
+      ]},
+      { type:"list", eyebrow:"03 · Processos", title:"Fluxo de resposta a incidentes", items:[
+        { tag:"01", text:"Detecção — como um alerta é identificado" },
+        { tag:"02", text:"Triagem — classificação de severidade" },
+        { tag:"03", text:"Resposta — ações tomadas para conter" },
+        { tag:"04", text:"Encerramento — documentação e lições aprendidas" }
+      ]},
+      { type:"grid", eyebrow:"04 · Ferramentas", title:"Stack utilizada pelo time", cols:2, cards:[
+        { num:"TOOL / 01", title:"Nome da ferramenta", text:"Para que serve e como o time usa no dia a dia." },
+        { num:"TOOL / 02", title:"Nome da ferramenta", text:"Para que serve e como o time usa no dia a dia." },
+        { num:"TOOL / 03", title:"Nome da ferramenta", text:"Para que serve e como o time usa no dia a dia." },
+        { num:"TOOL / 04", title:"Nome da ferramenta", text:"Para que serve e como o time usa no dia a dia." }
+      ]},
+      { type:"closing", eyebrow:"Perguntas", title:"Dúvidas?", kicker:"SOC · [Nome da Empresa]" }
+    ]
+  },
+
+  endpoint: {
+    label: "Endpoint", accent: "#5EC98A",
+    blurb: "Segurança de dispositivos, EDR e gestão de patches.",
+    slides: [
+      { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Endpoint Security", title:"Time de Endpoint", kicker:"Descreva aqui o escopo do time: dispositivos, antivírus/EDR, patching." },
+      { type:"content", eyebrow:"01 · Missão", title:"O que o time entrega", kicker:"Texto sobre a missão do time de Endpoint." },
+      { type:"team", eyebrow:"02 · Equipe", title:"Quem faz parte do time", members:[
+        { role:"Função", name:"Nome do integrante" },
+        { role:"Função", name:"Nome do integrante" }
+      ]},
+      { type:"list", eyebrow:"03 · Processos", title:"Principais processos", items:[
+        { tag:"01", text:"Descreva um processo do time" },
+        { tag:"02", text:"Descreva outro processo" }
+      ]},
+      { type:"grid", eyebrow:"04 · Ferramentas", title:"Stack utilizada", cols:2, cards:[
+        { num:"TOOL / 01", title:"Nome da ferramenta", text:"Para que serve." },
+        { num:"TOOL / 02", title:"Nome da ferramenta", text:"Para que serve." }
+      ]},
+      { type:"closing", eyebrow:"Perguntas", title:"Dúvidas?", kicker:"Endpoint · [Nome da Empresa]" }
+    ]
+  }
+
+};
+const TEAM_ORDER = ["network","iam","grc","soc","endpoint"];
+/* ========================================================================= */
+
+let currentTeam = TEAM_ORDER[0];
+let current = 0;
+
+/* ---------- HOME ---------- */
+function fillCompanyInfo(){
+  document.getElementById('companyNameHeader').textContent = COMPANY.name;
+  document.getElementById('companyNameHero').textContent = COMPANY.name;
+  document.getElementById('companyTagline').textContent = COMPANY.tagline;
+  document.getElementById('aboutText').textContent = COMPANY.about;
+  document.getElementById('footerLeft').textContent = COMPANY.name + " — Projeto acadêmico, Faculdade Impacta";
+  document.getElementById('contact').textContent = COMPANY.contact;
+  document.title = COMPANY.name;
+}
+
+function buildDeptGrid(){
+  const grid = document.getElementById('deptGrid');
+  grid.innerHTML = '';
+  TEAM_ORDER.forEach(key => {
+    const t = TEAMS[key];
+    const card = document.createElement('div');
+    card.className = 'dept-card';
+    card.style.setProperty('--card-accent', t.accent);
+    card.innerHTML = `
+      <div class="dept-label mono">Área</div>
+      <h3>${t.label}</h3>
+      <p>${t.blurb || ''}</p>
+      <div class="enter">Ver apresentação →</div>`;
+    card.addEventListener('click', () => openDeck(key));
+    grid.appendChild(card);
+  });
+}
+
+function goHome(){
+  document.body.classList.remove('deck-mode');
+  window.scrollTo({top:0});
+}
+
+/* ---------- DECK (apresentação) ---------- */
+const deck = document.getElementById('deck');
+const navbar = document.getElementById('navbar');
+const tabsEl = document.getElementById('tabs');
+
+function cardHTML(c){
+  return `<div class="card"><span class="num mono">${c.num||''}</span><h3>${c.title}</h3><p>${c.text}</p></div>`;
+}
+
+function renderSlide(s, i){
+  const el = document.createElement('div');
+  el.className = 'slide ' + s.type;
+  el.id = 'slide-' + i;
+  if(s.type === 'cover'){
+    el.innerHTML = `<div class="brand mono">${s.brand||''}</div><div class="eyebrow">${s.eyebrow||''}</div><h1 class="title">${s.title}</h1><p class="kicker">${s.kicker||''}</p>`;
+  } else if(s.type === 'content'){
+    el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h1 class="title">${s.title}</h1><p class="kicker">${s.kicker||''}</p>`;
+  } else if(s.type === 'grid'){
+    el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title}</h2><div class="grid-wrap" style="--cols:${s.cols||2}">${(s.cards||[]).map(cardHTML).join('')}</div>`;
+  } else if(s.type === 'list'){
+    el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title}</h2><ul class="plain-list">${(s.items||[]).map(it => `<li><span class="tag mono">${it.tag}</span><span>${it.text}</span></li>`).join('')}</ul>`;
+  } else if(s.type === 'team'){
+    el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title}</h2><div class="team-grid" style="--cols:${Math.min((s.members||[]).length,3) || 3}">${(s.members||[]).map(m => `<div class="member"><div class="role mono">${m.role}</div><div class="name">${m.name}</div></div>`).join('')}</div>`;
+  } else if(s.type === 'closing'){
+    el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h1 class="title">${s.title}</h1><p class="kicker">${s.kicker||''}</p>`;
+  }
+  return el;
+}
+
+function buildTabs(){
+  tabsEl.innerHTML = '';
+  TEAM_ORDER.forEach(key => {
+    const t = TEAMS[key];
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (key === currentTeam ? ' active' : '');
+    btn.textContent = t.label;
+    btn.addEventListener('click', () => switchTeam(key));
+    tabsEl.appendChild(btn);
+  });
+}
+
+function switchTeam(key){
+  currentTeam = key;
+  current = 0;
+  document.documentElement.style.setProperty('--accent', TEAMS[key].accent);
+  buildTabs();
+  buildDeck();
+}
+
+function openDeck(key){
+  document.body.classList.add('deck-mode');
+  switchTeam(key);
+}
+
+function buildDeck(){
+  const slides = TEAMS[currentTeam].slides;
+  deck.innerHTML = '';
+  navbar.innerHTML = '';
+  slides.forEach((s,i) => {
+    deck.appendChild(renderSlide(s,i));
+    const dot = document.createElement('button');
+    dot.className = 'nav-dot';
+    dot.setAttribute('aria-label', 'Ir para slide ' + (i+1));
+    dot.addEventListener('click', () => goTo(i));
+    navbar.appendChild(dot);
+  });
+  update();
+}
+
+function update(){
+  const slides = TEAMS[currentTeam].slides;
+  document.querySelectorAll('.slide').forEach((el,i) => el.classList.toggle('active', i===current));
+  document.querySelectorAll('.nav-dot').forEach((el,i) => el.classList.toggle('active', i===current));
+  document.getElementById('slidecount').textContent =
+    String(current+1).padStart(2,'0') + ' / ' + String(slides.length).padStart(2,'0');
+}
+
+function goTo(i){
+  const slides = TEAMS[currentTeam].slides;
+  current = Math.max(0, Math.min(slides.length-1, i));
+  update();
+}
+function next(){ goTo(current+1); }
+function prev(){ goTo(current-1); }
+
+document.getElementById('nextBtn').addEventListener('click', next);
+document.getElementById('prevBtn').addEventListener('click', prev);
+
+window.addEventListener('keydown', (e) => {
+  if(!document.body.classList.contains('deck-mode')) return;
+  if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
+  if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+  if(e.key === 'Home'){ goTo(0); }
+  if(e.key === 'End'){ const s=TEAMS[currentTeam].slides; goTo(s.length-1); }
+  if(e.key === 'Escape'){ goHome(); }
+  if(e.key === 'Tab'){
+    e.preventDefault();
+    const idx = TEAM_ORDER.indexOf(currentTeam);
+    const nextIdx = e.shiftKey ? (idx-1+TEAM_ORDER.length)%TEAM_ORDER.length : (idx+1)%TEAM_ORDER.length;
+    switchTeam(TEAM_ORDER[nextIdx]);
+  }
+});
+
+let touchStartY = null;
+window.addEventListener('touchstart', e => { if(document.body.classList.contains('deck-mode')) touchStartY = e.touches[0].clientY; });
+window.addEventListener('touchend', e => {
+  if(touchStartY === null) return;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if(dy < -50) next();
+  if(dy > 50) prev();
+  touchStartY = null;
+});
+
+function tickClock(){
+  const d = new Date();
+  document.getElementById('clock').textContent = d.toLocaleTimeString('pt-BR', {hour12:false});
+}
+setInterval(tickClock, 1000);
+tickClock();
+
+/* ---------- init ---------- */
+fillCompanyInfo();
+buildDeptGrid();
+</script>
+
+</body>
+</html>
