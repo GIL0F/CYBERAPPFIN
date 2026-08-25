@@ -1,13 +1,6 @@
-# [Nome da Empresa] — Site institucional (projeto SOC Impacta)
+# CYBERAPPFIN — Site institucional (projeto Impacta)
 
 Site estático em um único arquivo (`index.html`), sem backend — pronto pra publicar no GitHub Pages.
-
-## Como publicar
-
-1. Crie um repositório novo no GitHub (pode ser público).
-2. Faça upload deste `index.html` para a raiz do repositório (botão **Add file > Upload files**).
-3. Vá em **Settings > Pages**, escolha a branch `main` e a pasta `/ (root)`, salve.
-4. Em 1–2 minutos o site fica no ar em `https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/`.
 
 ## Como editar o conteúdo
 
