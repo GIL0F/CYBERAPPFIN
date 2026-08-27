@@ -362,6 +362,7 @@
   .tl-detail{ max-height:0; overflow:hidden; transition: max-height .35s ease; }
   .tl-detail-inner{ padding-top:10px; color: var(--text-muted); font-size:0.9rem; line-height:1.6; max-width: 60ch; }
   .tl-note{ margin-top: 20px; font-size: 0.82rem; color: var(--text-muted); max-width: 60ch; }
+  .slide-note{ margin-top: 20px; font-size: 0.82rem; color: var(--text-muted); max-width: 60ch; }
 
   /* ============ TAREFAS (aba secundária por time) ============ */
   #tasksPanel{
@@ -503,10 +504,12 @@
    }
    // color: "accent" | "success" | "danger" | "pro" | "neutral"
    // zones:[] → mostra só eyebrow/title/kicker (útil enquanto o conteúdo não está pronto)
+   // note: opcional, texto pequeno/secundário exibido no final do slide (ex: "dados provisórios")
 
    2) FLOW — animação de fluxo/processo até um destino escolhido
    { type:"flow", eyebrow:"Fluxo", title:"Fluxo de inspeção de tráfego",
      kicker:"Texto de apoio opcional, exibido mesmo se 'nodes'/'destinations' estiverem vazios.",
+     note:"Nota opcional, texto pequeno/secundário exibido no final do slide.",
      nodes:[
        { id:"internet", label:"Internet", x:340, y:40 },
        { id:"firewall", label:"Firewall", x:340, y:114, sublabel:"Inspeciona o tráfego" },
@@ -557,11 +560,60 @@ const TEAMS = {
       { title:"Missão do Network", kicker:"O time de Network é responsável pela infraestrutura de rede da Cyberappfin: desenho da topologia, segmentação por VLANs, disponibilidade e o caminho que todo o tráfego percorre antes de chegar aos sistemas da empresa. É a camada sobre a qual os demais times — especialmente SOC e IAM — constroem monitoramento e controle de acesso." },
       { type:"flow", title:"Como o tráfego flui pela rede",
         kicker:"Todo tráfego que entra na rede passa pelo firewall de borda antes de ser encaminhado à VLAN de destino pelo core switch.",
-        nodes: [], destinations: []
+        note:"Dados provisórios — topologia em validação.",
+        nodes: [
+          { id:"internet", label:"Internet", x:340, y:40 },
+          { id:"firewall", label:"Firewall", sublabel:"UniFi — inspeciona o tráfego", x:340, y:114 },
+          { id:"switch", label:"Core switch", sublabel:"Encaminha por VLAN", x:340, y:192 }
+        ],
+        destinations: [
+          { id:"vlan1", label:"VLAN 1", sublabel:"Física", x:100, y:308, color:"success" },
+          { id:"vlan50", label:"VLAN 50", sublabel:"Serviços", x:260, y:308, color:"accent" },
+          { id:"vlan99", label:"VLAN 99", sublabel:"Management", x:420, y:308, color:"pro" },
+          { id:"vlan30", label:"VLAN 30", sublabel:"Security", x:580, y:308, color:"danger" }
+        ]
       },
       { type:"zones", title:"Mapa da infraestrutura",
         kicker:"Cada VLAN agrupa hosts por função — física, serviços, management e security. Clique em um host para ver IP e papel na rede.",
-        zones: []
+        note:"Dados provisórios — topologia em validação.",
+        zones: [
+          {
+            label:"VLAN 1 — física",
+            color:"success",
+            items:[
+              { name:"UniFi Firewall", meta:"192.168.1.2", detail:"Roteador/firewall de borda. Ponto de entrada da internet para todas as VLANs." },
+              { name:"ESXi 001", meta:"192.168.1.11", detail:"Hipervisor VMware. Hospeda parte das VMs internas. Sem agente Wazuh nativo — monitoramento via API vCenter." },
+              { name:"ESXi 002", meta:"192.168.1.12", detail:"Hipervisor VMware. Mesma observação do ESXi 001 quanto a monitoramento agentless." }
+            ]
+          },
+          {
+            label:"VLAN 50 — serviços",
+            color:"accent",
+            items:[
+              { name:"NT001 — DC", meta:"10.0.50.80", detail:"Domain Controller Windows. Prioridade 1 no enrolamento do agente Wazuh." },
+              { name:"NT002 — File Server", meta:"10.0.50.81", detail:"Servidor de arquivos Windows. Segundo host da fila de enrolamento." },
+              { name:"Wazuh (SIEM)", meta:"10.0.50.103", detail:"Onde o manager do Wazuh está planejado para rodar. IP fixo ainda a confirmar." },
+              { name:"JumpServer", meta:"10.0.50.118", detail:"Salto administrativo. Único caminho de acesso à VLAN 30 (security)." },
+              { name:"Dolibarr (ERP)", meta:"10.0.50.116", detail:"Sistema ERP. Alvo de enrolamento após os hosts críticos de identidade." },
+              { name:"Zabbix (NMS)", meta:"10.0.50.10", detail:"Monitoramento de rede. Ferramenta de observabilidade complementar ao Wazuh." }
+            ]
+          },
+          {
+            label:"VLAN 99 — management",
+            color:"pro",
+            items:[
+              { name:"vCenter", meta:"10.0.99.70", detail:"Gerência dos hosts ESXi. Endereço definitivo ainda pendente de confirmação." },
+              { name:"OpenVAS (mgmt)", meta:"10.0.99.112", detail:"Interface de gerência do scanner de vulnerabilidades." }
+            ]
+          },
+          {
+            label:"VLAN 30 — security",
+            color:"danger",
+            items:[
+              { name:"OpenVAS (scan)", meta:"10.0.30.80", detail:"Interface dedicada de varredura. Segmento isolado — acesso só via JumpServer." }
+            ]
+          }
+        ]
       }
     ]
   },
@@ -756,43 +808,51 @@ function renderZonesSlide(s){
     (s.kicker ? `<p class="kicker">${s.kicker}</p>` : '');
 
   const zones = s.zones || [];
-  if(zones.length === 0) return wrap;
+  if(zones.length > 0){
+    const grid = document.createElement('div');
+    grid.className = 'zone-grid';
+    grid.style.marginTop = s.kicker ? '24px' : '0';
 
-  const grid = document.createElement('div');
-  grid.className = 'zone-grid';
-  grid.style.marginTop = s.kicker ? '24px' : '0';
+    const detail = document.createElement('div');
+    detail.className = 'zone-detail';
+    detail.innerHTML = `<div class="zd-title">Selecione um item</div><div>Clique em um item acima para ver os detalhes.</div>`;
 
-  const detail = document.createElement('div');
-  detail.className = 'zone-detail';
-  detail.innerHTML = `<div class="zd-title">Selecione um item</div><div>Clique em um item acima para ver os detalhes.</div>`;
+    zones.forEach(zone => {
+      const zEl = document.createElement('div');
+      zEl.className = 'zone';
+      zEl.style.setProperty('--zone-color', zoneColorVar(zone.color));
+      zEl.innerHTML = `<div class="zone-head"><span class="dot"></span>${zone.label||''}</div>`;
 
-  zones.forEach(zone => {
-    const zEl = document.createElement('div');
-    zEl.className = 'zone';
-    zEl.style.setProperty('--zone-color', zoneColorVar(zone.color));
-    zEl.innerHTML = `<div class="zone-head"><span class="dot"></span>${zone.label||''}</div>`;
-
-    const ul = document.createElement('ul');
-    ul.className = 'zone-items';
-    (zone.items||[]).forEach(item => {
-      const li = document.createElement('li');
-      const btn = document.createElement('button');
-      btn.className = 'zone-item';
-      btn.innerHTML = `<div class="zi-name">${item.name||''}</div>` + (item.meta ? `<div class="zi-meta mono">${item.meta}</div>` : '');
-      btn.addEventListener('click', () => {
-        wrap.querySelectorAll('.zone-item.selected').forEach(el => el.classList.remove('selected'));
-        btn.classList.add('selected');
-        detail.innerHTML = `<div class="zd-title">${item.name||''}</div><div>${item.detail||''}</div>`;
+      const ul = document.createElement('ul');
+      ul.className = 'zone-items';
+      (zone.items||[]).forEach(item => {
+        const li = document.createElement('li');
+        const btn = document.createElement('button');
+        btn.className = 'zone-item';
+        btn.innerHTML = `<div class="zi-name">${item.name||''}</div>` + (item.meta ? `<div class="zi-meta mono">${item.meta}</div>` : '');
+        btn.addEventListener('click', () => {
+          wrap.querySelectorAll('.zone-item.selected').forEach(el => el.classList.remove('selected'));
+          btn.classList.add('selected');
+          detail.innerHTML = `<div class="zd-title">${item.name||''}</div><div>${item.detail||''}</div>`;
+        });
+        li.appendChild(btn);
+        ul.appendChild(li);
       });
-      li.appendChild(btn);
-      ul.appendChild(li);
+      zEl.appendChild(ul);
+      grid.appendChild(zEl);
     });
-    zEl.appendChild(ul);
-    grid.appendChild(zEl);
-  });
 
-  wrap.appendChild(grid);
-  wrap.appendChild(detail);
+    wrap.appendChild(grid);
+    wrap.appendChild(detail);
+  }
+
+  if(s.note){
+    const note = document.createElement('p');
+    note.className = 'slide-note';
+    note.textContent = s.note;
+    wrap.appendChild(note);
+  }
+
   return wrap;
 }
 
@@ -805,7 +865,7 @@ function renderFlowSlide(s){
 
   const nodes = s.nodes||[];
   const dests = s.destinations||[];
-  if(nodes.length === 0 && dests.length === 0) return wrap;
+  if(nodes.length > 0 || dests.length > 0){
 
   const svgNS = 'http://www.w3.org/2000/svg';
   const allX = [...nodes,...dests].map(n=>n.x).concat([100]);
@@ -914,6 +974,16 @@ function renderFlowSlide(s){
 
   wrap.appendChild(controls);
   wrap.appendChild(arrival);
+
+  }
+
+  if(s.note){
+    const note = document.createElement('p');
+    note.className = 'slide-note';
+    note.textContent = s.note;
+    wrap.appendChild(note);
+  }
+
   return wrap;
 }
 
