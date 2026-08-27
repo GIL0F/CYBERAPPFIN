@@ -17,12 +17,13 @@
     --brand: #6EA8FF;      /* accent institucional da empresa */
     --accent: #F5A623;     /* accent do time atual (muda ao entrar no deck) */
 
-    /* paleta de categorias para os componentes interativos (zones/flow) */
+    /* paleta de categorias para os componentes interativos (zones/flow/tarefas) */
     --c-accent: var(--brand);
-    --c-success: #5EC98A;
-    --c-danger: #F2617A;
-    --c-pro: #B18CFF;
-    --c-neutral: #7C8894;
+    --c-success: #5EC98A;      --c-success-rgb: 94,201,138;
+    --c-danger: #F2617A;       --c-danger-rgb: 242,97,122;
+    --c-pro: #B18CFF;          --c-pro-rgb: 177,140,255;
+    --c-neutral: #7C8894;      --c-neutral-rgb: 124,136,148;
+    --c-warning: #F5C242;      --c-warning-rgb: 245,194,66;
   }
   *{ box-sizing: border-box; margin:0; padding:0; }
   html{ scroll-behavior: smooth; }
@@ -212,9 +213,20 @@
   .tab:hover{ color: var(--text-primary); }
   .tab.active{ color: var(--text-primary); border-bottom-color: var(--accent); }
 
-  #deck{ position:relative; height:100vh; z-index:1; padding-top: 82px; }
+  #viewTabs{ display:none; padding: 0 22px 12px; gap: 8px; }
+  #viewTabs.show{ display:flex; }
+  .view-tab{
+    font-family:'Space Mono', monospace; font-size: 11px; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--text-muted);
+    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
+    padding: 7px 14px; cursor: pointer; transition: color .2s, border-color .2s;
+  }
+  .view-tab:hover{ color: var(--text-primary); }
+  .view-tab.active{ color: var(--text-primary); border-color: var(--accent); }
+
+  #deck{ position:relative; height:100vh; z-index:1; padding-top: var(--topbar-h, 82px); }
   .slide{
-    position:absolute; inset:0; top:82px;
+    position:absolute; inset:0; top: var(--topbar-h, 82px);
     display:flex; flex-direction:column; justify-content:center;
     padding: 40px 90px 90px;
     opacity:0; visibility:hidden;
@@ -349,6 +361,30 @@
   .tl-step.open .tl-icon{ transform: rotate(45deg); color: var(--accent); }
   .tl-detail{ max-height:0; overflow:hidden; transition: max-height .35s ease; }
   .tl-detail-inner{ padding-top:10px; color: var(--text-muted); font-size:0.9rem; line-height:1.6; max-width: 60ch; }
+  .tl-note{ margin-top: 20px; font-size: 0.82rem; color: var(--text-muted); max-width: 60ch; }
+
+  /* ============ TAREFAS (aba secundária por time) ============ */
+  #tasksPanel{
+    display:none; position:relative; height:100vh; z-index:1; overflow-y:auto;
+    padding: calc(var(--topbar-h, 82px) + 40px) 90px 90px;
+  }
+  .tasks-wrap{ max-width: 900px; width:100%; }
+  .task-list{ display:flex; flex-direction:column; }
+  .task-row{
+    display:flex; align-items:flex-start; justify-content:space-between; gap:20px;
+    padding: 18px 0; border-bottom: 1px solid var(--line);
+  }
+  .task-row:last-child{ border-bottom:none; }
+  .task-main{ flex:1; min-width:0; }
+  .task-meta{ font-weight:700; font-size:1.02rem; margin-bottom:6px; }
+  .task-desc{ color: var(--text-muted); font-size:0.92rem; line-height:1.55; }
+  .task-badge{
+    font-family:'Space Mono', monospace; font-size: 11px; letter-spacing:0.04em;
+    padding: 4px 12px; border-radius: 999px; white-space:nowrap; flex-shrink:0; margin-top:2px;
+  }
+  .task-badge.not_started{ background: rgba(var(--c-neutral-rgb),0.15); color: var(--c-neutral); }
+  .task-badge.in_progress{ background: rgba(var(--c-warning-rgb),0.15); color: var(--c-warning); }
+  .task-badge.done{ background: rgba(var(--c-success-rgb),0.15); color: var(--c-success); }
 
   #navbar{
     position: fixed; bottom:0; left:0; right:0; height:60px;
@@ -368,6 +404,8 @@
     .grid-wrap, .team-grid, .zone-grid{ grid-template-columns: 1fr !important; }
     #arrows{ display:none; }
     .matrix-body-inner{ padding-left: 18px; }
+    #tasksPanel{ padding-left: 24px; padding-right: 24px; }
+    .task-row{ flex-direction:column; gap:10px; }
   }
   @media (prefers-reduced-motion: reduce){ .slide{ transition: opacity .01s; transform:none; } }
 </style>
@@ -427,9 +465,11 @@
       </div>
     </div>
     <div id="tabs"></div>
+    <div id="viewTabs"></div>
   </div>
 
   <div id="deck"></div>
+  <div id="tasksPanel"></div>
 
   <div id="arrows">
     <button id="prevBtn" aria-label="Slide anterior">↑</button>
@@ -454,6 +494,7 @@
 
    1) ZONES — zonas clicáveis agrupadas (clique num item revela detalhe)
    { type:"zones", eyebrow:"Zonas", title:"Topologia de rede",
+     kicker:"Texto de apoio opcional, exibido mesmo se 'zones' estiver vazio.",
      zones:[
        { label:"VLAN 50 — serviços", color:"accent", items:[
          { name:"NT001 — DC", meta:"10.0.50.80", detail:"Domain Controller Windows." }
@@ -461,9 +502,11 @@
      ]
    }
    // color: "accent" | "success" | "danger" | "pro" | "neutral"
+   // zones:[] → mostra só eyebrow/title/kicker (útil enquanto o conteúdo não está pronto)
 
    2) FLOW — animação de fluxo/processo até um destino escolhido
    { type:"flow", eyebrow:"Fluxo", title:"Fluxo de inspeção de tráfego",
+     kicker:"Texto de apoio opcional, exibido mesmo se 'nodes'/'destinations' estiverem vazios.",
      nodes:[
        { id:"internet", label:"Internet", x:340, y:40 },
        { id:"firewall", label:"Firewall", x:340, y:114, sublabel:"Inspeciona o tráfego" },
@@ -484,10 +527,18 @@
 
    4) TIMELINE — linha do tempo vertical com etapas
    { type:"timeline", eyebrow:"Processo", title:"Jornada de venda consultiva",
+     note:"Nota opcional, exibida em texto pequeno abaixo da linha do tempo.",
      steps:[
        { title:"Diagnóstico oculto", detail:"O time de CS ou o contador identifica a oportunidade..." }
      ]
    }
+
+   TAREFAS — cada time pode ganhar um campo opcional "tasks" (array). Se
+   presente e com ao menos 1 item, o site mostra uma aba "Tarefas" ao lado
+   de "Apresentação" na página do time. status: "not_started" | "in_progress" | "done".
+   tasks:[
+     { meta:"Nome curto da tarefa", desc:"Descrição da tarefa.", status:"not_started" }
+   ]
    ========================================================================= */
 
 const COMPANY = {
@@ -569,26 +620,48 @@ const TEAMS = {
     label: "SOC", accent: "#F5A623",
     blurb: "Monitoramento contínuo do ambiente, detecção de eventos de segurança e resposta a incidentes, com ferramentas como SIEM e escaneamento de vulnerabilidades.",
     slides: [
-      { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Security Operations Center", title:"Time de SOC", kicker:"Time responsável pela segurança operacional da empresa: monitoramento, detecção e resposta a incidentes." },
-      { type:"content", eyebrow:"01 · Missão", title:"O que o SOC entrega", kicker:"Descreva aqui, em 2–3 frases, o objetivo do time: o que vocês monitoram, protegem e para quem." },
-      { type:"team", eyebrow:"02 · Equipe", title:"Quem faz parte do time", members:[
-        { role:"Função", name:"Nome do integrante" },
-        { role:"Função", name:"Nome do integrante" },
-        { role:"Função", name:"Nome do integrante" }
+      { title:"Missão do SOC", kicker:"O SOC da Cyberappfin é responsável pela visibilidade contínua sobre o ambiente de TI da empresa: monitorar eventos de segurança em tempo real, detectar comportamentos anômalos e coordenar a resposta a incidentes antes que se tornem impacto ao negócio. Como financeira regulada, a Cyberappfin lida com dados sensíveis de clientes e operações de crédito — o que torna a detecção precoce não apenas uma boa prática, mas parte da conformidade com Bacen e LGPD." },
+      { type:"zones", title:"Ambiente monitorado",
+        kicker:"O SOC acompanha o ambiente segmentado por VLANs, priorizando hosts de identidade e infraestrutura crítica. Endereçamento e camadas de segurança em fase de validação.",
+        zones: []
+      },
+      { type:"flow", title:"Como o tráfego é inspecionado",
+        kicker:"Todo tráfego que entra na rede passa por inspeção no firewall de borda antes de ser encaminhado à VLAN de destino. É esse ponto de inspeção que alimenta os alertas que o SOC investiga.",
+        nodes: [], destinations: []
+      },
+      { type:"matrix", title:"Stack de ferramentas", rows:[
+        { title:"Wazuh", detail:"SIEM — correlaciona logs e eventos de segurança de todos os hosts com agente instalado, gera alertas." },
+        { title:"Zabbix", detail:"Monitoramento de rede e disponibilidade — complementa o Wazuh com visão de saúde da infraestrutura." },
+        { title:"OpenVAS", detail:"Scanner de vulnerabilidades — varre a rede em busca de falhas conhecidas antes que sejam exploradas." },
+        { title:"JumpServer", detail:"Acesso administrativo — ponto único e auditável de entrada para os segmentos mais sensíveis." }
       ]},
-      { type:"timeline", eyebrow:"03 · Processos", title:"Fluxo de resposta a incidentes", steps:[
-        { title:"Detecção", detail:"Como um alerta é identificado — fontes de monitoramento, regras de correlação e o que dispara a abertura de um caso." },
-        { title:"Triagem", detail:"Classificação de severidade — critérios usados para priorizar o caso e decidir quem deve ser acionado." },
-        { title:"Resposta", detail:"Ações tomadas para conter o incidente — contenção, erradicação e comunicação com as partes envolvidas." },
-        { title:"Encerramento", detail:"Documentação e lições aprendidas — registro do caso, causa raiz e ajustes de processo para evitar recorrência." }
+      { type:"timeline", title:"Ciclo de resposta a incidentes", steps:[
+        { title:"Detecção", detail:"Wazuh ou Zabbix geram alerta a partir de um evento anômalo." },
+        { title:"Triagem", detail:"O analista classifica severidade e confirma se é incidente real ou falso positivo." },
+        { title:"Contenção", detail:"Isola o host ou segmento afetado para impedir propagação." },
+        { title:"Erradicação", detail:"Remove a causa raiz — malware, acesso indevido ou vulnerabilidade explorada." },
+        { title:"Recuperação", detail:"Restaura o serviço afetado e confirma normalidade." },
+        { title:"Lição aprendida", detail:"Documenta o incidente e ajusta regras e alertas para reduzir recorrência." }
       ]},
-      { type:"grid", eyebrow:"04 · Ferramentas", title:"Stack utilizada pelo time", cols:2, cards:[
-        { num:"TOOL / 01", title:"Nome da ferramenta", text:"Para que serve e como o time usa no dia a dia." },
-        { num:"TOOL / 02", title:"Nome da ferramenta", text:"Para que serve e como o time usa no dia a dia." },
-        { num:"TOOL / 03", title:"Nome da ferramenta", text:"Para que serve e como o time usa no dia a dia." },
-        { num:"TOOL / 04", title:"Nome da ferramenta", text:"Para que serve e como o time usa no dia a dia." }
-      ]},
-      { type:"closing", eyebrow:"Perguntas", title:"Dúvidas?", kicker:"SOC · [Nome da Empresa]" }
+      { type:"timeline", title:"Roadmap de implementação",
+        note:"Endereço do manager Wazuh e topologia final: a confirmar.",
+        steps:[
+          { title:"NT001 (Domain Controller)", detail:"Primeiro alvo de enrolamento, por concentrar identidade de todo o domínio." },
+          { title:"NT002 (File Server)", detail:"Segundo alvo, por armazenar dados críticos de arquivos." },
+          { title:"JumpServer", detail:"Enrolado em seguida, por ser o único caminho administrativo à VLAN de security." },
+          { title:"Dolibarr / MFA", detail:"Sistemas de negócio e autenticação multifator." },
+          { title:"Observabilidade (Zabbix, OpenVAS)", detail:"Ferramentas de suporte ao próprio SOC." },
+          { title:"Hosts ESXi / rede", detail:"Monitorados via API, sem agente nativo instalado (agentless)." }
+        ]
+      },
+      { title:"Fechamento", kicker:"O SOC entrega à Cyberappfin o que nenhuma outra área sozinha consegue: visibilidade sobre o que está acontecendo agora e capacidade de reagir antes que um evento vire prejuízo. Essa visibilidade sustenta, na prática, os controles de gestão de incidentes e conformidade que a GRC formaliza em política." }
+    ],
+    tasks: [
+      { meta: "Implantação Wazuh (SIEM/EDR)", desc: "Implantar o Wazuh para coleta, correlação e monitoramento de eventos de segurança.", status: "not_started" },
+      { meta: "Instalação Zabbix (monitoramento)", desc: "Configurar o Zabbix para monitoramento da infraestrutura e disponibilidade dos ativos.", status: "not_started" },
+      { meta: "Integração pfSense (Suricata EVE JSON)", desc: "Integrar os eventos do Suricata/pfSense ao ambiente de monitoramento e segurança.", status: "not_started" },
+      { meta: "Configuração Grafana (dashboards)", desc: "Criar dashboards para visualização dos principais indicadores de infraestrutura e segurança.", status: "not_started" },
+      { meta: "OpenVAS (varredura)", desc: "Configurar o OpenVAS para realização de varreduras e identificação de vulnerabilidades.", status: "not_started" }
     ]
   },
 
@@ -620,6 +693,7 @@ const TEAM_ORDER = ["network","iam","grc","soc","endpoint"];
 
 let currentTeam = TEAM_ORDER[0];
 let current = 0;
+let currentView = 'slides';
 
 /* ---------- HOME ---------- */
 function fillCompanyInfo(){
@@ -658,7 +732,12 @@ function goHome(){
 /* ---------- DECK (apresentação) ---------- */
 const deck = document.getElementById('deck');
 const navbar = document.getElementById('navbar');
+const arrowsEl = document.getElementById('arrows');
 const tabsEl = document.getElementById('tabs');
+const viewTabsEl = document.getElementById('viewTabs');
+const tasksPanel = document.getElementById('tasksPanel');
+const topbarEl = document.getElementById('topbar');
+const TASK_STATUS_LABEL = { not_started:'Não iniciado', in_progress:'Em andamento', done:'Concluído' };
 
 function cardHTML(c){
   return `<div class="card"><span class="num mono">${c.num||''}</span><h3>${c.title}</h3><p>${c.text}</p></div>`;
@@ -673,16 +752,21 @@ function zoneColorVar(name){
 function renderZonesSlide(s){
   const wrap = document.createElement('div');
   wrap.className = 'zones-wrap';
-  wrap.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title||''}</h2>`;
+  wrap.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title||''}</h2>` +
+    (s.kicker ? `<p class="kicker">${s.kicker}</p>` : '');
+
+  const zones = s.zones || [];
+  if(zones.length === 0) return wrap;
 
   const grid = document.createElement('div');
   grid.className = 'zone-grid';
+  grid.style.marginTop = s.kicker ? '24px' : '0';
 
   const detail = document.createElement('div');
   detail.className = 'zone-detail';
   detail.innerHTML = `<div class="zd-title">Selecione um item</div><div>Clique em um item acima para ver os detalhes.</div>`;
 
-  (s.zones||[]).forEach(zone => {
+  zones.forEach(zone => {
     const zEl = document.createElement('div');
     zEl.className = 'zone';
     zEl.style.setProperty('--zone-color', zoneColorVar(zone.color));
@@ -716,10 +800,13 @@ function renderZonesSlide(s){
 function renderFlowSlide(s){
   const wrap = document.createElement('div');
   wrap.className = 'flow-wrap';
-  wrap.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title||''}</h2>`;
+  wrap.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title||''}</h2>` +
+    (s.kicker ? `<p class="kicker">${s.kicker}</p>` : '');
 
   const nodes = s.nodes||[];
   const dests = s.destinations||[];
+  if(nodes.length === 0 && dests.length === 0) return wrap;
+
   const svgNS = 'http://www.w3.org/2000/svg';
   const allX = [...nodes,...dests].map(n=>n.x).concat([100]);
   const allY = [...nodes,...dests].map(n=>n.y).concat([100]);
@@ -730,6 +817,7 @@ function renderFlowSlide(s){
   svg.setAttribute('class','flow-svg');
   svg.setAttribute('viewBox', `0 0 ${maxX} ${maxY}`);
   svg.setAttribute('preserveAspectRatio','xMidYMin meet');
+  if(s.kicker) svg.style.marginTop = '24px';
 
   for(let i=0;i<nodes.length-1;i++){
     const a = nodes[i], b = nodes[i+1];
@@ -891,6 +979,12 @@ function renderTimelineSlide(s){
   });
 
   wrap.appendChild(list);
+  if(s.note){
+    const note = document.createElement('p');
+    note.className = 'tl-note';
+    note.textContent = s.note;
+    wrap.appendChild(note);
+  }
   return wrap;
 }
 
@@ -938,14 +1032,83 @@ function buildTabs(){
 function switchTeam(key){
   currentTeam = key;
   current = 0;
+  currentView = 'slides';
   document.documentElement.style.setProperty('--accent', TEAMS[key].accent);
   buildTabs();
+  buildViewTabs();
   buildDeck();
+  buildTasksPanel();
+  applyView();
 }
 
 function openDeck(key){
   document.body.classList.add('deck-mode');
   switchTeam(key);
+}
+
+/* ---------- Abas Apresentação / Tarefas ---------- */
+function buildViewTabs(){
+  viewTabsEl.innerHTML = '';
+  const tasks = TEAMS[currentTeam].tasks || [];
+  if(tasks.length === 0){
+    viewTabsEl.classList.remove('show');
+    updateTopbarHeight();
+    return;
+  }
+  viewTabsEl.classList.add('show');
+  [['slides','Apresentação'], ['tasks','Tarefas']].forEach(([key,label]) => {
+    const btn = document.createElement('button');
+    btn.className = 'view-tab' + (currentView === key ? ' active' : '');
+    btn.textContent = label;
+    btn.addEventListener('click', () => switchView(key));
+    viewTabsEl.appendChild(btn);
+  });
+  updateTopbarHeight();
+}
+
+function switchView(view){
+  currentView = view;
+  viewTabsEl.querySelectorAll('.view-tab').forEach((btn,i) => btn.classList.toggle('active', (i===0 ? 'slides' : 'tasks') === view));
+  applyView();
+}
+
+function applyView(){
+  const showSlides = currentView === 'slides';
+  deck.style.display = showSlides ? '' : 'none';
+  arrowsEl.style.display = showSlides ? '' : 'none';
+  navbar.style.display = showSlides ? '' : 'none';
+  tasksPanel.style.display = showSlides ? 'none' : 'block';
+  updateTopbarHeight();
+}
+
+function updateTopbarHeight(){
+  document.documentElement.style.setProperty('--topbar-h', topbarEl.offsetHeight + 'px');
+}
+
+function buildTasksPanel(){
+  const t = TEAMS[currentTeam];
+  const tasks = t.tasks || [];
+  tasksPanel.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'tasks-wrap';
+  wrap.innerHTML = `<div class="eyebrow">Tarefas</div><h2 class="title">Tarefas do time ${t.label}</h2>`;
+
+  const list = document.createElement('div');
+  list.className = 'task-list';
+  tasks.forEach(task => {
+    const status = task.status || 'not_started';
+    const row = document.createElement('div');
+    row.className = 'task-row';
+    row.innerHTML = `
+      <div class="task-main">
+        <div class="task-meta">${task.meta||''}</div>
+        <div class="task-desc">${task.desc||''}</div>
+      </div>
+      <span class="task-badge ${status}">${TASK_STATUS_LABEL[status] || TASK_STATUS_LABEL.not_started}</span>`;
+    list.appendChild(row);
+  });
+  wrap.appendChild(list);
+  tasksPanel.appendChild(wrap);
 }
 
 function buildDeck(){
@@ -984,10 +1147,12 @@ document.getElementById('prevBtn').addEventListener('click', prev);
 
 window.addEventListener('keydown', (e) => {
   if(!document.body.classList.contains('deck-mode')) return;
-  if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
-  if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
-  if(e.key === 'Home'){ goTo(0); }
-  if(e.key === 'End'){ const s=TEAMS[currentTeam].slides; goTo(s.length-1); }
+  if(currentView === 'slides'){
+    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
+    if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+    if(e.key === 'Home'){ goTo(0); }
+    if(e.key === 'End'){ const s=TEAMS[currentTeam].slides; goTo(s.length-1); }
+  }
   if(e.key === 'Escape'){ goHome(); }
   if(e.key === 'Tab'){
     e.preventDefault();
@@ -1001,10 +1166,16 @@ let touchStartY = null;
 window.addEventListener('touchstart', e => { if(document.body.classList.contains('deck-mode')) touchStartY = e.touches[0].clientY; });
 window.addEventListener('touchend', e => {
   if(touchStartY === null) return;
-  const dy = e.changedTouches[0].clientY - touchStartY;
-  if(dy < -50) next();
-  if(dy > 50) prev();
+  if(currentView === 'slides'){
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if(dy < -50) next();
+    if(dy > 50) prev();
+  }
   touchStartY = null;
+});
+
+window.addEventListener('resize', () => {
+  if(document.body.classList.contains('deck-mode')) updateTopbarHeight();
 });
 
 function tickClock(){
