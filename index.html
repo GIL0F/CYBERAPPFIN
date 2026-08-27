@@ -554,21 +554,15 @@ const TEAMS = {
     label: "Network", accent: "#3ED6C4",
     blurb: "Infraestrutura de rede segmentada por VLANs, com firewall de borda e monitoramento de disponibilidade — a espinha dorsal sobre a qual os demais times operam com segurança.",
     slides: [
-      { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Network", title:"Time de Network", kicker:"Descreva aqui o escopo do time: infraestrutura, topologia, disponibilidade." },
-      { type:"content", eyebrow:"01 · Missão", title:"O que o time entrega", kicker:"Texto sobre a missão do time de rede." },
-      { type:"team", eyebrow:"02 · Equipe", title:"Quem faz parte do time", members:[
-        { role:"Função", name:"Nome do integrante" },
-        { role:"Função", name:"Nome do integrante" }
-      ]},
-      { type:"list", eyebrow:"03 · Processos", title:"Principais processos", items:[
-        { tag:"01", text:"Descreva um processo do time" },
-        { tag:"02", text:"Descreva outro processo" }
-      ]},
-      { type:"grid", eyebrow:"04 · Ferramentas", title:"Stack utilizada", cols:2, cards:[
-        { num:"TOOL / 01", title:"Nome da ferramenta", text:"Para que serve." },
-        { num:"TOOL / 02", title:"Nome da ferramenta", text:"Para que serve." }
-      ]},
-      { type:"closing", eyebrow:"Perguntas", title:"Dúvidas?", kicker:"Network · [Nome da Empresa]" }
+      { title:"Missão do Network", kicker:"O time de Network é responsável pela infraestrutura de rede da Cyberappfin: desenho da topologia, segmentação por VLANs, disponibilidade e o caminho que todo o tráfego percorre antes de chegar aos sistemas da empresa. É a camada sobre a qual os demais times — especialmente SOC e IAM — constroem monitoramento e controle de acesso." },
+      { type:"flow", title:"Como o tráfego flui pela rede",
+        kicker:"Todo tráfego que entra na rede passa pelo firewall de borda antes de ser encaminhado à VLAN de destino pelo core switch.",
+        nodes: [], destinations: []
+      },
+      { type:"zones", title:"Mapa da infraestrutura",
+        kicker:"Cada VLAN agrupa hosts por função — física, serviços, management e security. Clique em um host para ver IP e papel na rede.",
+        zones: []
+      }
     ]
   },
 
