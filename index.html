@@ -16,6 +16,13 @@
     --text-muted: #7C8894;
     --brand: #6EA8FF;      /* accent institucional da empresa */
     --accent: #F5A623;     /* accent do time atual (muda ao entrar no deck) */
+
+    /* paleta de categorias para os componentes interativos (zones/flow) */
+    --c-accent: var(--brand);
+    --c-success: #5EC98A;
+    --c-danger: #F2617A;
+    --c-pro: #B18CFF;
+    --c-neutral: #7C8894;
   }
   *{ box-sizing: border-box; margin:0; padding:0; }
   html{ scroll-behavior: smooth; }
@@ -213,6 +220,7 @@
     opacity:0; visibility:hidden;
     transform: translateY(18px);
     transition: opacity .5s ease, transform .5s ease, visibility .5s;
+    overflow-y: auto;
   }
   .slide.active{ opacity:1; visibility:visible; transform: translateY(0); }
 
@@ -255,6 +263,93 @@
   .slide.closing{ align-items:center; text-align:center; }
   .slide.closing h1{ max-width: none; }
 
+  /* ============ COMPONENTE: zones (zonas clicáveis agrupadas) ============ */
+  .zones-wrap{ max-width: 1100px; width:100%; }
+  .zone-grid{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px; margin-bottom: 20px;
+  }
+  .zone{ background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 16px 18px; }
+  .zone-head{
+    display:flex; align-items:center; gap:8px;
+    font-family:'Space Mono', monospace; font-size: 12px; letter-spacing:0.06em; text-transform:uppercase;
+    color: var(--zone-color, var(--accent)); margin-bottom: 12px;
+  }
+  .zone-head .dot{ width:8px; height:8px; border-radius:50%; background: var(--zone-color, var(--accent)); flex-shrink:0; }
+  .zone-items{ list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .zone-item{
+    width:100%; text-align:left; background: var(--panel-2); border:1px solid var(--line); border-radius:4px;
+    padding: 10px 12px; cursor:pointer; color: var(--text-primary); font-family: inherit;
+    transition: border-color .2s, background .2s;
+  }
+  .zone-item .zi-name{ font-weight:600; font-size:0.92rem; }
+  .zone-item .zi-meta{ font-family:'Space Mono', monospace; font-size:11px; color: var(--text-muted); margin-top:3px; }
+  .zone-item:hover{ border-color: var(--zone-color, var(--accent)); }
+  .zone-item.selected{ border-color: var(--zone-color, var(--accent)); background: rgba(255,255,255,0.05); }
+  .zone-detail{
+    background: var(--panel); border:1px solid var(--line); border-left: 3px solid var(--accent);
+    border-radius:6px; padding: 16px 20px; min-height: 60px; max-width: 1100px;
+    color: var(--text-muted); font-size:0.95rem; line-height:1.55; transition: border-color .4s;
+  }
+  .zone-detail .zd-title{ color: var(--text-primary); font-weight:700; margin-bottom:6px; font-family:'Space Mono', monospace; font-size:0.85rem; letter-spacing:0.05em; }
+
+  /* ============ COMPONENTE: flow (animação de fluxo/processo) ============ */
+  .flow-wrap{ max-width: 900px; width:100%; }
+  .flow-svg{ width:100%; height:auto; max-height: 46vh; display:block; overflow:visible; }
+  .flow-svg text{ fill: var(--text-primary); font-family:'Inter', sans-serif; }
+  .fn-sub{ fill: var(--text-muted) !important; }
+  .flow-link{ stroke: var(--line); stroke-width:2; }
+  .flow-route{ stroke: var(--line); stroke-width:1.5; stroke-dasharray:4 4; opacity:0.5; transition: stroke .3s, opacity .3s; }
+  .flow-route.active{ stroke: var(--accent); opacity:1; }
+  .flow-dot{ transition:none; }
+  .flow-controls{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
+  .flow-btn{
+    font-family:'Space Mono', monospace; font-size:12px; letter-spacing:0.05em; text-transform:uppercase;
+    background: var(--panel); border:1px solid var(--line); color: var(--text-primary);
+    padding: 9px 14px; border-radius:4px; cursor:pointer; display:flex; align-items:center; gap:8px;
+    transition: border-color .2s, color .2s;
+  }
+  .flow-btn .fb-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+  .flow-btn:hover, .flow-btn.active{ border-color: var(--accent); color: var(--accent); }
+  .flow-arrival{ margin-top:14px; font-family:'Space Mono', monospace; font-size:13px; color: var(--accent); min-height:18px; }
+
+  /* ============ COMPONENTE: matrix (lista expansível / accordion) ============ */
+  .matrix-wrap{ max-width: 900px; width:100%; display:flex; flex-direction:column; gap:8px; }
+  .matrix-row{ background: var(--panel); border:1px solid var(--line); border-radius:4px; overflow:hidden; transition: border-color .2s; }
+  .matrix-row.open{ border-color: var(--accent); }
+  .matrix-head{
+    width:100%; display:flex; align-items:center; gap:14px; padding: 14px 18px;
+    background:none; border:none; color: var(--text-primary); font-size:0.98rem; text-align:left;
+    cursor:pointer; font-family: inherit;
+  }
+  .matrix-head .mh-num{ font-family:'Space Mono', monospace; font-size:12px; color: var(--accent); width: 3ch; flex-shrink:0; }
+  .matrix-head .mh-icon{ margin-left:auto; font-family:'Space Mono', monospace; color: var(--text-muted); transition: transform .3s; flex-shrink:0; }
+  .matrix-row.open .mh-icon{ transform: rotate(45deg); color: var(--accent); }
+  .matrix-body{ max-height:0; overflow:hidden; transition: max-height .35s ease; }
+  .matrix-body-inner{ padding: 0 18px 18px calc(18px + 3ch + 14px); color: var(--text-muted); font-size:0.9rem; line-height:1.6; }
+
+  /* ============ COMPONENTE: timeline (linha do tempo vertical) ============ */
+  .timeline-wrap{ max-width: 760px; width:100%; }
+  .tl-step{ display:flex; gap:18px; position:relative; padding-bottom:26px; }
+  .tl-step:last-child{ padding-bottom:0; }
+  .tl-step::before{ content:""; position:absolute; left:15px; top:32px; bottom:0; width:2px; background: var(--line); }
+  .tl-step:last-child::before{ display:none; }
+  .tl-num{
+    flex-shrink:0; width:32px; height:32px; border-radius:50%; background: var(--panel);
+    border:2px solid var(--accent); color: var(--accent); display:flex; align-items:center; justify-content:center;
+    font-family:'Space Mono', monospace; font-size:13px; z-index:1; transition: border-color .4s, color .4s;
+  }
+  .tl-content{ flex:1; padding-top:4px; }
+  .tl-title-btn{
+    width:100%; text-align:left; background:none; border:none; color: var(--text-primary);
+    font-size:1rem; font-weight:600; cursor:pointer; font-family: inherit; padding:0;
+    display:flex; justify-content:space-between; align-items:center; gap:10px;
+  }
+  .tl-title-btn .tl-icon{ font-family:'Space Mono', monospace; color: var(--text-muted); transition: transform .3s; flex-shrink:0; }
+  .tl-step.open .tl-icon{ transform: rotate(45deg); color: var(--accent); }
+  .tl-detail{ max-height:0; overflow:hidden; transition: max-height .35s ease; }
+  .tl-detail-inner{ padding-top:10px; color: var(--text-muted); font-size:0.9rem; line-height:1.6; max-width: 60ch; }
+
   #navbar{
     position: fixed; bottom:0; left:0; right:0; height:60px;
     display:flex; align-items:center; justify-content:center; gap: 10px; z-index: 50;
@@ -270,8 +365,9 @@
 
   @media (max-width: 720px){
     .slide{ padding: 30px 24px 80px; }
-    .grid-wrap, .team-grid{ grid-template-columns: 1fr !important; }
+    .grid-wrap, .team-grid, .zone-grid{ grid-template-columns: 1fr !important; }
     #arrows{ display:none; }
+    .matrix-body-inner{ padding-left: 18px; }
   }
   @media (prefers-reduced-motion: reduce){ .slide{ transition: opacity .01s; transform:none; } }
 </style>
@@ -350,6 +446,48 @@
    COMPANY  → dados institucionais da home (nome, tagline, sobre, contato)
    TEAMS    → cada time edita SÓ o seu bloco. "blurb" aparece no card da
               home; "slides" é o conteúdo do modo apresentação do time.
+
+   Cada slide tem um campo "type". Sem "type", cai no comportamento padrão
+   de texto simples (eyebrow + title + kicker). Além dos tipos originais
+   (cover, content, grid, list, team, closing), existem 4 componentes
+   interativos — basta colar um destes objetos dentro de "slides":
+
+   1) ZONES — zonas clicáveis agrupadas (clique num item revela detalhe)
+   { type:"zones", eyebrow:"Zonas", title:"Topologia de rede",
+     zones:[
+       { label:"VLAN 50 — serviços", color:"accent", items:[
+         { name:"NT001 — DC", meta:"10.0.50.80", detail:"Domain Controller Windows." }
+       ]}
+     ]
+   }
+   // color: "accent" | "success" | "danger" | "pro" | "neutral"
+
+   2) FLOW — animação de fluxo/processo até um destino escolhido
+   { type:"flow", eyebrow:"Fluxo", title:"Fluxo de inspeção de tráfego",
+     nodes:[
+       { id:"internet", label:"Internet", x:340, y:40 },
+       { id:"firewall", label:"Firewall", x:340, y:114, sublabel:"Inspeciona o tráfego" },
+       { id:"switch", label:"Core switch", x:340, y:192, sublabel:"Encaminha por VLAN" }
+     ],
+     destinations:[
+       { id:"vlan1", label:"VLAN 1", sublabel:"Física", x:100, y:308, color:"success" },
+       { id:"vlan50", label:"VLAN 50", sublabel:"Serviços", x:260, y:308, color:"accent" }
+     ]
+   }
+
+   3) MATRIX — lista expansível / accordion
+   { type:"matrix", eyebrow:"Referência", title:"Domínios ISO 27001",
+     rows:[
+       { title:"Política de segurança da informação", detail:"Diretrizes formais que orientam..." }
+     ]
+   }
+
+   4) TIMELINE — linha do tempo vertical com etapas
+   { type:"timeline", eyebrow:"Processo", title:"Jornada de venda consultiva",
+     steps:[
+       { title:"Diagnóstico oculto", detail:"O time de CS ou o contador identifica a oportunidade..." }
+     ]
+   }
    ========================================================================= */
 
 const COMPANY = {
@@ -438,11 +576,11 @@ const TEAMS = {
         { role:"Função", name:"Nome do integrante" },
         { role:"Função", name:"Nome do integrante" }
       ]},
-      { type:"list", eyebrow:"03 · Processos", title:"Fluxo de resposta a incidentes", items:[
-        { tag:"01", text:"Detecção — como um alerta é identificado" },
-        { tag:"02", text:"Triagem — classificação de severidade" },
-        { tag:"03", text:"Resposta — ações tomadas para conter" },
-        { tag:"04", text:"Encerramento — documentação e lições aprendidas" }
+      { type:"timeline", eyebrow:"03 · Processos", title:"Fluxo de resposta a incidentes", steps:[
+        { title:"Detecção", detail:"Como um alerta é identificado — fontes de monitoramento, regras de correlação e o que dispara a abertura de um caso." },
+        { title:"Triagem", detail:"Classificação de severidade — critérios usados para priorizar o caso e decidir quem deve ser acionado." },
+        { title:"Resposta", detail:"Ações tomadas para conter o incidente — contenção, erradicação e comunicação com as partes envolvidas." },
+        { title:"Encerramento", detail:"Documentação e lições aprendidas — registro do caso, causa raiz e ajustes de processo para evitar recorrência." }
       ]},
       { type:"grid", eyebrow:"04 · Ferramentas", title:"Stack utilizada pelo time", cols:2, cards:[
         { num:"TOOL / 01", title:"Nome da ferramenta", text:"Para que serve e como o time usa no dia a dia." },
@@ -526,22 +664,261 @@ function cardHTML(c){
   return `<div class="card"><span class="num mono">${c.num||''}</span><h3>${c.title}</h3><p>${c.text}</p></div>`;
 }
 
+function zoneColorVar(name){
+  const map = { accent:'var(--brand)', success:'var(--c-success)', danger:'var(--c-danger)', pro:'var(--c-pro)', neutral:'var(--c-neutral)' };
+  return map[name] || map.accent;
+}
+
+/* ---------- Componente: zones ---------- */
+function renderZonesSlide(s){
+  const wrap = document.createElement('div');
+  wrap.className = 'zones-wrap';
+  wrap.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title||''}</h2>`;
+
+  const grid = document.createElement('div');
+  grid.className = 'zone-grid';
+
+  const detail = document.createElement('div');
+  detail.className = 'zone-detail';
+  detail.innerHTML = `<div class="zd-title">Selecione um item</div><div>Clique em um item acima para ver os detalhes.</div>`;
+
+  (s.zones||[]).forEach(zone => {
+    const zEl = document.createElement('div');
+    zEl.className = 'zone';
+    zEl.style.setProperty('--zone-color', zoneColorVar(zone.color));
+    zEl.innerHTML = `<div class="zone-head"><span class="dot"></span>${zone.label||''}</div>`;
+
+    const ul = document.createElement('ul');
+    ul.className = 'zone-items';
+    (zone.items||[]).forEach(item => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.className = 'zone-item';
+      btn.innerHTML = `<div class="zi-name">${item.name||''}</div>` + (item.meta ? `<div class="zi-meta mono">${item.meta}</div>` : '');
+      btn.addEventListener('click', () => {
+        wrap.querySelectorAll('.zone-item.selected').forEach(el => el.classList.remove('selected'));
+        btn.classList.add('selected');
+        detail.innerHTML = `<div class="zd-title">${item.name||''}</div><div>${item.detail||''}</div>`;
+      });
+      li.appendChild(btn);
+      ul.appendChild(li);
+    });
+    zEl.appendChild(ul);
+    grid.appendChild(zEl);
+  });
+
+  wrap.appendChild(grid);
+  wrap.appendChild(detail);
+  return wrap;
+}
+
+/* ---------- Componente: flow ---------- */
+function renderFlowSlide(s){
+  const wrap = document.createElement('div');
+  wrap.className = 'flow-wrap';
+  wrap.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title||''}</h2>`;
+
+  const nodes = s.nodes||[];
+  const dests = s.destinations||[];
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const allX = [...nodes,...dests].map(n=>n.x).concat([100]);
+  const allY = [...nodes,...dests].map(n=>n.y).concat([100]);
+  const maxX = Math.max(...allX) + 100;
+  const maxY = Math.max(...allY) + 60;
+
+  const svg = document.createElementNS(svgNS,'svg');
+  svg.setAttribute('class','flow-svg');
+  svg.setAttribute('viewBox', `0 0 ${maxX} ${maxY}`);
+  svg.setAttribute('preserveAspectRatio','xMidYMin meet');
+
+  for(let i=0;i<nodes.length-1;i++){
+    const a = nodes[i], b = nodes[i+1];
+    const line = document.createElementNS(svgNS,'line');
+    line.setAttribute('class','flow-link');
+    line.setAttribute('x1',a.x); line.setAttribute('y1',a.y);
+    line.setAttribute('x2',b.x); line.setAttribute('y2',b.y);
+    svg.appendChild(line);
+  }
+
+  const last = nodes[nodes.length-1] || {x:0,y:0};
+  const routeEls = {};
+  dests.forEach(d => {
+    const route = document.createElementNS(svgNS,'line');
+    route.setAttribute('class','flow-route');
+    route.setAttribute('x1',last.x); route.setAttribute('y1',last.y);
+    route.setAttribute('x2',d.x); route.setAttribute('y2',d.y);
+    svg.appendChild(route);
+    routeEls[d.id] = route;
+  });
+
+  nodes.forEach(n => {
+    const g = document.createElementNS(svgNS,'g');
+    g.setAttribute('class','flow-node');
+    g.innerHTML = `<circle cx="${n.x}" cy="${n.y}" r="26" fill="var(--panel)" stroke="var(--line)" stroke-width="2"></circle>
+      <text x="${n.x}" y="${n.y+4}" text-anchor="middle" font-size="11" font-family="Space Mono, monospace">${n.label||''}</text>`;
+    svg.appendChild(g);
+    if(n.sublabel){
+      const sub = document.createElementNS(svgNS,'text');
+      sub.setAttribute('class','fn-sub');
+      sub.setAttribute('x', n.x+38); sub.setAttribute('y', n.y+4);
+      sub.setAttribute('font-size','11');
+      sub.textContent = n.sublabel;
+      svg.appendChild(sub);
+    }
+  });
+
+  dests.forEach(d => {
+    const g = document.createElementNS(svgNS,'g');
+    g.setAttribute('class','flow-dest');
+    g.innerHTML = `<circle cx="${d.x}" cy="${d.y}" r="22" fill="var(--panel-2)" stroke="${zoneColorVar(d.color)}" stroke-width="2"></circle>
+      <text x="${d.x}" y="${d.y+4}" text-anchor="middle" font-size="10" font-weight="600">${d.label||''}</text>`;
+    svg.appendChild(g);
+  });
+
+  const dot = document.createElementNS(svgNS,'circle');
+  dot.setAttribute('class','flow-dot');
+  dot.setAttribute('r','6');
+  dot.setAttribute('cx', last.x); dot.setAttribute('cy', last.y);
+  dot.setAttribute('fill','var(--brand)');
+  dot.style.opacity = '0';
+  svg.appendChild(dot);
+
+  wrap.appendChild(svg);
+
+  const controls = document.createElement('div');
+  controls.className = 'flow-controls';
+  const arrival = document.createElement('div');
+  arrival.className = 'flow-arrival';
+
+  dests.forEach(d => {
+    const btn = document.createElement('button');
+    btn.className = 'flow-btn';
+    btn.innerHTML = `<span class="fb-dot" style="background:${zoneColorVar(d.color)}"></span>${d.label||''}`;
+    btn.addEventListener('click', () => {
+      wrap.querySelectorAll('.flow-btn.active').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      Object.values(routeEls).forEach(r=>r.classList.remove('active'));
+      routeEls[d.id].classList.add('active');
+      arrival.textContent = '';
+      dot.style.opacity = '1';
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      dot.style.transition = 'none';
+      dot.setAttribute('cx', last.x); dot.setAttribute('cy', last.y);
+      void dot.getBoundingClientRect(); // força reflow antes de reativar a transição
+
+      if(reduced){
+        dot.setAttribute('cx', d.x); dot.setAttribute('cy', d.y);
+        arrival.textContent = `Chegada: ${d.label}` + (d.sublabel ? ` — ${d.sublabel}` : '');
+      } else {
+        dot.style.transition = 'cx 1s ease, cy 1s ease';
+        requestAnimationFrame(() => {
+          dot.setAttribute('cx', d.x);
+          dot.setAttribute('cy', d.y);
+        });
+        setTimeout(() => {
+          arrival.textContent = `Chegada: ${d.label}` + (d.sublabel ? ` — ${d.sublabel}` : '');
+        }, 1050);
+      }
+    });
+    controls.appendChild(btn);
+  });
+
+  wrap.appendChild(controls);
+  wrap.appendChild(arrival);
+  return wrap;
+}
+
+/* ---------- Componente: matrix ---------- */
+function renderMatrixSlide(s){
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title||''}</h2>`;
+
+  const list = document.createElement('div');
+  list.className = 'matrix-wrap';
+  (s.rows||[]).forEach((row,i) => {
+    const rEl = document.createElement('div');
+    rEl.className = 'matrix-row';
+    const head = document.createElement('button');
+    head.className = 'matrix-head';
+    head.innerHTML = `<span class="mh-num mono">${String(i+1).padStart(2,'0')}</span><span>${row.title||''}</span><span class="mh-icon mono">+</span>`;
+    const body = document.createElement('div');
+    body.className = 'matrix-body';
+    body.innerHTML = `<div class="matrix-body-inner">${row.detail||''}</div>`;
+    head.addEventListener('click', () => {
+      const isOpen = rEl.classList.toggle('open');
+      body.style.maxHeight = isOpen ? body.scrollHeight + 'px' : '0px';
+    });
+    rEl.appendChild(head);
+    rEl.appendChild(body);
+    list.appendChild(rEl);
+  });
+
+  wrap.appendChild(list);
+  return wrap;
+}
+
+/* ---------- Componente: timeline ---------- */
+function renderTimelineSlide(s){
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title||''}</h2>`;
+
+  const list = document.createElement('div');
+  list.className = 'timeline-wrap';
+  (s.steps||[]).forEach((step,i) => {
+    const stepEl = document.createElement('div');
+    stepEl.className = 'tl-step';
+    const num = document.createElement('div');
+    num.className = 'tl-num mono';
+    num.textContent = String(i+1).padStart(2,'0');
+    const content = document.createElement('div');
+    content.className = 'tl-content';
+    const btn = document.createElement('button');
+    btn.className = 'tl-title-btn';
+    btn.innerHTML = `<span>${step.title||''}</span><span class="tl-icon mono">+</span>`;
+    const detail = document.createElement('div');
+    detail.className = 'tl-detail';
+    detail.innerHTML = `<div class="tl-detail-inner">${step.detail||''}</div>`;
+    btn.addEventListener('click', () => {
+      const isOpen = stepEl.classList.toggle('open');
+      detail.style.maxHeight = isOpen ? detail.scrollHeight + 'px' : '0px';
+    });
+    content.appendChild(btn);
+    content.appendChild(detail);
+    stepEl.appendChild(num);
+    stepEl.appendChild(content);
+    list.appendChild(stepEl);
+  });
+
+  wrap.appendChild(list);
+  return wrap;
+}
+
 function renderSlide(s, i){
+  const type = s.type || 'content';
   const el = document.createElement('div');
-  el.className = 'slide ' + s.type;
+  el.className = 'slide ' + type;
   el.id = 'slide-' + i;
-  if(s.type === 'cover'){
+  if(type === 'cover'){
     el.innerHTML = `<div class="brand mono">${s.brand||''}</div><div class="eyebrow">${s.eyebrow||''}</div><h1 class="title">${s.title}</h1><p class="kicker">${s.kicker||''}</p>`;
-  } else if(s.type === 'content'){
+  } else if(type === 'content'){
     el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h1 class="title">${s.title}</h1><p class="kicker">${s.kicker||''}</p>`;
-  } else if(s.type === 'grid'){
+  } else if(type === 'grid'){
     el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title}</h2><div class="grid-wrap" style="--cols:${s.cols||2}">${(s.cards||[]).map(cardHTML).join('')}</div>`;
-  } else if(s.type === 'list'){
+  } else if(type === 'list'){
     el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title}</h2><ul class="plain-list">${(s.items||[]).map(it => `<li><span class="tag mono">${it.tag}</span><span>${it.text}</span></li>`).join('')}</ul>`;
-  } else if(s.type === 'team'){
+  } else if(type === 'team'){
     el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h2 class="title">${s.title}</h2><div class="team-grid" style="--cols:${Math.min((s.members||[]).length,3) || 3}">${(s.members||[]).map(m => `<div class="member"><div class="role mono">${m.role}</div><div class="name">${m.name}</div></div>`).join('')}</div>`;
-  } else if(s.type === 'closing'){
+  } else if(type === 'closing'){
     el.innerHTML = `<div class="eyebrow">${s.eyebrow||''}</div><h1 class="title">${s.title}</h1><p class="kicker">${s.kicker||''}</p>`;
+  } else if(type === 'zones'){
+    el.appendChild(renderZonesSlide(s));
+  } else if(type === 'flow'){
+    el.appendChild(renderFlowSlide(s));
+  } else if(type === 'matrix'){
+    el.appendChild(renderMatrixSlide(s));
+  } else if(type === 'timeline'){
+    el.appendChild(renderTimelineSlide(s));
   }
   return el;
 }
