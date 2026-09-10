@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cyberappfin — Protótipo V2 (prédio 3D + andares)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-void:#F4F7FA; --panel:#FFFFFF; --panel-2:#EDF1F6; --line:#D8E0E9;
+    --text-primary:#0E1A26; --text-muted:#5C6B7A; --brand:#1D6FE0;
+    --f-network:#0E9C8B; --f-iam:#6D3FD4; --f-soc:#C2700A; --f-endpoint:#1B9455; --f-grc:#B07D0A;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{
+    background:var(--bg-void); color:var(--text-primary);
+    font-family:'Inter',sans-serif; overflow-x:hidden;
+  }
+  .mono{ font-family:'Space Mono',monospace; }
+
+  /* canvas 3D fixo no fundo */
+  #stage{ position:fixed; inset:0; z-index:0; pointer-events:none; }
+  #stage canvas{ width:100%; height:100%; display:block; }
+
+  #loader{
+    position:fixed; inset:0; z-index:5; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; gap:14px; background:var(--bg-void);
+    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--text-muted); transition:opacity .6s ease;
+  }
+  #loader.hide{ opacity:0; pointer-events:none; visibility:hidden; }
+  #loader .bar{ width:180px; height:2px; background:var(--line); overflow:hidden; }
+  #loader .bar i{ display:block; height:100%; width:0%; background:var(--brand); transition:width .3s ease; }
+  #loader .err{ max-width:44ch; text-align:center; text-transform:none; letter-spacing:0; line-height:1.6; font-family:'Inter',sans-serif; font-size:13px; color:#D23A57; }
+
+  /* ---------- HERO ---------- */
+  .hero-spacer{ height:220vh; position:relative; z-index:2; pointer-events:none; }
+  .hero-pin{
+    position:sticky; top:0; height:100vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:flex-start; padding:11vh 24px 0;
+    will-change:transform,opacity;
+  }
+  .hero-eyebrow{
+    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--brand); margin-bottom:14px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .hero-eyebrow::before{ content:""; width:22px; height:1px; background:var(--brand); }
+  .hero-title{
+    font-family:'Space Mono',monospace; font-weight:700;
+    font-size:clamp(2.4rem,6vw,4.4rem); line-height:1.02; text-align:center;
+  }
+  .hero-sub{
+    margin-top:16px; color:var(--text-muted); font-size:1.05rem; line-height:1.6;
+    max-width:46ch; text-align:center;
+  }
+  .scroll-cue{
+    position:absolute; bottom:5vh; left:50%; transform:translateX(-50%);
+    display:flex; flex-direction:column; align-items:center; gap:8px;
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.15em;
+    text-transform:uppercase; color:var(--text-muted);
+  }
+  .scroll-cue .arrow{
+    width:12px; height:12px; border-right:2px solid var(--text-muted);
+    border-bottom:2px solid var(--text-muted); transform:rotate(45deg);
+    animation:cue 1.6s ease-in-out infinite;
+  }
+  @keyframes cue{ 0%,100%{ transform:rotate(45deg) translate(0,0); opacity:.45; } 50%{ transform:rotate(45deg) translate(3px,3px); opacity:1; } }
+
+  /* marcador de andar que aparece durante a descida */
+  .level-hud{
+    position:fixed; left:5vw; top:50%; transform:translateY(-50%);
+    z-index:3; display:flex; flex-direction:column-reverse; gap:12px;
+    opacity:0; transition:opacity .5s ease; pointer-events:none;
+  }
+  .level-hud.show{ opacity:1; }
+  .level-hud .lv{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--text-muted); transition:color .3s ease;
+  }
+  .level-hud .lv .bar{ width:22px; height:2px; background:var(--line); transition:all .3s ease; }
+  .level-hud .lv.on{ color:var(--text-primary); }
+  .level-hud .lv.on .bar{ width:40px; background:var(--lv-color); }
+
+  /* ---------- ANDAR (detalhe) ---------- */
+  .floor-spacer{ height:240vh; position:relative; z-index:2; }
+  .floor-pin{
+    position:sticky; top:0; height:100vh; display:flex; align-items:center;
+    justify-content:center; padding:24px;
+  }
+  .floor-inner{
+    width:min(1140px,94vw); display:grid; grid-template-columns:minmax(280px,400px) 1fr;
+    gap:34px; align-items:center; will-change:transform,opacity;
+    background:rgba(244,247,250,.82); backdrop-filter:blur(8px);
+    border:1px solid var(--line); border-radius:12px; padding:30px 32px;
+  }
+  .floor-num{
+    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--floor-color); margin-bottom:10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .floor-num::before{ content:""; width:22px; height:1px; background:var(--floor-color); }
+  .floor-inner h2{ font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(1.6rem,3vw,2.2rem); }
+  .floor-blurb{ margin-top:14px; color:var(--text-muted); font-size:.94rem; line-height:1.6; }
+  .floor-hint{
+    margin-top:18px; font-family:'Space Mono',monospace; font-size:11px;
+    letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted);
+    display:flex; align-items:center; gap:8px;
+  }
+  .floor-hint .dot{ width:8px; height:8px; border-radius:50%; background:var(--floor-color); animation:blink 2s ease-in-out infinite; }
+  @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
+  #lottieChar{ width:100%; max-width:230px; margin-top:6px; }
+  #floorSvg{ width:100%; height:auto; }
+
+  .hotspot{ cursor:pointer; pointer-events:auto; }
+  .hotspot .ring{ animation:ping 2.4s ease-out infinite; transform-box:fill-box; transform-origin:center; }
+  @keyframes ping{ 0%{ transform:scale(.6); opacity:.85; } 70%{ transform:scale(1.9); opacity:0; } 100%{ opacity:0; } }
+  .hotspot .core{ transition:r .2s ease; }
+  .hotspot:hover .core, .hotspot:focus .core{ r:9; }
+  .hotspot:focus{ outline:none; }
+
+  /* ---------- painel ---------- */
+  .overlay{ position:fixed; inset:0; background:rgba(14,26,38,.28); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:40; }
+  .overlay.show{ opacity:1; pointer-events:auto; }
+  .panel{
+    position:fixed; top:0; right:0; height:100vh; width:min(400px,90vw);
+    background:var(--panel); border-left:1px solid var(--line);
+    box-shadow:-16px 0 44px rgba(14,26,38,.14);
+    transform:translateX(102%); transition:transform .42s cubic-bezier(.22,.61,.36,1);
+    z-index:50; padding:34px 28px; overflow-y:auto;
+  }
+  .panel.open{ transform:translateX(0); }
+  .panel .close{
+    position:absolute; top:18px; right:18px; width:32px; height:32px;
+    background:none; border:1px solid var(--line); border-radius:4px;
+    color:var(--text-muted); cursor:pointer; font-size:14px; line-height:1;
+  }
+  .panel h3{
+    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.1em;
+    text-transform:uppercase; color:var(--pc,var(--brand));
+    display:flex; align-items:center; gap:9px; margin-bottom:6px;
+  }
+  .panel h3 .sw{ width:9px; height:9px; border-radius:50%; background:var(--pc,var(--brand)); }
+  .panel .count{ font-size:.8rem; color:var(--text-muted); margin-bottom:20px; }
+  .host{ padding:15px 0; border-bottom:1px solid var(--line); }
+  .host:last-child{ border-bottom:none; }
+  .host .name{ font-weight:700; font-size:.98rem; }
+  .host .meta{ font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); margin:3px 0 7px; }
+  .host .detail{ font-size:.87rem; color:var(--text-muted); line-height:1.55; }
+
+  .teaser{
+    position:relative; z-index:2; min-height:80vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:60px 24px; gap:10px;
+  }
+  .teaser .lvl{
+    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--text-muted);
+    border:1px dashed var(--line); border-radius:4px; padding:9px 18px; background:rgba(255,255,255,.6);
+  }
+  .teaser .note{ margin-top:16px; font-size:.85rem; color:var(--text-muted); max-width:46ch; line-height:1.6; }
+
+  @media (max-width:900px){
+    .floor-inner{ grid-template-columns:1fr; }
+    .level-hud{ display:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage"><canvas id="scene"></canvas></div>
+
+<div id="loader">
+  <span id="loaderMsg">carregando o prédio</span>
+  <span class="bar"><i id="loaderBar"></i></span>
+  <span class="err" id="loaderErr" hidden></span>
+</div>
+
+<div class="level-hud" id="levelHud"></div>
+
+<section class="hero-spacer" id="heroSpacer">
+  <div class="hero-pin" id="heroPin">
+    <div class="hero-eyebrow">Faculdade Impacta · Simulação Empresarial</div>
+    <h1 class="hero-title">Cyberappfin</h1>
+    <p class="hero-sub">Cada andar do prédio é uma área da empresa. Role para descer nível por nível.</p>
+    <div class="scroll-cue"><span>role para entrar</span><span class="arrow"></span></div>
+  </div>
+</section>
+
+<section class="floor-spacer" id="floorSpacer" style="--floor-color:var(--f-network);">
+  <div class="floor-pin">
+    <div class="floor-inner" id="floorInner">
+      <div>
+        <div class="floor-num">Nível 01</div>
+        <h2>Network</h2>
+        <p class="floor-blurb">Infraestrutura de rede segmentada por VLANs, com firewall de borda e monitoramento de disponibilidade — a espinha dorsal sobre a qual os demais times operam com segurança.</p>
+        <div class="floor-hint"><span class="dot"></span>clique nos pontos para explorar</div>
+        <div id="lottieChar"></div>
+      </div>
+      <div>
+        <svg id="floorSvg" viewBox="0 0 900 520" role="img" aria-label="Planta isométrica do andar de rede"></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="teaser">
+  <span class="lvl">Nível 02 · IAM</span>
+  <span class="lvl">Nível 03 · SOC</span>
+  <span class="lvl">Nível 04 · Endpoint</span>
+  <span class="lvl">Nível 05 · GRC</span>
+  <p class="note">Protótipo — a home e o nível 01 estão montados. Os demais andares seguem o mesmo modelo.</p>
+</section>
+
+<div class="overlay" id="overlay"></div>
+<aside class="panel" id="panel" aria-hidden="true">
+  <button class="close" id="closePanel" aria-label="Fechar">✕</button>
+  <h3><span class="sw"></span><span id="panelTitleText"></span></h3>
+  <div class="count" id="panelCount"></div>
+  <div id="panelHosts"></div>
+</aside>
+
+<script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie_light.min.js"></script>
+
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+} }
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+/* =========================================================================
+   PROTÓTIPO V2
+   - hero: modelo 3D fintech-hq.glb, câmera desce andar por andar no scroll
+   - nível 01: planta isométrica em SVG com hotspots + personagem Lottie
+   ATENÇÃO: precisa ser servido por HTTP (o .glb e o .json não carregam via file://)
+   ========================================================================= */
+
+const TEAMS = [
+  { floor:'floor_1', num:'01', name:'Network',  color:'#0E9C8B' },
+  { floor:'floor_2', num:'02', name:'IAM',      color:'#6D3FD4' },
+  { floor:'floor_3', num:'03', name:'SOC',      color:'#C2700A' },
+  { floor:'floor_4', num:'04', name:'Endpoint', color:'#1B9455' },
+  { floor:'floor_5', num:'05', name:'GRC',      color:'#B07D0A' }
+];
+
+/* ---------------- cena 3D ---------------- */
+const canvas   = document.getElementById('scene');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setSize(window.innerWidth, window.innerHeight, false);
+
+const scene  = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 200);
+
+scene.add(new THREE.AmbientLight(0xffffff, 1.35));
+const key = new THREE.DirectionalLight(0xffffff, 2.1);
+key.position.set(7, 12, 9);
+scene.add(key);
+const fill = new THREE.DirectionalLight(0xcfe0f5, 0.9);
+fill.position.set(-8, 5, -6);
+scene.add(fill);
+
+const floorGroups = {};   // floor_N -> THREE.Object3D
+const floorCenter = {};   // floor_N -> Y do centro
+const accentMats  = {};   // floor_N -> [materiais de glow/accent]
+let building = null;
+
+const loaderEl  = document.getElementById('loader');
+const loaderBar = document.getElementById('loaderBar');
+const loaderErr = document.getElementById('loaderErr');
+const loaderMsg = document.getElementById('loaderMsg');
+
+new GLTFLoader().load('fintech-hq.glb',
+  gltf => {
+    building = gltf.scene;
+    scene.add(building);
+
+    TEAMS.forEach(t => {
+      const g = building.getObjectByName(t.floor);
+      if(!g) return;
+      floorGroups[t.floor] = g;
+      floorCenter[t.floor] = new THREE.Box3().setFromObject(g).getCenter(new THREE.Vector3()).y;
+
+      // os 9 materiais do modelo são compartilhados entre os andares — clonar por andar
+      // é o que permite destacar/apagar um andar sem afetar os outros
+      const mats = [];
+      g.traverse(o => {
+        if(!o.isMesh) return;
+        o.material = o.material.clone();
+        o.userData.baseOpacity = o.material.opacity;
+        if(/glow|accent/i.test(o.name)){
+          o.material.color.set(t.color);
+          if(o.material.emissive) o.material.emissive.set(t.color);
+          o.material.emissiveIntensity = 0.25;
+          mats.push(o.material);
+        }
+      });
+      accentMats[t.floor] = mats;
+    });
+
+    frameBuilding(building);
+    buildLevelHud();
+    loaderEl.classList.add('hide');
+    onScroll();
+  },
+  ev => {
+    if(ev.total) loaderBar.style.width = Math.round(ev.loaded/ev.total*100) + '%';
+  },
+  () => {
+    loaderMsg.textContent = 'não foi possível carregar o modelo';
+    loaderErr.hidden = false;
+    loaderErr.textContent = 'O arquivo fintech-hq.glb não pôde ser lido. Abra esta página por um servidor HTTP (ex: rodar "python -m http.server" na pasta) — abrir o arquivo direto pelo Windows (file://) bloqueia o carregamento do modelo 3D.';
+  }
+);
+
+/* enquadramentos da câmera — calculados a partir do tamanho real do modelo */
+let CAM_FAR  = { pos:new THREE.Vector3(11.5, 8.5, 13.5), look:new THREE.Vector3(0, 0.6, 0) };
+let CAM_NEAR = { pos:new THREE.Vector3(7.0, -1.6, 8.2),  look:new THREE.Vector3(0, -3.6, 0) };
+
+function frameBuilding(obj){
+  const box    = new THREE.Box3().setFromObject(obj);
+  const size   = box.getSize(new THREE.Vector3());
+  const center = box.getCenter(new THREE.Vector3());
+  const maxDim = Math.max(size.x, size.y, size.z);
+  const fov    = camera.fov * Math.PI/180;
+  // distância pra caber o prédio inteiro, com folga (o prédio é alto: usa a altura)
+  // a mira sobe k*altura pra empurrar o prédio pra baixo no quadro (libera o topo pro texto);
+  // a distância precisa cobrir metade da altura + esse deslocamento, senão a base corta
+  const k    = 0.20;
+  const dist = (size.y * (0.5 + k)) / Math.tan(fov/2) * 1.24;
+
+  // direção normalizada: a distância real da câmera tem que ser exatamente "dist"
+  const dirFar  = new THREE.Vector3(0.58, 0.40, 0.71).normalize();
+  const lookFar = new THREE.Vector3(center.x, center.y + size.y*k, center.z);
+  CAM_FAR = { look: lookFar, pos: lookFar.clone().add(dirFar.clone().multiplyScalar(dist)) };
+
+  // vista de dentro: perto do andar 1 (base do prédio)
+  const y1       = floorCenter['floor_1'] ?? (box.min.y + size.y*0.12);
+  const distNear = maxDim * 1.05;
+  const dirNear  = new THREE.Vector3(0.62, 0.16, 0.77).normalize();
+  const lookNear = new THREE.Vector3(center.x, y1, center.z);
+  CAM_NEAR = { look: lookNear, pos: lookNear.clone().add(dirNear.clone().multiplyScalar(distNear)) };
+}
+
+const easeInOut = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
+
+function applyCamera(p){
+  const e = easeInOut(Math.min(1, Math.max(0, p)));
+  camera.position.lerpVectors(CAM_FAR.pos, CAM_NEAR.pos, e);
+  const look = new THREE.Vector3().lerpVectors(CAM_FAR.look, CAM_NEAR.look, e);
+  camera.lookAt(look);
+  if(building) building.rotation.y = -0.35 + e * 0.5;
+}
+
+function highlightFloor(activeKey){
+  TEAMS.forEach(t => {
+    const on = t.floor === activeKey;
+    (accentMats[t.floor] || []).forEach(m => {
+      m.emissiveIntensity = on ? 1.5 : 0.12;
+      m.opacity = on ? 1 : 0.55;
+      m.transparent = !on;
+    });
+    const dim = !on && activeKey !== null;
+    const g = floorGroups[t.floor];
+    if(g) g.traverse(o => {
+      if(!o.isMesh || /glow|accent/i.test(o.name)) return;
+      const base = o.userData.baseOpacity ?? 1;
+      o.material.opacity = dim ? base * 0.45 : base;
+      o.material.transparent = dim || base < 1;
+    });
+  });
+  document.querySelectorAll('.level-hud .lv').forEach(el => {
+    el.classList.toggle('on', el.dataset.floor === activeKey);
+  });
+}
+
+function buildLevelHud(){
+  const hud = document.getElementById('levelHud');
+  hud.innerHTML = '';
+  TEAMS.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'lv';
+    el.dataset.floor = t.floor;
+    el.style.setProperty('--lv-color', t.color);
+    el.innerHTML = `<span class="bar"></span><span>${t.num} · ${t.name}</span>`;
+    hud.appendChild(el);
+  });
+}
+
+/* loop contínuo: com preserveDrawingBuffer=false, renderizar só no scroll
+   deixa o buffer vazio entre frames (e o rAF já deixa o movimento mais suave) */
+function render(){ renderer.render(scene, camera); }
+(function tick(){ requestAnimationFrame(tick); renderer.render(scene, camera); })();
+
+window.addEventListener('resize', () => {
+  renderer.setSize(window.innerWidth, window.innerHeight, false);
+  camera.aspect = window.innerWidth/window.innerHeight;
+  camera.updateProjectionMatrix();
+  onScroll();
+});
+
+/* ---------------- planta isométrica do nível 01 ---------------- */
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const makeProj = (ox,oy,tw,th,tz) => (gx,gy,gz) => ({
+  x: ox + (gx-gy)*(tw/2),
+  y: oy + (gx+gy)*(th/2) - gz*tz
+});
+function shade(hex, pct){
+  const n = parseInt(hex.slice(1),16), c = v => Math.min(255,Math.max(0,v));
+  const r=c((n>>16)+Math.round(255*pct)), g=c(((n>>8)&0xff)+Math.round(255*pct)), b=c((n&0xff)+Math.round(255*pct));
+  return '#'+((r<<16)|(g<<8)|b).toString(16).padStart(6,'0');
+}
+function poly(pts, fill, extra={}){
+  const p = document.createElementNS(SVG_NS,'polygon');
+  p.setAttribute('points', pts.map(q=>`${q.x.toFixed(1)},${q.y.toFixed(1)}`).join(' '));
+  p.setAttribute('fill', fill);
+  Object.entries(extra).forEach(([k,v]) => p.setAttribute(k,v));
+  return p;
+}
+function cube(proj,gx,gy,sx,sy,z0,z1,color){
+  const g = document.createElementNS(SVG_NS,'g');
+  const top   = [proj(gx,gy,z1), proj(gx+sx,gy,z1), proj(gx+sx,gy+sy,z1), proj(gx,gy+sy,z1)];
+  const right = [proj(gx+sx,gy,z0), proj(gx+sx,gy+sy,z0), proj(gx+sx,gy+sy,z1), proj(gx+sx,gy,z1)];
+  const left  = [proj(gx,gy+sy,z0), proj(gx+sx,gy+sy,z0), proj(gx+sx,gy+sy,z1), proj(gx,gy+sy,z1)];
+  g.appendChild(poly(left,  shade(color,-0.20)));
+  g.appendChild(poly(right, shade(color,-0.07)));
+  g.appendChild(poly(top,   shade(color, 0.20)));
+  g._right = right;
+  return g;
+}
+function onFace(c,u,v){
+  const [p00,p10,p11,p01] = c;
+  const a = {x:p00.x+(p10.x-p00.x)*u, y:p00.y+(p10.y-p00.y)*u};
+  const b = {x:p01.x+(p11.x-p01.x)*u, y:p01.y+(p11.y-p01.y)*u};
+  return {x:a.x+(b.x-a.x)*v, y:a.y+(b.y-a.y)*v};
+}
+
+/* dados reais do time de Network (mesmos do site atual) */
+const ZONES = [
+  { id:'vlan1', label:'VLAN 1 — física', color:'#1B9455', gx:1, gy:0.5, items:[
+    { name:'UniFi Firewall', meta:'192.168.1.2',  detail:'Roteador/firewall de borda. Ponto de entrada da internet para todas as VLANs.' },
+    { name:'ESXi 001',       meta:'192.168.1.11', detail:'Hipervisor VMware. Hospeda parte das VMs internas. Sem agente Wazuh nativo — monitoramento via API vCenter.' },
+    { name:'ESXi 002',       meta:'192.168.1.12', detail:'Hipervisor VMware. Mesma observação do ESXi 001 quanto a monitoramento agentless.' }
+  ]},
+  { id:'vlan50', label:'VLAN 50 — serviços', color:'#1D6FE0', gx:6.2, gy:0.5, items:[
+    { name:'NT001 — DC',          meta:'10.0.50.80',  detail:'Domain Controller Windows. Prioridade 1 no enrolamento do agente Wazuh.' },
+    { name:'NT002 — File Server', meta:'10.0.50.81',  detail:'Servidor de arquivos Windows. Segundo host da fila de enrolamento.' },
+    { name:'Wazuh (SIEM)',        meta:'10.0.50.103', detail:'Onde o manager do Wazuh está planejado para rodar. IP fixo ainda a confirmar.' },
+    { name:'JumpServer',          meta:'10.0.50.118', detail:'Salto administrativo. Único caminho de acesso à VLAN 30 (security).' },
+    { name:'Dolibarr (ERP)',      meta:'10.0.50.116', detail:'Sistema ERP. Alvo de enrolamento após os hosts críticos de identidade.' },
+    { name:'Zabbix (NMS)',        meta:'10.0.50.10',  detail:'Monitoramento de rede. Ferramenta de observabilidade complementar ao Wazuh.' }
+  ]},
+  { id:'vlan99', label:'VLAN 99 — management', color:'#6D3FD4', gx:1, gy:4, items:[
+    { name:'vCenter',        meta:'10.0.99.70',  detail:'Gerência dos hosts ESXi. Endereço definitivo ainda pendente de confirmação.' },
+    { name:'OpenVAS (mgmt)', meta:'10.0.99.112', detail:'Interface de gerência do scanner de vulnerabilidades.' }
+  ]},
+  { id:'vlan30', label:'VLAN 30 — security', color:'#D23A57', gx:6.2, gy:4, items:[
+    { name:'OpenVAS (scan)', meta:'10.0.30.80', detail:'Interface dedicada de varredura. Segmento isolado — acesso só via JumpServer.' }
+  ]}
+];
+
+function buildFloorPlan(){
+  const svg = document.getElementById('floorSvg');
+  svg.innerHTML = '';
+  const proj = makeProj(450, 290, 76, 38, 29);
+  const W = 10, D = 6.2, WALL = 2.4;
+
+  svg.appendChild(poly([proj(0,0,0),proj(W,0,0),proj(W,D,0),proj(0,D,0)], '#E7EDF4', { stroke:'#D8E0E9','stroke-width':1.5 }));
+  for(let i=2;i<W;i+=2){ const a=proj(i,0,0), b=proj(i,D,0); const l=document.createElementNS(SVG_NS,'line');
+    l.setAttribute('x1',a.x);l.setAttribute('y1',a.y);l.setAttribute('x2',b.x);l.setAttribute('y2',b.y);
+    l.setAttribute('stroke','#D8E0E9');l.setAttribute('stroke-width','1'); svg.appendChild(l); }
+  for(let j=2;j<D;j+=2){ const a=proj(0,j,0), b=proj(W,j,0); const l=document.createElementNS(SVG_NS,'line');
+    l.setAttribute('x1',a.x);l.setAttribute('y1',a.y);l.setAttribute('x2',b.x);l.setAttribute('y2',b.y);
+    l.setAttribute('stroke','#D8E0E9');l.setAttribute('stroke-width','1'); svg.appendChild(l); }
+
+  svg.appendChild(poly([proj(0,0,0),proj(W,0,0),proj(W,0,WALL),proj(0,0,WALL)], '#DCE4EC', { stroke:'#CBD5DF','stroke-width':1 }));
+  svg.appendChild(poly([proj(0,0,0),proj(0,D,0),proj(0,D,WALL),proj(0,0,WALL)], '#D2DBE5', { stroke:'#CBD5DF','stroke-width':1 }));
+
+  ZONES.forEach(z => {
+    svg.appendChild(cube(proj, z.gx, z.gy, 0.85, 0.85, 0, 2.0, z.color));
+    const tall = cube(proj, z.gx+1.05, z.gy, 0.85, 0.85, 0, 2.8, z.color);
+    svg.appendChild(tall);
+    [0.30,0.50,0.70].forEach(v => {
+      const a = onFace(tall._right, 0.15, v), b = onFace(tall._right, 0.85, v);
+      const l = document.createElementNS(SVG_NS,'line');
+      l.setAttribute('x1',a.x);l.setAttribute('y1',a.y);l.setAttribute('x2',b.x);l.setAttribute('y2',b.y);
+      l.setAttribute('stroke', shade(z.color,-0.28)); l.setAttribute('stroke-width','2');
+      svg.appendChild(l);
+    });
+
+    const hp   = proj(z.gx+1.47, z.gy+0.42, 3.35);
+    const base = proj(z.gx+1.47, z.gy+0.42, 2.8);
+    const g = document.createElementNS(SVG_NS,'g');
+    g.setAttribute('class','hotspot');
+    g.setAttribute('role','button');
+    g.setAttribute('tabindex','0');
+    g.setAttribute('aria-label','Ver detalhes de ' + z.label);
+
+    const stem = document.createElementNS(SVG_NS,'line');
+    stem.setAttribute('x1',base.x);stem.setAttribute('y1',base.y);
+    stem.setAttribute('x2',hp.x);stem.setAttribute('y2',hp.y);
+    stem.setAttribute('stroke',z.color);stem.setAttribute('stroke-width','1.5');
+    stem.setAttribute('stroke-dasharray','3 3');
+
+    const ring = document.createElementNS(SVG_NS,'circle');
+    ring.setAttribute('class','ring');
+    ring.setAttribute('cx',hp.x);ring.setAttribute('cy',hp.y);ring.setAttribute('r',9);ring.setAttribute('fill',z.color);
+
+    const core = document.createElementNS(SVG_NS,'circle');
+    core.setAttribute('class','core');
+    core.setAttribute('cx',hp.x);core.setAttribute('cy',hp.y);core.setAttribute('r',7);
+    core.setAttribute('fill',z.color);core.setAttribute('stroke','#FFFFFF');core.setAttribute('stroke-width','2.5');
+
+    const label = document.createElementNS(SVG_NS,'text');
+    label.setAttribute('x',hp.x);label.setAttribute('y',hp.y-17);
+    label.setAttribute('text-anchor','middle');
+    label.setAttribute('font-family','Space Mono, monospace');
+    label.setAttribute('font-size','11');label.setAttribute('font-weight','700');
+    label.setAttribute('fill', shade(z.color,-0.12));
+    label.textContent = z.label.split(' — ')[0];
+
+    g.append(stem, ring, core, label);
+    g.addEventListener('click', () => openPanel(z));
+    g.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPanel(z); } });
+    svg.appendChild(g);
+  });
+}
+
+/* ---------------- painel ---------------- */
+const panel = document.getElementById('panel');
+const overlay = document.getElementById('overlay');
+function openPanel(z){
+  panel.style.setProperty('--pc', z.color);
+  document.getElementById('panelTitleText').textContent = z.label;
+  document.getElementById('panelCount').textContent = z.items.length + (z.items.length===1?' host':' hosts');
+  const box = document.getElementById('panelHosts');
+  box.innerHTML = '';
+  z.items.forEach(it => {
+    const el = document.createElement('div');
+    el.className = 'host';
+    el.innerHTML = '<div class="name"></div><div class="meta mono"></div><div class="detail"></div>';
+    el.querySelector('.name').textContent = it.name;
+    el.querySelector('.meta').textContent = it.meta;
+    el.querySelector('.detail').textContent = it.detail;
+    box.appendChild(el);
+  });
+  panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
+  overlay.classList.add('show');
+}
+function closePanel(){
+  panel.classList.remove('open'); panel.setAttribute('aria-hidden','true');
+  overlay.classList.remove('show');
+}
+document.getElementById('closePanel').addEventListener('click', closePanel);
+overlay.addEventListener('click', closePanel);
+window.addEventListener('keydown', e => { if(e.key==='Escape') closePanel(); });
+
+/* ---------------- personagem Lottie ---------------- */
+if(window.lottie){
+  lottie.loadAnimation({
+    container: document.getElementById('lottieChar'),
+    renderer: 'svg', loop: true, autoplay: true, path: 'Tech.json'
+  });
+}
+
+/* ---------------- scroll ---------------- */
+function progressOf(el){
+  const r = el.getBoundingClientRect();
+  const total = r.height - window.innerHeight;
+  if(total <= 0) return 0;
+  return Math.min(1, Math.max(0, -r.top/total));
+}
+const heroSpacer  = document.getElementById('heroSpacer');
+const heroPin     = document.getElementById('heroPin');
+const floorSpacer = document.getElementById('floorSpacer');
+const floorInner  = document.getElementById('floorInner');
+const levelHud    = document.getElementById('levelHud');
+
+function onScroll(){
+  const hp = progressOf(heroSpacer);
+  heroPin.style.opacity   = String(1 - hp*1.25);
+  heroPin.style.transform = `translateY(${(-hp*40).toFixed(1)}px)`;
+
+  applyCamera(hp);
+  levelHud.classList.toggle('show', hp > 0.25);
+
+  // qual andar está em foco durante a descida (5 -> 1)
+  if(hp > 0.2){
+    const idx = Math.min(TEAMS.length-1, Math.floor((1-hp) / 0.2));
+    highlightFloor(TEAMS[idx].floor);
+  } else {
+    highlightFloor(null);
+  }
+
+  const fp = progressOf(floorSpacer);
+  const enter = Math.min(1, fp*3);
+  floorInner.style.opacity   = String(enter);
+  floorInner.style.transform = `translateY(${((1-enter)*44).toFixed(1)}px)`;
+  if(fp > 0.02) highlightFloor('floor_1');
+
+  render();
+}
+
+let ticking = false;
+window.addEventListener('scroll', () => {
+  if(!ticking){ ticking = true; requestAnimationFrame(() => { onScroll(); ticking = false; }); }
+}, { passive:true });
+
+buildFloorPlan();
+applyCamera(0);
+render();
+onScroll();
+</script>
+</body>
+</html>
