@@ -71,7 +71,7 @@
   /* marcador de andar que aparece durante a descida */
   .level-hud{
     position:fixed; left:5vw; top:50%; transform:translateY(-50%);
-    z-index:3; display:flex; flex-direction:column-reverse; gap:12px;
+    z-index:3; display:flex; flex-direction:column; gap:12px;
     opacity:0; transition:opacity .5s ease; pointer-events:none;
   }
   .level-hud.show{ opacity:1; }
@@ -83,6 +83,52 @@
   .level-hud .lv .bar{ width:22px; height:2px; background:var(--line); transition:all .3s ease; }
   .level-hud .lv.on{ color:var(--text-primary); }
   .level-hud .lv.on .bar{ width:40px; background:var(--lv-color); }
+
+  /* ---------- badge de status ---------- */
+  .status-chip{
+    display:inline-block; font-family:'Space Mono',monospace; font-weight:700;
+    font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+    padding:5px 10px; border-radius:999px; white-space:nowrap;
+  }
+  .status-chip.andamento{ background:#E4F1EA; color:#1B7A45; }
+  .status-chip.parado{ background:#ECEFF3; color:#77828F; }
+
+  /* ---------- PANORAMA (overview) ---------- */
+  .overview-spacer{ height:150vh; position:relative; z-index:2; }
+  .overview-pin{
+    position:sticky; top:0; height:100vh; display:flex; align-items:center;
+    justify-content:center; padding:24px;
+  }
+  .overview-card{
+    width:min(760px,94vw); background:rgba(255,255,255,.9); backdrop-filter:blur(8px);
+    border:1px solid var(--line); border-radius:14px; padding:34px 34px 28px;
+    box-shadow:0 24px 60px rgba(14,26,38,.10); will-change:transform,opacity;
+  }
+  .overview-card .ov-eyebrow{
+    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.2em;
+    text-transform:uppercase; color:var(--brand); margin-bottom:10px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .overview-card .ov-eyebrow::before{ content:""; width:22px; height:1px; background:var(--brand); }
+  .overview-card h2{ font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(1.5rem,2.8vw,2rem); }
+  .overview-card .ov-sub{ margin-top:10px; color:var(--text-muted); font-size:.94rem; line-height:1.6; max-width:62ch; }
+  .team-rows{ margin-top:22px; border-top:1px solid var(--line); }
+  .team-row{
+    width:100%; display:grid; grid-template-columns:34px minmax(0,1fr) auto 14px; align-items:center;
+    gap:14px; padding:15px 4px; background:none; border:none; border-bottom:1px solid var(--line);
+    text-align:left; cursor:pointer; color:inherit; font-family:inherit;
+    transition:background .18s ease, padding-left .18s ease;
+  }
+  .team-row:hover, .team-row:focus{ outline:none; background:var(--panel-2); padding-left:10px; }
+  .team-row .tr-num{ font-family:'Space Mono',monospace; font-size:12px; color:var(--tr-color); font-weight:700; }
+  .team-row .tr-body .tr-name{ font-family:'Space Mono',monospace; font-weight:700; font-size:1rem; }
+  .team-row .tr-body .tr-line{ color:var(--text-muted); font-size:.86rem; line-height:1.45; margin-top:3px; }
+  .team-row .tr-arrow{ color:var(--text-muted); font-size:13px; transition:transform .18s ease; }
+  .team-row:hover .tr-arrow{ transform:translateX(3px); color:var(--tr-color); }
+  .overview-hint{
+    margin-top:18px; font-family:'Space Mono',monospace; font-size:11px;
+    letter-spacing:.06em; text-transform:uppercase; color:var(--text-muted);
+  }
 
   /* ---------- ANDAR (detalhe) ---------- */
   .floor-spacer{ height:240vh; position:relative; z-index:2; }
@@ -96,23 +142,25 @@
     background:rgba(244,247,250,.82); backdrop-filter:blur(8px);
     border:1px solid var(--line); border-radius:12px; padding:30px 32px;
   }
+  .floor-side{ display:flex; flex-direction:column; align-items:flex-start; gap:12px; }
   .floor-num{
     font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.2em;
-    text-transform:uppercase; color:var(--floor-color); margin-bottom:10px;
+    text-transform:uppercase; color:var(--floor-color);
     display:flex; align-items:center; gap:10px;
   }
   .floor-num::before{ content:""; width:22px; height:1px; background:var(--floor-color); }
-  .floor-inner h2{ font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(1.6rem,3vw,2.2rem); }
-  .floor-blurb{ margin-top:14px; color:var(--text-muted); font-size:.94rem; line-height:1.6; }
+  .floor-side h2{ font-family:'Space Mono',monospace; font-weight:700; font-size:clamp(1.6rem,3vw,2.2rem); }
+  .floor-blurb{ color:var(--text-muted); font-size:.94rem; line-height:1.6; }
   .floor-hint{
-    margin-top:18px; font-family:'Space Mono',monospace; font-size:11px;
+    font-family:'Space Mono',monospace; font-size:11px;
     letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted);
     display:flex; align-items:center; gap:8px;
   }
   .floor-hint .dot{ width:8px; height:8px; border-radius:50%; background:var(--floor-color); animation:blink 2s ease-in-out infinite; }
   @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
-  #lottieChar{ width:100%; max-width:230px; margin-top:6px; }
-  #floorSvg{ width:100%; height:auto; }
+  .lottie-slot{ width:100%; max-width:230px; margin-top:2px; }
+  .lottie-slot:empty{ display:none; }
+  .floor-scene svg{ width:100%; height:auto; }
 
   .hotspot{ cursor:pointer; pointer-events:auto; }
   .hotspot .ring{ animation:ping 2.4s ease-out infinite; transform-box:fill-box; transform-origin:center; }
@@ -125,11 +173,11 @@
   .overlay{ position:fixed; inset:0; background:rgba(14,26,38,.28); opacity:0; pointer-events:none; transition:opacity .3s ease; z-index:40; }
   .overlay.show{ opacity:1; pointer-events:auto; }
   .panel{
-    position:fixed; top:0; right:0; height:100vh; width:min(400px,90vw);
+    position:fixed; top:0; right:0; height:100vh; width:min(420px,92vw);
     background:var(--panel); border-left:1px solid var(--line);
     box-shadow:-16px 0 44px rgba(14,26,38,.14);
     transform:translateX(102%); transition:transform .42s cubic-bezier(.22,.61,.36,1);
-    z-index:50; padding:34px 28px; overflow-y:auto;
+    z-index:50; padding:34px 30px; overflow-y:auto;
   }
   .panel.open{ transform:translateX(0); }
   .panel .close{
@@ -140,30 +188,41 @@
   .panel h3{
     font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.1em;
     text-transform:uppercase; color:var(--pc,var(--brand));
-    display:flex; align-items:center; gap:9px; margin-bottom:6px;
+    display:flex; align-items:center; gap:9px; margin-bottom:8px; padding-right:26px;
   }
-  .panel h3 .sw{ width:9px; height:9px; border-radius:50%; background:var(--pc,var(--brand)); }
+  .panel h3 .sw{ width:9px; height:9px; border-radius:50%; background:var(--pc,var(--brand)); flex-shrink:0; }
+  .panel .p-status{ margin-bottom:20px; }
   .panel .count{ font-size:.8rem; color:var(--text-muted); margin-bottom:20px; }
+
+  /* painel — modo host list (Network) */
   .host{ padding:15px 0; border-bottom:1px solid var(--line); }
   .host:last-child{ border-bottom:none; }
   .host .name{ font-weight:700; font-size:.98rem; }
   .host .meta{ font-family:'Space Mono',monospace; font-size:11px; color:var(--text-muted); margin:3px 0 7px; }
   .host .detail{ font-size:.87rem; color:var(--text-muted); line-height:1.55; }
 
+  /* painel — modo explicação (andares 2-5 + panorama) */
+  .p-block{ padding:16px 0; border-bottom:1px solid var(--line); }
+  .p-block:last-child{ border-bottom:none; }
+  .p-block h4{
+    font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.12em;
+    text-transform:uppercase; color:var(--text-muted); margin-bottom:7px;
+  }
+  .p-block p{ font-size:.9rem; line-height:1.6; color:var(--text-primary); }
+  .p-block.connects p{ color:var(--text-muted); }
+
   .teaser{
-    position:relative; z-index:2; min-height:80vh; display:flex; flex-direction:column;
-    align-items:center; justify-content:center; text-align:center; padding:60px 24px; gap:10px;
+    position:relative; z-index:2; min-height:70vh; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center; padding:60px 24px; gap:12px;
   }
-  .teaser .lvl{
-    font-family:'Space Mono',monospace; font-size:12px; letter-spacing:.12em;
-    text-transform:uppercase; color:var(--text-muted);
-    border:1px dashed var(--line); border-radius:4px; padding:9px 18px; background:rgba(255,255,255,.6);
-  }
-  .teaser .note{ margin-top:16px; font-size:.85rem; color:var(--text-muted); max-width:46ch; line-height:1.6; }
+  .teaser h3{ font-family:'Space Mono',monospace; font-weight:700; font-size:1.1rem; }
+  .teaser .note{ font-size:.85rem; color:var(--text-muted); max-width:52ch; line-height:1.6; }
 
   @media (max-width:900px){
     .floor-inner{ grid-template-columns:1fr; }
     .level-hud{ display:none; }
+    .team-row{ grid-template-columns:32px 1fr auto; }
+    .team-row .tr-arrow{ display:none; }
   }
 </style>
 </head>
@@ -188,37 +247,31 @@
   </div>
 </section>
 
-<section class="floor-spacer" id="floorSpacer" style="--floor-color:var(--f-network);">
-  <div class="floor-pin">
-    <div class="floor-inner" id="floorInner">
-      <div>
-        <div class="floor-num">Nível 01</div>
-        <h2>Network</h2>
-        <p class="floor-blurb">Infraestrutura de rede segmentada por VLANs, com firewall de borda e monitoramento de disponibilidade — a espinha dorsal sobre a qual os demais times operam com segurança.</p>
-        <div class="floor-hint"><span class="dot"></span>clique nos pontos para explorar</div>
-        <div id="lottieChar"></div>
-      </div>
-      <div>
-        <svg id="floorSvg" viewBox="0 0 900 520" role="img" aria-label="Planta isométrica do andar de rede"></svg>
-      </div>
+<section class="overview-spacer" id="overviewSpacer">
+  <div class="overview-pin">
+    <div class="overview-card" id="overviewCard">
+      <div class="ov-eyebrow">Panorama do projeto</div>
+      <h2>As 5 áreas da Cyberappfin</h2>
+      <p class="ov-sub">A simulação divide a empresa em cinco times de segurança e infraestrutura, cada um responsável por uma camada. Clique num time para o resumo; role para descer pelos andares.</p>
+      <div class="team-rows" id="teamRows"></div>
+      <div class="overview-hint">▼ role para entrar no prédio</div>
     </div>
   </div>
 </section>
 
+<div id="floors"></div>
+
 <section class="teaser">
-  <span class="lvl">Nível 02 · IAM</span>
-  <span class="lvl">Nível 03 · SOC</span>
-  <span class="lvl">Nível 04 · Endpoint</span>
-  <span class="lvl">Nível 05 · GRC</span>
-  <p class="note">Protótipo — a home e o nível 01 estão montados. Os demais andares seguem o mesmo modelo.</p>
+  <h3>Fim do prédio</h3>
+  <p class="note">Protótipo — home, panorama e os 5 andares. Ajustes de câmera, personagens e detalhamento 3D em andamento.</p>
 </section>
 
 <div class="overlay" id="overlay"></div>
 <aside class="panel" id="panel" aria-hidden="true">
   <button class="close" id="closePanel" aria-label="Fechar">✕</button>
   <h3><span class="sw"></span><span id="panelTitleText"></span></h3>
-  <div class="count" id="panelCount"></div>
-  <div id="panelHosts"></div>
+  <div id="panelStatus" class="p-status"></div>
+  <div id="panelBody"></div>
 </aside>
 
 <script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie_light.min.js"></script>
@@ -235,28 +288,36 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 /* =========================================================================
-   PROTÓTIPO V2
-   - hero: modelo 3D fintech-hq.glb, câmera desce andar por andar no scroll
-   - nível 01: planta isométrica em SVG com hotspots + personagem Lottie
+   PROTÓTIPO V2 — home 3D + panorama + 5 andares
+   - camada 3D: fintech-hq.glb, câmera desce do topo (Nível 05) à base (Nível 01)
+   - panorama: seção com as 5 áreas, cada linha abre um resumo no painel
+   - andares 2-5: planta isométrica em SVG com hotspots -> painel explicativo
+   - Nível 01 (Network): intocado — dados e painel de hosts como já estavam
    ATENÇÃO: precisa ser servido por HTTP (o .glb e o .json não carregam via file://)
    ========================================================================= */
 
+/* ordem de scroll = topo do prédio (05) -> base (01) */
 const TEAMS = [
-  { floor:'floor_1', num:'01', name:'Network',  color:'#0E9C8B' },
-  { floor:'floor_2', num:'02', name:'IAM',      color:'#6D3FD4' },
-  { floor:'floor_3', num:'03', name:'SOC',      color:'#C2700A' },
-  { floor:'floor_4', num:'04', name:'Endpoint', color:'#1B9455' },
-  { floor:'floor_5', num:'05', name:'GRC',      color:'#B07D0A' }
+  { key:'grc',      floor:'floor_5', num:'05', name:'GRC',      color:'#B07D0A', status:'não iniciado' },
+  { key:'endpoint', floor:'floor_4', num:'04', name:'Endpoint', color:'#1B9455', status:'não iniciado' },
+  { key:'soc',      floor:'floor_3', num:'03', name:'SOC',      color:'#C2700A', status:'em andamento' },
+  { key:'iam',      floor:'floor_2', num:'02', name:'IAM',      color:'#6D3FD4', status:'não iniciado' },
+  { key:'network',  floor:'floor_1', num:'01', name:'Network',  color:'#0E9C8B', status:'em andamento' }
 ];
+const chipClass = s => s === 'em andamento' ? 'andamento' : 'parado';
 
-/* ---------------- cena 3D ---------------- */
+/* ---------------- cena 3D (opcional — a página 2D funciona sem WebGL) ---------------- */
 const canvas   = document.getElementById('scene');
-const renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-renderer.setSize(window.innerWidth, window.innerHeight, false);
-
-const scene  = new THREE.Scene();
-const camera = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 200);
+const scene    = new THREE.Scene();
+const camera   = new THREE.PerspectiveCamera(38, window.innerWidth/window.innerHeight, 0.1, 200);
+let renderer   = null;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias:true, alpha:true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight, false);
+} catch(e){
+  console.warn('WebGL indisponível — seguindo só com o conteúdo 2D:', e);
+}
 
 scene.add(new THREE.AmbientLight(0xffffff, 1.35));
 const key = new THREE.DirectionalLight(0xffffff, 2.1);
@@ -266,9 +327,9 @@ const fill = new THREE.DirectionalLight(0xcfe0f5, 0.9);
 fill.position.set(-8, 5, -6);
 scene.add(fill);
 
-const floorGroups = {};   // floor_N -> THREE.Object3D
-const floorCenter = {};   // floor_N -> Y do centro
-const accentMats  = {};   // floor_N -> [materiais de glow/accent]
+const floorGroups = {};
+const floorCenter = {};
+const accentMats  = {};
 let building = null;
 
 const loaderEl  = document.getElementById('loader');
@@ -276,7 +337,7 @@ const loaderBar = document.getElementById('loaderBar');
 const loaderErr = document.getElementById('loaderErr');
 const loaderMsg = document.getElementById('loaderMsg');
 
-new GLTFLoader().load('fintech-hq.glb',
+if(renderer) new GLTFLoader().load('fintech-hq.glb',
   gltf => {
     building = gltf.scene;
     scene.add(building);
@@ -287,8 +348,7 @@ new GLTFLoader().load('fintech-hq.glb',
       floorGroups[t.floor] = g;
       floorCenter[t.floor] = new THREE.Box3().setFromObject(g).getCenter(new THREE.Vector3()).y;
 
-      // os 9 materiais do modelo são compartilhados entre os andares — clonar por andar
-      // é o que permite destacar/apagar um andar sem afetar os outros
+      // materiais do modelo são compartilhados entre andares — clonar por andar
       const mats = [];
       g.traverse(o => {
         if(!o.isMesh) return;
@@ -309,19 +369,22 @@ new GLTFLoader().load('fintech-hq.glb',
     loaderEl.classList.add('hide');
     onScroll();
   },
-  ev => {
-    if(ev.total) loaderBar.style.width = Math.round(ev.loaded/ev.total*100) + '%';
-  },
+  ev => { if(ev.total) loaderBar.style.width = Math.round(ev.loaded/ev.total*100) + '%'; },
   () => {
-    loaderMsg.textContent = 'não foi possível carregar o modelo';
+    loaderMsg.textContent = 'não foi possível carregar o modelo 3D';
     loaderErr.hidden = false;
-    loaderErr.textContent = 'O arquivo fintech-hq.glb não pôde ser lido. Abra esta página por um servidor HTTP (ex: rodar "python -m http.server" na pasta) — abrir o arquivo direto pelo Windows (file://) bloqueia o carregamento do modelo 3D.';
+    loaderErr.textContent = 'O prédio 3D (fintech-hq.glb) não pôde ser lido — o conteúdo dos andares continua funcionando. Se estiver abrindo o arquivo direto pelo Windows, use um servidor HTTP ("python -m http.server" na pasta); no GitHub Pages carrega normalmente.';
+    setTimeout(() => loaderEl.classList.add('hide'), 2600);
   }
 );
+if(!renderer) loaderEl.classList.add('hide');   // sem WebGL: mostra logo o conteúdo 2D
 
-/* enquadramentos da câmera — calculados a partir do tamanho real do modelo */
-let CAM_FAR  = { pos:new THREE.Vector3(11.5, 8.5, 13.5), look:new THREE.Vector3(0, 0.6, 0) };
-let CAM_NEAR = { pos:new THREE.Vector3(7.0, -1.6, 8.2),  look:new THREE.Vector3(0, -3.6, 0) };
+/* enquadramentos da câmera */
+let CAM = {
+  far:  { pos:new THREE.Vector3(11.5, 8.5, 13.5), look:new THREE.Vector3(0, 0.6, 0) },
+  wide: { pos:new THREE.Vector3(9, 6, 11),        look:new THREE.Vector3(0, 3, 0) },
+  base: { pos:new THREE.Vector3(7, -1.6, 8.2),    look:new THREE.Vector3(0, -3.6, 0) }
+};
 
 function frameBuilding(obj){
   const box    = new THREE.Box3().setFromObject(obj);
@@ -329,33 +392,51 @@ function frameBuilding(obj){
   const center = box.getCenter(new THREE.Vector3());
   const maxDim = Math.max(size.x, size.y, size.z);
   const fov    = camera.fov * Math.PI/180;
-  // distância pra caber o prédio inteiro, com folga (o prédio é alto: usa a altura)
-  // a mira sobe k*altura pra empurrar o prédio pra baixo no quadro (libera o topo pro texto);
-  // a distância precisa cobrir metade da altura + esse deslocamento, senão a base corta
-  const k    = 0.20;
-  const dist = (size.y * (0.5 + k)) / Math.tan(fov/2) * 1.24;
 
-  // direção normalizada: a distância real da câmera tem que ser exatamente "dist"
+  // FAR: estabelece o prédio, mira um pouco acima do centro (libera o topo pro texto do hero)
+  const k    = 0.20;
+  const distFar = (size.y * (0.5 + k)) / Math.tan(fov/2) * 1.24;
   const dirFar  = new THREE.Vector3(0.58, 0.40, 0.71).normalize();
   const lookFar = new THREE.Vector3(center.x, center.y + size.y*k, center.z);
-  CAM_FAR = { look: lookFar, pos: lookFar.clone().add(dirFar.clone().multiplyScalar(dist)) };
+  CAM.far = { look: lookFar, pos: lookFar.clone().add(dirFar.clone().multiplyScalar(distFar)) };
 
-  // vista de dentro: perto do andar 1 (base do prédio)
+  // WIDE: prédio centralizado, um pouco mais perto (usado no panorama)
+  const distWide = (size.y * 0.5) / Math.tan(fov/2) * 1.32;
+  const dirWide  = new THREE.Vector3(0.5, 0.28, 0.82).normalize();
+  const lookWide = new THREE.Vector3(center.x, center.y, center.z);
+  CAM.wide = { look: lookWide, pos: lookWide.clone().add(dirWide.clone().multiplyScalar(distWide)) };
+
+  // BASE: na altura do Nível 01
   const y1       = floorCenter['floor_1'] ?? (box.min.y + size.y*0.12);
   const distNear = maxDim * 1.05;
   const dirNear  = new THREE.Vector3(0.62, 0.16, 0.77).normalize();
   const lookNear = new THREE.Vector3(center.x, y1, center.z);
-  CAM_NEAR = { look: lookNear, pos: lookNear.clone().add(dirNear.clone().multiplyScalar(distNear)) };
+  CAM.base = { look: lookNear, pos: lookNear.clone().add(dirNear.clone().multiplyScalar(distNear)) };
 }
 
+const clamp01  = v => Math.min(1, Math.max(0, v));
 const easeInOut = t => t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2, 2)/2;
 
-function applyCamera(p){
-  const e = easeInOut(Math.min(1, Math.max(0, p)));
-  camera.position.lerpVectors(CAM_FAR.pos, CAM_NEAR.pos, e);
-  const look = new THREE.Vector3().lerpVectors(CAM_FAR.look, CAM_NEAR.look, e);
-  camera.lookAt(look);
-  if(building) building.rotation.y = -0.35 + e * 0.5;
+function lerpCam(a, b, e){
+  return {
+    pos:  new THREE.Vector3().lerpVectors(a.pos, b.pos, e),
+    look: new THREE.Vector3().lerpVectors(a.look, b.look, e)
+  };
+}
+
+/* globalT: 0 = início do hero  ->  1 = câmera na base (fim do último andar) */
+function applyCameraByT(globalT){
+  let c;
+  if(globalT < 0.16){                       // hero: far -> wide
+    c = lerpCam(CAM.far, CAM.wide, easeInOut(globalT / 0.16));
+  } else if(globalT < 0.30){                 // panorama: segura wide
+    c = CAM.wide;
+  } else {                                   // descida: wide -> base
+    c = lerpCam(CAM.wide, CAM.base, easeInOut((globalT - 0.30) / 0.70));
+  }
+  camera.position.copy(c.pos);
+  camera.lookAt(c.look);
+  if(building) building.rotation.y = -0.32 + easeInOut(clamp01(globalT)) * 0.46;
 }
 
 function highlightFloor(activeKey){
@@ -383,7 +464,7 @@ function highlightFloor(activeKey){
 function buildLevelHud(){
   const hud = document.getElementById('levelHud');
   hud.innerHTML = '';
-  TEAMS.forEach(t => {
+  TEAMS.forEach(t => {                     // TEAMS já vem 05 -> 01, então 05 no topo
     const el = document.createElement('div');
     el.className = 'lv';
     el.dataset.floor = t.floor;
@@ -393,19 +474,20 @@ function buildLevelHud(){
   });
 }
 
-/* loop contínuo: com preserveDrawingBuffer=false, renderizar só no scroll
-   deixa o buffer vazio entre frames (e o rAF já deixa o movimento mais suave) */
-function render(){ renderer.render(scene, camera); }
-(function tick(){ requestAnimationFrame(tick); renderer.render(scene, camera); })();
+/* render contínuo (preserveDrawingBuffer=false + rAF = movimento suave) */
+function render(){ if(renderer) renderer.render(scene, camera); }
+if(renderer) (function tick(){ requestAnimationFrame(tick); renderer.render(scene, camera); })();
 
 window.addEventListener('resize', () => {
-  renderer.setSize(window.innerWidth, window.innerHeight, false);
-  camera.aspect = window.innerWidth/window.innerHeight;
-  camera.updateProjectionMatrix();
+  if(renderer){
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+  }
   onScroll();
 });
 
-/* ---------------- planta isométrica do nível 01 ---------------- */
+/* ---------------- helpers isométricos ---------------- */
 const SVG_NS = 'http://www.w3.org/2000/svg';
 const makeProj = (ox,oy,tw,th,tz) => (gx,gy,gz) => ({
   x: ox + (gx-gy)*(tw/2),
@@ -441,7 +523,7 @@ function onFace(c,u,v){
   return {x:a.x+(b.x-a.x)*v, y:a.y+(b.y-a.y)*v};
 }
 
-/* dados reais do time de Network (mesmos do site atual) */
+/* ---------------- Nível 01: dados reais do Network (INTOCADO) ---------------- */
 const ZONES = [
   { id:'vlan1', label:'VLAN 1 — física', color:'#1B9455', gx:1, gy:0.5, items:[
     { name:'UniFi Firewall', meta:'192.168.1.2',  detail:'Roteador/firewall de borda. Ponto de entrada da internet para todas as VLANs.' },
@@ -465,12 +547,163 @@ const ZONES = [
   ]}
 ];
 
-function buildFloorPlan(){
-  const svg = document.getElementById('floorSvg');
-  svg.innerHTML = '';
-  const proj = makeProj(450, 290, 76, 38, 29);
-  const W = 10, D = 6.2, WALL = 2.4;
+/* ---------------- Andares 2-5 + resumo do panorama ---------------- */
+const OVERVIEW = {
+  network: {
+    line: 'A infraestrutura de rede — topologia, VLANs e firewall. Tudo roda em cima dela.',
+    what: 'O time de Network monta a fundação: a topologia física, a segmentação da rede em VLANs, o firewall de borda e o caminho que todo tráfego percorre antes de chegar aos sistemas.',
+    why: 'Segmentar a rede em VLANs limita o estrago de um comprometimento — um problema na faixa dos usuários não alcança a faixa de segurança. É contenção por desenho.',
+    connects: 'Sustenta todos os outros times. SOC e IAM constroem monitoramento e controle de acesso diretamente sobre a segmentação que o Network define.'
+  },
+  iam: {
+    line: 'Quem é quem e quem pode o quê — Active Directory, políticas e acesso administrativo controlado.',
+    what: 'IAM (Identity and Access Management) cuida das identidades da empresa: monta o Active Directory (o cadastro central de usuários e máquinas), define grupos e políticas, e controla o acesso privilegiado por um ponto único e auditado.',
+    why: 'Sem controle de identidade, todo mundo vira administrador de tudo e ninguém sabe quem fez o quê. O princípio é o menor privilégio: cada pessoa enxerga só o que precisa para o trabalho dela.',
+    connects: 'É base para quase tudo: o SOC monitora os Domain Controllers como alvo prioritário, o Endpoint usa as identidades do AD para saber quem loga em cada máquina, e o Network hospeda os DCs na VLAN de serviços.'
+  },
+  soc: {
+    line: 'O time que fica de olho no ambiente em tempo real: coleta logs, gera alertas, responde a incidentes.',
+    what: 'O SOC (Security Operations Center) coleta logs de todos os servidores, correlaciona eventos, gera alertas quando algo foge do normal e coordena a resposta quando é um incidente de verdade.',
+    why: 'Ataque não avisa quando começa. Sem alguém monitorando continuamente, uma invasão pode ficar meses sem ser notada. Para uma financeira que lida com dados de crédito, detecção precoce é parte da conformidade.',
+    connects: 'Consome dados de praticamente todos: agentes nos servidores do Network e do IAM, telemetria do Endpoint, resultados de varredura do OpenVAS. Entrega ao GRC o registro de incidentes que vira evidência.'
+  },
+  endpoint: {
+    line: 'Segurança das máquinas que as pessoas usam — EDR/antivírus e configuração segura padrão.',
+    what: 'O time de Endpoint protege os dispositivos dos usuários: instala e opera o EDR/antivírus (que detecta comportamento malicioso na própria máquina) e aplica o hardening — fechar portas, remover o que não é necessário, forçar configuração segura.',
+    why: 'O endpoint é a porta de entrada mais comum de um ataque: um clique errado num e-mail, um pendrive infectado. Proteger o servidor não adianta se a máquina que o acessa está comprometida.',
+    connects: 'Fornece ao SOC a telemetria dos endpoints (o EDR vira mais uma fonte de alertas no Wazuh). Depende do IAM para saber quem deveria estar em cada máquina e do Network para a VLAN dos usuários.'
+  },
+  grc: {
+    line: 'Políticas, risco, conformidade e continuidade — backup, restauração e a documentação que o regulador exige.',
+    what: 'GRC (Governança, Risco e Conformidade) define as políticas de segurança, avalia riscos e garante que a operação siga as normas — Banco Central, LGPD, PLD/COAF. Também cuida da continuidade: backup, réplicas e planos de recuperação.',
+    why: 'Uma financeira regulada não pode só "ter segurança" — precisa provar que tem, com política escrita, evidência de controle e capacidade de se recuperar de um desastre. Sem isso a empresa não opera legalmente.',
+    connects: 'Depende do Network para o segmento onde o backup roda, e do SOC/IAM para transformar os controles técnicos deles em evidência de conformidade. É o time que documenta e responde pela operação dos outros.'
+  }
+};
 
+const FLOOR_CONTENT = {
+  iam: {
+    blurb: 'Identidades, grupos e acesso administrativo controlado. Define quem é quem na empresa e por onde cada acesso privilegiado tem que passar.',
+    lottie: null,
+    points: [
+      { id:'ad', label:'AD-01 / AD-02', gx:1.6, gy:0.6,
+        what:'O par de servidores que hospeda o Active Directory — o cadastro central de todos os usuários, máquinas e permissões. São dois para redundância: se um cai, o outro segura.',
+        why:'Sem um diretório central, cada sistema teria seu próprio login e ninguém conseguiria desligar de uma vez o acesso de quem saiu da empresa.',
+        connects:'É o alvo nº 1 de monitoramento do SOC. O Endpoint usa o AD para autenticar as máquinas. Roda na VLAN de serviços do Network.' },
+      { id:'dns', label:'DNS integrado', gx:6.2, gy:0.6,
+        what:'O serviço que traduz nome (servidor-x) em endereço IP, rodando junto com o Active Directory.',
+        why:'No ambiente Windows quase tudo depende de DNS: logon, acesso a compartilhamento, replicação entre os DCs. DNS quebrado = domínio quebrado.',
+        connects:'O Network define a topologia onde o DNS resolve. O SOC monitora consultas anômalas — um sinal clássico de malware tentando "telefonar para casa".' },
+      { id:'gpo', label:'GPOs', gx:3.9, gy:2.3,
+        what:'Regras aplicadas automaticamente a grupos de máquinas e usuários — senha mínima, tela de bloqueio, o que pode ou não ser instalado.',
+        why:'Configurar máquina por máquina não escala e sempre sobra uma esquecida. A GPO garante todo mundo no mesmo padrão, sem depender de disciplina individual.',
+        connects:'É a fonte das regras que o Endpoint aplica no hardening. Desvios do padrão são alertados pelo SOC.' },
+      { id:'ou', label:'OUs e grupos', gx:1.6, gy:4,
+        what:'A organização do diretório em "gavetas" (Unidades Organizacionais) por área e função, com grupos que concentram permissões.',
+        why:'É o que torna o menor privilégio viável na prática — você dá acesso ao grupo "Financeiro", não a 15 pessoas uma a uma; quem troca de área só troca de grupo.',
+        connects:'Reflete o organograma real da empresa. O GRC audita se os grupos batem com quem deveria ter acesso a quê.' },
+      { id:'pam', label:'Jump Server / PAM', gx:6.2, gy:4,
+        what:'Um servidor-ponte que é o único caminho para acessar os segmentos mais sensíveis. Todo acesso administrativo passa por ele, que grava a sessão inteira.',
+        why:'Acesso direto a servidor crítico é risco duplo — credencial que vaza e ação que ninguém viu. O Jump Server força um funil auditável: quem entrou, quando, o que fez.',
+        connects:'Fica na VLAN de serviços do Network e é a única porta para a VLAN de security. As gravações são evidência para o GRC; o SOC alerta acesso fora de hora.' }
+    ]
+  },
+
+  soc: {
+    blurb: 'Monitoramento contínuo, correlação de eventos e resposta a incidentes. O time mais avançado depois do Network — Wazuh já rodando com 5 agentes.',
+    lottie: 'Pcguy.json',
+    points: [
+      { id:'wazuh', label:'Wazuh / SIEM', gx:1, gy:0.6, status:'em andamento',
+        what:'O cérebro do SOC. Um agente instalado em cada servidor manda os logs para o manager central, que correlaciona tudo e gera alertas. Hoje com 5 agentes ativos: NT-001, NT-002, zabbixgrafana, openvaz e FIREFLY.',
+        why:'Cada servidor gera milhares de linhas de log por dia — ninguém lê isso na mão. O SIEM junta, cruza e só chama atenção quando o padrão foge do normal.',
+        connects:'Depende do Network para a rede entre agentes e manager, e do IAM (os Domain Controllers são alvo prioritário de enrollment).' },
+      { id:'dash', label:'Dashboard "Cyber"', gx:4, gy:0.6, status:'em andamento',
+        what:'A tela que o analista olha. Prontos: volume de eventos no tempo, distribuição por rule.level (severidade) e logons reais. Pendentes: painel de eventos de alta severidade e contador de escalonamento de privilégio.',
+        why:'Dado bruto não vira decisão. O dashboard transforma milhões de eventos em "está tudo normal" ou "olha aqui".',
+        connects:'Reflete o que os agentes do Network, IAM e Endpoint reportam. Alimenta os relatórios que vão para o GRC.' },
+      { id:'ws', label:'Workstations Windows', gx:7, gy:0.6, status:'pendente',
+        what:'Instalar o agente Wazuh nas estações de trabalho Windows (W10, W10-2, WIN-10) para que elas também sejam monitoradas.',
+        why:'Hoje o SOC enxerga os servidores mas não as máquinas dos usuários — que é justamente por onde a maioria dos ataques entra.',
+        connects:'Precisa do Endpoint (padrão de instalação nas máquinas) e do IAM (as workstations dentro do domínio).' },
+      { id:'zabbix', label:'Zabbix', gx:1, gy:4, status:'não iniciado',
+        what:'Monitoramento de disponibilidade e saúde da infraestrutura — CPU, memória, disco, serviço no ar ou fora. Complementa o Wazuh, que é focado em segurança.',
+        why:'Nem todo problema é ataque. Um disco cheio ou um serviço travado também derruba a operação, e o SOC precisa ver antes do cliente.',
+        connects:'Monitora ativos do Network e do IAM. Envia métricas para o Grafana.' },
+      { id:'grafana', label:'Grafana', gx:4, gy:4, status:'não iniciado',
+        what:'Camada de visualização que junta dados de várias fontes (Zabbix, Wazuh e outras) em painéis únicos.',
+        why:'Cada ferramenta tem sua própria tela. O Grafana dá a visão consolidada — útil para a apresentação executiva e para o plantão.',
+        connects:'Consome dados do Zabbix e do Wazuh. Painéis podem virar evidência para o GRC.' },
+      { id:'openvas', label:'OpenVAS', gx:7, gy:4, status:'não iniciado',
+        what:'Scanner de vulnerabilidades. Varre a rede procurando falhas conhecidas — serviço desatualizado, senha fraca, configuração exposta.',
+        why:'Melhor você achar a porta aberta antes do atacante. O scan periódico vira uma lista priorizada de "conserte isto".',
+        connects:'Aponta o que o Endpoint precisa corrigir (patches) e o que o Network precisa fechar. Roda de um segmento isolado (VLAN 30), acessível só via Jump Server.' }
+    ]
+  },
+
+  endpoint: {
+    blurb: 'Segurança dos dispositivos dos usuários — EDR/antivírus, hardening e patches. Ainda não iniciado.',
+    lottie: null,
+    points: [
+      { id:'edr', label:'EDR / Antivírus', gx:1.6, gy:0.6,
+        what:'Software instalado em cada máquina que observa o comportamento (processos, arquivos, conexões) e bloqueia ou isola o que parece malicioso — vai além do antivírus clássico por assinatura.',
+        why:'O endpoint é o alvo nº 1: phishing, download infectado, pendrive. Proteger só o servidor não resolve se a máquina que o acessa está comprometida.',
+        connects:'Cada EDR vira uma fonte de alertas para o SOC (Wazuh). Usa as identidades do IAM para amarrar "máquina X, usuário Y".' },
+      { id:'hardening', label:'Hardening e baseline', gx:6.2, gy:0.6,
+        what:'Aplicar uma configuração segura padrão a todas as máquinas — desativar serviços inúteis, fechar portas, exigir tela de bloqueio, tirar o direito de administrador local.',
+        why:'Máquina "de fábrica" vem aberta demais. Hardening reduz a superfície de ataque antes mesmo de qualquer ameaça aparecer.',
+        connects:'As regras vêm das GPOs do IAM. O SOC monitora desvios do baseline.' },
+      { id:'patch', label:'Gestão de patches', gx:1.6, gy:4,
+        what:'Manter sistema operacional e aplicativos atualizados, de forma controlada e verificável.',
+        why:'A maioria dos ataques explora falha já conhecida e já corrigida — o problema é o patch que nunca foi aplicado.',
+        connects:'Coordena a janela de atualização com o Network e o GRC (não derrubar sistema em horário crítico). O OpenVAS (SOC) aponta o que está desatualizado.' },
+      { id:'inv', label:'Inventário de dispositivos', gx:6.2, gy:4,
+        what:'Lista viva de todas as máquinas da empresa — o que é, de quem é, o que tem instalado.',
+        why:'Não dá para proteger o que você não sabe que existe. Máquina "esquecida" sem patch é porta dos fundos.',
+        connects:'Alimenta o SOC (o que deveria estar reportando) e o IAM (a quem cada máquina pertence).' }
+    ]
+  },
+
+  grc: {
+    blurb: 'Política, risco, conformidade e continuidade de negócio. Backup, testes de restauração e o runbook que o regulador exige. Ainda não iniciado.',
+    lottie: null,
+    points: [
+      { id:'bkpsrv', label:'Servidor de backup', gx:1.6, gy:0.6,
+        what:'Máquina dedicada que guarda cópias de todos os sistemas críticos, isolada do resto para não ser atingida junto num ataque.',
+        why:'Se um ransomware criptografa a produção, o backup é a única forma de voltar sem pagar resgate — desde que ele próprio não tenha sido criptografado junto.',
+        connects:'Precisa de uma VLAN própria e regras de firewall restritas (Network). Guarda dados que só o IAM deveria poder acessar.' },
+      { id:'rotina', label:'Rotinas de backup e réplica', gx:6.2, gy:0.6,
+        what:'Agendamento automático de cópias (diárias/semanais) e réplica dos dados para um segundo local.',
+        why:'Backup manual é backup que ninguém faz. E uma cópia só, no mesmo lugar, não protege contra incêndio ou roubo do equipamento.',
+        connects:'Depende dos sistemas do IAM e do ERP (Dolibarr, no Network) estarem estáveis para definir a janela de backup.' },
+      { id:'restore', label:'Testes de restauração', gx:1.6, gy:4,
+        what:'Simular periodicamente a volta de um sistema a partir do backup, para confirmar que a cópia realmente funciona.',
+        why:'A maioria das empresas só descobre que o backup estava corrompido no dia do desastre. O teste é o que transforma "temos backup" em "sabemos nos recuperar".',
+        connects:'Envolve o Network (recriar o ambiente) e o SOC (validar que o sistema restaurado não traz junto o problema original).' },
+      { id:'runbook', label:'Runbook e documentação', gx:6.2, gy:4,
+        what:'O manual passo a passo de "o que fazer quando" — quem aciona, em que ordem restaurar, quais os contatos. Reúne também as políticas de segurança e o mapeamento para as normas (Bacen, LGPD, ISO 27001).',
+        why:'Num incidente às 3 da manhã ninguém improvisa bem. E o regulador exige política escrita e evidência — o runbook é parte dessa prova.',
+        connects:'Consolida o trabalho de todos os times num só lugar. É o que o auditor lê.' }
+    ]
+  }
+};
+
+/* ---------------- personagem Lottie (nunca deve quebrar a página) ---------------- */
+const LOTTIE = window.lottie || window.bodymovin || null;
+function loadLottie(container, path){
+  try {
+    if(container && LOTTIE && typeof LOTTIE.loadAnimation === 'function'){
+      LOTTIE.loadAnimation({ container, renderer:'svg', loop:true, autoplay:true, path });
+    }
+  } catch(e){ console.warn('lottie:', e); }
+}
+
+/* ---------------- construção dos andares ---------------- */
+const panel = document.getElementById('panel');
+const overlay = document.getElementById('overlay');
+const floorsWrap = document.getElementById('floors');
+const floorSecs = [];   // { el, key, floor, inner }
+
+function drawIsoRoom(svg, proj, W, D, WALL){
   svg.appendChild(poly([proj(0,0,0),proj(W,0,0),proj(W,D,0),proj(0,D,0)], '#E7EDF4', { stroke:'#D8E0E9','stroke-width':1.5 }));
   for(let i=2;i<W;i+=2){ const a=proj(i,0,0), b=proj(i,D,0); const l=document.createElementNS(SVG_NS,'line');
     l.setAttribute('x1',a.x);l.setAttribute('y1',a.y);l.setAttribute('x2',b.x);l.setAttribute('y2',b.y);
@@ -478,10 +711,53 @@ function buildFloorPlan(){
   for(let j=2;j<D;j+=2){ const a=proj(0,j,0), b=proj(W,j,0); const l=document.createElementNS(SVG_NS,'line');
     l.setAttribute('x1',a.x);l.setAttribute('y1',a.y);l.setAttribute('x2',b.x);l.setAttribute('y2',b.y);
     l.setAttribute('stroke','#D8E0E9');l.setAttribute('stroke-width','1'); svg.appendChild(l); }
-
   svg.appendChild(poly([proj(0,0,0),proj(W,0,0),proj(W,0,WALL),proj(0,0,WALL)], '#DCE4EC', { stroke:'#CBD5DF','stroke-width':1 }));
   svg.appendChild(poly([proj(0,0,0),proj(0,D,0),proj(0,D,WALL),proj(0,0,WALL)], '#D2DBE5', { stroke:'#CBD5DF','stroke-width':1 }));
+}
 
+function drawHotspot(svg, proj, gx, gy, color, labelText, onActivate){
+  const hp   = proj(gx+1.47, gy+0.42, 3.35);
+  const base = proj(gx+1.47, gy+0.42, 2.8);
+  const g = document.createElementNS(SVG_NS,'g');
+  g.setAttribute('class','hotspot');
+  g.setAttribute('role','button');
+  g.setAttribute('tabindex','0');
+  g.setAttribute('aria-label','Ver detalhes de ' + labelText);
+
+  const stem = document.createElementNS(SVG_NS,'line');
+  stem.setAttribute('x1',base.x);stem.setAttribute('y1',base.y);
+  stem.setAttribute('x2',hp.x);stem.setAttribute('y2',hp.y);
+  stem.setAttribute('stroke',color);stem.setAttribute('stroke-width','1.5');
+  stem.setAttribute('stroke-dasharray','3 3');
+
+  const ring = document.createElementNS(SVG_NS,'circle');
+  ring.setAttribute('class','ring');
+  ring.setAttribute('cx',hp.x);ring.setAttribute('cy',hp.y);ring.setAttribute('r',9);ring.setAttribute('fill',color);
+
+  const core = document.createElementNS(SVG_NS,'circle');
+  core.setAttribute('class','core');
+  core.setAttribute('cx',hp.x);core.setAttribute('cy',hp.y);core.setAttribute('r',7);
+  core.setAttribute('fill',color);core.setAttribute('stroke','#FFFFFF');core.setAttribute('stroke-width','2.5');
+
+  const label = document.createElementNS(SVG_NS,'text');
+  label.setAttribute('x',hp.x);label.setAttribute('y',hp.y-17);
+  label.setAttribute('text-anchor','middle');
+  label.setAttribute('font-family','Space Mono, monospace');
+  label.setAttribute('font-size','11');label.setAttribute('font-weight','700');
+  label.setAttribute('fill', shade(color,-0.12));
+  label.textContent = labelText;
+
+  g.append(stem, ring, core, label);
+  g.addEventListener('click', onActivate);
+  g.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); onActivate(); } });
+  svg.appendChild(g);
+}
+
+/* planta do Nível 01 (Network) — comportamento original */
+function buildNetworkPlan(svg){
+  svg.innerHTML = '';
+  const proj = makeProj(450, 290, 76, 38, 29);
+  drawIsoRoom(svg, proj, 10, 6.2, 2.4);
   ZONES.forEach(z => {
     svg.appendChild(cube(proj, z.gx, z.gy, 0.85, 0.85, 0, 2.0, z.color));
     const tall = cube(proj, z.gx+1.05, z.gy, 0.85, 0.85, 0, 2.8, z.color);
@@ -493,53 +769,113 @@ function buildFloorPlan(){
       l.setAttribute('stroke', shade(z.color,-0.28)); l.setAttribute('stroke-width','2');
       svg.appendChild(l);
     });
+    drawHotspot(svg, proj, z.gx, z.gy, z.color, z.label.split(' — ')[0], () => openHostPanel(z));
+  });
+}
 
-    const hp   = proj(z.gx+1.47, z.gy+0.42, 3.35);
-    const base = proj(z.gx+1.47, z.gy+0.42, 2.8);
-    const g = document.createElementNS(SVG_NS,'g');
-    g.setAttribute('class','hotspot');
-    g.setAttribute('role','button');
-    g.setAttribute('tabindex','0');
-    g.setAttribute('aria-label','Ver detalhes de ' + z.label);
+/* planta genérica dos andares 2-5 */
+function buildFloorPlan(svg, team){
+  svg.innerHTML = '';
+  const proj = makeProj(450, 290, 76, 38, 29);
+  drawIsoRoom(svg, proj, 10, 6.2, 2.4);
+  const content = FLOOR_CONTENT[team.key];
+  content.points.forEach((pt, i) => {
+    const h = 2.0 + (i % 3) * 0.35;
+    svg.appendChild(cube(proj, pt.gx, pt.gy, 0.85, 0.85, 0, h - 0.6, team.color));
+    const tall = cube(proj, pt.gx+1.05, pt.gy, 0.85, 0.85, 0, h + 0.3, team.color);
+    svg.appendChild(tall);
+    [0.30,0.55,0.80].forEach(v => {
+      const a = onFace(tall._right, 0.15, v), b = onFace(tall._right, 0.85, v);
+      const l = document.createElementNS(SVG_NS,'line');
+      l.setAttribute('x1',a.x);l.setAttribute('y1',a.y);l.setAttribute('x2',b.x);l.setAttribute('y2',b.y);
+      l.setAttribute('stroke', shade(team.color,-0.28)); l.setAttribute('stroke-width','2');
+      svg.appendChild(l);
+    });
+    drawHotspot(svg, proj, pt.gx, pt.gy, team.color, pt.label, () => openInfoPanel(team, pt));
+  });
+}
 
-    const stem = document.createElementNS(SVG_NS,'line');
-    stem.setAttribute('x1',base.x);stem.setAttribute('y1',base.y);
-    stem.setAttribute('x2',hp.x);stem.setAttribute('y2',hp.y);
-    stem.setAttribute('stroke',z.color);stem.setAttribute('stroke-width','1.5');
-    stem.setAttribute('stroke-dasharray','3 3');
+function buildFloors(){
+  floorsWrap.innerHTML = '';
+  TEAMS.forEach(team => {
+    const sec = document.createElement('section');
+    sec.className = 'floor-spacer';
+    sec.dataset.floor = team.floor;
+    sec.style.setProperty('--floor-color', team.color);
 
-    const ring = document.createElementNS(SVG_NS,'circle');
-    ring.setAttribute('class','ring');
-    ring.setAttribute('cx',hp.x);ring.setAttribute('cy',hp.y);ring.setAttribute('r',9);ring.setAttribute('fill',z.color);
+    const blurb  = team.key === 'network'
+      ? 'Infraestrutura de rede segmentada por VLANs, com firewall de borda e monitoramento de disponibilidade — a espinha dorsal sobre a qual os demais times operam com segurança.'
+      : FLOOR_CONTENT[team.key].blurb;
+    const lottie = team.key === 'network' ? 'Tech.json' : FLOOR_CONTENT[team.key].lottie;
 
-    const core = document.createElementNS(SVG_NS,'circle');
-    core.setAttribute('class','core');
-    core.setAttribute('cx',hp.x);core.setAttribute('cy',hp.y);core.setAttribute('r',7);
-    core.setAttribute('fill',z.color);core.setAttribute('stroke','#FFFFFF');core.setAttribute('stroke-width','2.5');
+    sec.innerHTML = `
+      <div class="floor-pin">
+        <div class="floor-inner">
+          <div class="floor-side">
+            <div class="floor-num">Nível ${team.num}</div>
+            <h2>${team.name}</h2>
+            <span class="status-chip ${chipClass(team.status)}">${team.status}</span>
+            <p class="floor-blurb">${blurb}</p>
+            <div class="floor-hint"><span class="dot"></span>clique nos pontos para explorar</div>
+            <div class="lottie-slot"></div>
+          </div>
+          <div class="floor-scene"><svg viewBox="0 0 900 520" role="img" aria-label="Planta isométrica do andar ${team.name}"></svg></div>
+        </div>
+      </div>`;
+    floorsWrap.appendChild(sec);
 
-    const label = document.createElementNS(SVG_NS,'text');
-    label.setAttribute('x',hp.x);label.setAttribute('y',hp.y-17);
-    label.setAttribute('text-anchor','middle');
-    label.setAttribute('font-family','Space Mono, monospace');
-    label.setAttribute('font-size','11');label.setAttribute('font-weight','700');
-    label.setAttribute('fill', shade(z.color,-0.12));
-    label.textContent = z.label.split(' — ')[0];
+    const svg = sec.querySelector('svg');
+    if(team.key === 'network') buildNetworkPlan(svg);
+    else buildFloorPlan(svg, team);
 
-    g.append(stem, ring, core, label);
-    g.addEventListener('click', () => openPanel(z));
-    g.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPanel(z); } });
-    svg.appendChild(g);
+    if(lottie) loadLottie(sec.querySelector('.lottie-slot'), lottie);
+
+    floorSecs.push({ el: sec, key: team.key, floor: team.floor, inner: sec.querySelector('.floor-inner') });
+  });
+}
+
+function buildTeamRows(){
+  const wrap = document.getElementById('teamRows');
+  wrap.innerHTML = '';
+  TEAMS.forEach(team => {
+    const ov = OVERVIEW[team.key];
+    const row = document.createElement('button');
+    row.className = 'team-row';
+    row.style.setProperty('--tr-color', team.color);
+    row.innerHTML = `
+      <span class="tr-num">${team.num}</span>
+      <span class="tr-body">
+        <span class="tr-name">${team.name}</span>
+        <span class="tr-line">${ov.line}</span>
+      </span>
+      <span class="status-chip ${chipClass(team.status)}">${team.status}</span>
+      <span class="tr-arrow">→</span>`;
+    row.addEventListener('click', () => openOverviewPanel(team));
+    wrap.appendChild(row);
   });
 }
 
 /* ---------------- painel ---------------- */
-const panel = document.getElementById('panel');
-const overlay = document.getElementById('overlay');
-function openPanel(z){
-  panel.style.setProperty('--pc', z.color);
-  document.getElementById('panelTitleText').textContent = z.label;
-  document.getElementById('panelCount').textContent = z.items.length + (z.items.length===1?' host':' hosts');
-  const box = document.getElementById('panelHosts');
+function panelHeader(title, color, statusHtml){
+  panel.style.setProperty('--pc', color);
+  document.getElementById('panelTitleText').textContent = title;
+  document.getElementById('panelStatus').innerHTML = statusHtml || '';
+}
+function openPanel(){
+  panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
+  overlay.classList.add('show');
+}
+function closePanel(){
+  panel.classList.remove('open'); panel.setAttribute('aria-hidden','true');
+  overlay.classList.remove('show');
+}
+
+/* Nível 01 — lista de hosts (comportamento original) */
+function openHostPanel(z){
+  panelHeader(z.label, z.color, '');
+  document.getElementById('panelStatus').innerHTML =
+    `<div class="count">${z.items.length} ${z.items.length === 1 ? 'host' : 'hosts'}</div>`;
+  const box = document.getElementById('panelBody');
   box.innerHTML = '';
   z.items.forEach(it => {
     const el = document.createElement('div');
@@ -550,59 +886,89 @@ function openPanel(z){
     el.querySelector('.detail').textContent = it.detail;
     box.appendChild(el);
   });
-  panel.classList.add('open'); panel.setAttribute('aria-hidden','false');
-  overlay.classList.add('show');
+  openPanel();
 }
-function closePanel(){
-  panel.classList.remove('open'); panel.setAttribute('aria-hidden','true');
-  overlay.classList.remove('show');
+
+/* blocos "o que é / por que existe / como se conecta" */
+function infoBlocks(o){
+  return `
+    <div class="p-block"><h4>O que é</h4><p>${o.what}</p></div>
+    <div class="p-block"><h4>Por que existe</h4><p>${o.why}</p></div>
+    <div class="p-block connects"><h4>Como se conecta com os outros times</h4><p>${o.connects}</p></div>`;
 }
+
+/* andares 2-5 — hotspot */
+function openInfoPanel(team, pt){
+  const st = pt.status
+    ? `<span class="status-chip ${chipClass(pt.status)}">${pt.status}</span>`
+    : `<span class="status-chip ${chipClass(team.status)}">${team.status}</span>`;
+  panelHeader(pt.label, team.color, st);
+  document.getElementById('panelBody').innerHTML = infoBlocks(pt);
+  openPanel();
+}
+
+/* panorama — resumo do time */
+function openOverviewPanel(team){
+  const ov = OVERVIEW[team.key];
+  panelHeader(`${team.num} · ${team.name}`, team.color,
+    `<span class="status-chip ${chipClass(team.status)}">${team.status}</span>`);
+  document.getElementById('panelBody').innerHTML = infoBlocks(ov);
+  openPanel();
+}
+
 document.getElementById('closePanel').addEventListener('click', closePanel);
 overlay.addEventListener('click', closePanel);
 window.addEventListener('keydown', e => { if(e.key==='Escape') closePanel(); });
-
-/* ---------------- personagem Lottie ---------------- */
-if(window.lottie){
-  lottie.loadAnimation({
-    container: document.getElementById('lottieChar'),
-    renderer: 'svg', loop: true, autoplay: true, path: 'Tech.json'
-  });
-}
 
 /* ---------------- scroll ---------------- */
 function progressOf(el){
   const r = el.getBoundingClientRect();
   const total = r.height - window.innerHeight;
   if(total <= 0) return 0;
-  return Math.min(1, Math.max(0, -r.top/total));
+  return clamp01(-r.top / total);
 }
-const heroSpacer  = document.getElementById('heroSpacer');
-const heroPin     = document.getElementById('heroPin');
-const floorSpacer = document.getElementById('floorSpacer');
-const floorInner  = document.getElementById('floorInner');
-const levelHud    = document.getElementById('levelHud');
+
+const heroSpacer     = document.getElementById('heroSpacer');
+const heroPin        = document.getElementById('heroPin');
+const overviewSpacer = document.getElementById('overviewSpacer');
+const overviewCard   = document.getElementById('overviewCard');
+const levelHud       = document.getElementById('levelHud');
+
+function computeGlobalT(){
+  const start = heroSpacer.offsetTop;
+  const last  = floorSecs.length ? floorSecs[floorSecs.length-1].el : overviewSpacer;
+  const end   = last.offsetTop + last.offsetHeight - window.innerHeight;
+  if(end <= start) return 0;
+  return clamp01((window.scrollY - start) / (end - start));
+}
 
 function onScroll(){
   const hp = progressOf(heroSpacer);
-  heroPin.style.opacity   = String(1 - hp*1.25);
+  heroPin.style.opacity   = String(clamp01(1 - hp*1.3));
   heroPin.style.transform = `translateY(${(-hp*40).toFixed(1)}px)`;
 
-  applyCamera(hp);
-  levelHud.classList.toggle('show', hp > 0.25);
+  const ovp = progressOf(overviewSpacer);
+  const ovIn = clamp01(Math.min(ovp, 1-ovp) * 4);
+  overviewCard.style.opacity   = String(ovIn);
+  overviewCard.style.transform = `translateY(${((1-ovIn)*40).toFixed(1)}px)`;
 
-  // qual andar está em foco durante a descida (5 -> 1)
-  if(hp > 0.2){
-    const idx = Math.min(TEAMS.length-1, Math.floor((1-hp) / 0.2));
-    highlightFloor(TEAMS[idx].floor);
-  } else {
-    highlightFloor(null);
-  }
+  applyCameraByT(computeGlobalT());
 
-  const fp = progressOf(floorSpacer);
-  const enter = Math.min(1, fp*3);
-  floorInner.style.opacity   = String(enter);
-  floorInner.style.transform = `translateY(${((1-enter)*44).toFixed(1)}px)`;
-  if(fp > 0.02) highlightFloor('floor_1');
+  // andar ativo = o último cujo scroll já começou
+  let activeIdx = -1;
+  floorSecs.forEach((f, i) => { if(progressOf(f.el) > 0.05) activeIdx = i; });
+  levelHud.classList.toggle('show', activeIdx >= 0 || ovp > 0.15);
+  highlightFloor(activeIdx >= 0 ? floorSecs[activeIdx].floor : null);
+
+  // fade dos cards de andar
+  floorSecs.forEach((f, i) => {
+    const p = progressOf(f.el);
+    let vis = 0;
+    if(p > 0.06 && p < 0.94) vis = clamp01(Math.min((p-0.06)/0.14, (0.94-p)/0.14));
+    f.inner.style.opacity   = String(vis);
+    f.inner.style.transform = `translateY(${((1-vis)*42).toFixed(1)}px)`;
+    f.inner.style.pointerEvents = vis > 0.6 ? 'auto' : 'none';
+  });
 
   render();
 }
@@ -612,8 +978,10 @@ window.addEventListener('scroll', () => {
   if(!ticking){ ticking = true; requestAnimationFrame(() => { onScroll(); ticking = false; }); }
 }, { passive:true });
 
-buildFloorPlan();
-applyCamera(0);
+/* ---------------- init ---------------- */
+buildTeamRows();
+buildFloors();
+applyCameraByT(0);
 render();
 onScroll();
 </script>
