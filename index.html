@@ -8,22 +8,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-void: #0A0D10;
-    --panel: #10151A;
-    --panel-2: #141B21;
-    --line: #1E2730;
-    --text-primary: #E4EAEF;
-    --text-muted: #7C8894;
-    --brand: #6EA8FF;      /* accent institucional da empresa */
-    --accent: #F5A623;     /* accent do time atual (muda ao entrar no deck) */
+    --bg-void: #F4F7FA;    /* branco gelo — fundo do site */
+    --panel: #FFFFFF;
+    --panel-2: #EDF1F6;
+    --line: #D8E0E9;
+    --text-primary: #0E1A26;
+    --text-muted: #5C6B7A;
+    --brand: #1D6FE0;      /* accent institucional da empresa */
+    --accent: #C2700A;     /* accent do time atual (muda ao entrar no deck) */
 
-    /* paleta de categorias para os componentes interativos (zones/flow/tarefas) */
+    /* paleta de categorias para os componentes interativos (zones/flow) */
     --c-accent: var(--brand);
-    --c-success: #5EC98A;      --c-success-rgb: 94,201,138;
-    --c-danger: #F2617A;       --c-danger-rgb: 242,97,122;
-    --c-pro: #B18CFF;          --c-pro-rgb: 177,140,255;
-    --c-neutral: #7C8894;      --c-neutral-rgb: 124,136,148;
-    --c-warning: #F5C242;      --c-warning-rgb: 245,194,66;
+    --c-success: #1B9455;      --c-success-rgb: 27,148,85;
+    --c-danger: #D23A57;       --c-danger-rgb: 210,58,87;
+    --c-pro: #6D3FD4;          --c-pro-rgb: 109,63,212;
+    --c-neutral: #5C6B7A;      --c-neutral-rgb: 92,107,122;
+    --c-warning: #B07D0A;      --c-warning-rgb: 176,125,10;
   }
   *{ box-sizing: border-box; margin:0; padding:0; }
   html{ scroll-behavior: smooth; }
@@ -44,7 +44,7 @@
       linear-gradient(var(--line) 1px, transparent 1px),
       linear-gradient(90deg, var(--line) 1px, transparent 1px);
     background-size: 48px 48px;
-    opacity: 0.3;
+    opacity: 0.6;
     pointer-events: none;
     z-index: 0;
   }
@@ -56,7 +56,7 @@
     position: sticky; top:0; z-index: 40;
     display:flex; align-items:center; justify-content:space-between;
     padding: 18px 60px;
-    background: rgba(10,13,16,0.85);
+    background: rgba(244,247,250,0.88);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--line);
   }
@@ -180,7 +180,7 @@
 
   #topbar{
     position: fixed; top:0; left:0; right:0; z-index: 60;
-    background: rgba(16,21,26,0.9);
+    background: rgba(255,255,255,0.92);
     backdrop-filter: blur(6px);
     border-bottom: 1px solid var(--line);
   }
@@ -212,17 +212,6 @@
   }
   .tab:hover{ color: var(--text-primary); }
   .tab.active{ color: var(--text-primary); border-bottom-color: var(--accent); }
-
-  #viewTabs{ display:none; padding: 0 22px 12px; gap: 8px; }
-  #viewTabs.show{ display:flex; }
-  .view-tab{
-    font-family:'Space Mono', monospace; font-size: 11px; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--text-muted);
-    background: var(--panel); border: 1px solid var(--line); border-radius: 4px;
-    padding: 7px 14px; cursor: pointer; transition: color .2s, border-color .2s;
-  }
-  .view-tab:hover{ color: var(--text-primary); }
-  .view-tab.active{ color: var(--text-primary); border-color: var(--accent); }
 
   #deck{ position:relative; height:100vh; z-index:1; padding-top: var(--topbar-h, 82px); }
   .slide{
@@ -297,7 +286,7 @@
   .zone-item .zi-name{ font-weight:600; font-size:0.92rem; }
   .zone-item .zi-meta{ font-family:'Space Mono', monospace; font-size:11px; color: var(--text-muted); margin-top:3px; }
   .zone-item:hover{ border-color: var(--zone-color, var(--accent)); }
-  .zone-item.selected{ border-color: var(--zone-color, var(--accent)); background: rgba(255,255,255,0.05); }
+  .zone-item.selected{ border-color: var(--zone-color, var(--accent)); background: rgba(14,26,38,0.06); }
   .zone-detail{
     background: var(--panel); border:1px solid var(--line); border-left: 3px solid var(--accent);
     border-radius:6px; padding: 16px 20px; min-height: 60px; max-width: 1100px;
@@ -311,9 +300,9 @@
   .flow-svg text{ fill: var(--text-primary); font-family:'Inter', sans-serif; }
   .fn-sub{ fill: var(--text-muted) !important; }
   .flow-link{ stroke: var(--line); stroke-width:2; fill:none; }
-  .flow-route{ stroke: var(--line); stroke-width:1.5; stroke-dasharray:4 4; opacity:0.5; transition: stroke .3s, opacity .3s; fill:none; }
+  .flow-route{ stroke: var(--line); stroke-width:1.5; stroke-dasharray:4 4; opacity:0.9; transition: stroke .3s, opacity .3s; fill:none; }
   .flow-route.active{ stroke: var(--accent); opacity:1; }
-  .flow-packet{ filter: drop-shadow(0 0 3px rgba(255,255,255,0.55)); }
+  .flow-packet{ filter: drop-shadow(0 0 3px rgba(14,26,38,0.35)); }
   .flow-controls{ display:flex; flex-wrap:wrap; gap:10px; margin-top:18px; }
   .flow-btn{
     font-family:'Space Mono', monospace; font-size:12px; letter-spacing:0.05em; text-transform:uppercase;
@@ -364,33 +353,10 @@
   .tl-note{ margin-top: 20px; font-size: 0.82rem; color: var(--text-muted); max-width: 60ch; }
   .slide-note{ margin-top: 20px; font-size: 0.82rem; color: var(--text-muted); max-width: 60ch; }
 
-  /* ============ TAREFAS (aba secundária por time) ============ */
-  #tasksPanel{
-    display:none; position:relative; height:100vh; z-index:1; overflow-y:auto;
-    padding: calc(var(--topbar-h, 82px) + 40px) 90px 90px;
-  }
-  .tasks-wrap{ max-width: 900px; width:100%; }
-  .task-list{ display:flex; flex-direction:column; }
-  .task-row{
-    display:flex; align-items:flex-start; justify-content:space-between; gap:20px;
-    padding: 18px 0; border-bottom: 1px solid var(--line);
-  }
-  .task-row:last-child{ border-bottom:none; }
-  .task-main{ flex:1; min-width:0; }
-  .task-meta{ font-weight:700; font-size:1.02rem; margin-bottom:6px; }
-  .task-desc{ color: var(--text-muted); font-size:0.92rem; line-height:1.55; }
-  .task-badge{
-    font-family:'Space Mono', monospace; font-size: 11px; letter-spacing:0.04em;
-    padding: 4px 12px; border-radius: 999px; white-space:nowrap; flex-shrink:0; margin-top:2px;
-  }
-  .task-badge.not_started{ background: rgba(var(--c-neutral-rgb),0.15); color: var(--c-neutral); }
-  .task-badge.in_progress{ background: rgba(var(--c-warning-rgb),0.15); color: var(--c-warning); }
-  .task-badge.done{ background: rgba(var(--c-success-rgb),0.15); color: var(--c-success); }
-
   #navbar{
     position: fixed; bottom:0; left:0; right:0; height:60px;
     display:flex; align-items:center; justify-content:center; gap: 10px; z-index: 50;
-    background: linear-gradient(0deg, rgba(10,13,16,0.9), transparent);
+    background: linear-gradient(0deg, rgba(244,247,250,0.95), transparent);
   }
   .nav-dot{ width: 30px; height:4px; border-radius:2px; background: var(--line); cursor:pointer; border:none; transition: background .25s; }
   .nav-dot.active{ background: var(--accent); }
@@ -405,8 +371,6 @@
     .grid-wrap, .team-grid, .zone-grid{ grid-template-columns: 1fr !important; }
     #arrows{ display:none; }
     .matrix-body-inner{ padding-left: 18px; }
-    #tasksPanel{ padding-left: 24px; padding-right: 24px; }
-    .task-row{ flex-direction:column; gap:10px; }
   }
   @media (prefers-reduced-motion: reduce){ .slide{ transition: opacity .01s; transform:none; } }
 </style>
@@ -466,11 +430,9 @@
       </div>
     </div>
     <div id="tabs"></div>
-    <div id="viewTabs"></div>
   </div>
 
   <div id="deck"></div>
-  <div id="tasksPanel"></div>
 
   <div id="arrows">
     <button id="prevBtn" aria-label="Slide anterior">↑</button>
@@ -535,13 +497,6 @@
        { title:"Diagnóstico oculto", detail:"O time de CS ou o contador identifica a oportunidade..." }
      ]
    }
-
-   TAREFAS — cada time pode ganhar um campo opcional "tasks" (array). Se
-   presente e com ao menos 1 item, o site mostra uma aba "Tarefas" ao lado
-   de "Apresentação" na página do time. status: "not_started" | "in_progress" | "done".
-   tasks:[
-     { meta:"Nome curto da tarefa", desc:"Descrição da tarefa.", status:"not_started" }
-   ]
    ========================================================================= */
 
 const COMPANY = {
@@ -554,7 +509,7 @@ const COMPANY = {
 const TEAMS = {
 
   network: {
-    label: "Network", accent: "#3ED6C4",
+    label: "Network", accent: "#0E9C8B",
     blurb: "Infraestrutura de rede segmentada por VLANs, com firewall de borda e monitoramento de disponibilidade — a espinha dorsal sobre a qual os demais times operam com segurança.",
     slides: [
       { title:"Missão do Network", kicker:"O time de Network é responsável pela infraestrutura de rede da Cyberappfin: desenho da topologia, segmentação por VLANs, disponibilidade e o caminho que todo o tráfego percorre antes de chegar aos sistemas da empresa. É a camada sobre a qual os demais times — especialmente SOC e IAM — constroem monitoramento e controle de acesso." },
@@ -619,7 +574,7 @@ const TEAMS = {
   },
 
   iam: {
-    label: "IAM", accent: "#B18CFF",
+    label: "IAM", accent: "#6D3FD4",
     blurb: "Gestão de identidades e controle de acesso a sistemas críticos, garantindo que cada colaborador opere apenas com os privilégios necessários à sua função.",
     slides: [
       { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Identity & Access Management", title:"Time de IAM", kicker:"Descreva aqui o escopo do time: identidades, acessos, permissões." },
@@ -641,7 +596,7 @@ const TEAMS = {
   },
 
   grc: {
-    label: "GRC", accent: "#F5C242",
+    label: "GRC", accent: "#B07D0A",
     blurb: "Mapeamento dos 14 domínios da ISO/IEC 27001 ao contexto regulatório da Cyberappfin — Bacen, LGPD e PLD/COAF — sustentando a política de segurança da informação da empresa.",
     slides: [
       { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Governance, Risk & Compliance", title:"Time de GRC", kicker:"Descreva aqui o escopo do time: políticas, riscos, conformidade." },
@@ -663,7 +618,7 @@ const TEAMS = {
   },
 
   soc: {
-    label: "SOC", accent: "#F5A623",
+    label: "SOC", accent: "#C2700A",
     blurb: "Monitoramento contínuo do ambiente, detecção de eventos de segurança e resposta a incidentes, com ferramentas como SIEM e escaneamento de vulnerabilidades.",
     slides: [
       { title:"Missão do SOC", kicker:"O SOC da Cyberappfin é responsável pela visibilidade contínua sobre o ambiente de TI da empresa: monitorar eventos de segurança em tempo real, detectar comportamentos anômalos e coordenar a resposta a incidentes antes que se tornem impacto ao negócio. Como financeira regulada, a Cyberappfin lida com dados sensíveis de clientes e operações de crédito — o que torna a detecção precoce não apenas uma boa prática, mas parte da conformidade com Bacen e LGPD." },
@@ -707,18 +662,11 @@ const TEAMS = {
         ]
       },
       { title:"Fechamento", kicker:"O SOC entrega à Cyberappfin o que nenhuma outra área sozinha consegue: visibilidade sobre o que está acontecendo agora e capacidade de reagir antes que um evento vire prejuízo. Essa visibilidade sustenta, na prática, os controles de gestão de incidentes e conformidade que a GRC formaliza em política." }
-    ],
-    tasks: [
-      { meta: "Implantação Wazuh (SIEM/EDR)", desc: "Implantar o Wazuh para coleta, correlação e monitoramento de eventos de segurança.", status: "not_started" },
-      { meta: "Instalação Zabbix (monitoramento)", desc: "Configurar o Zabbix para monitoramento da infraestrutura e disponibilidade dos ativos.", status: "not_started" },
-      { meta: "Integração pfSense (Suricata EVE JSON)", desc: "Integrar os eventos do Suricata/pfSense ao ambiente de monitoramento e segurança.", status: "not_started" },
-      { meta: "Configuração Grafana (dashboards)", desc: "Criar dashboards para visualização dos principais indicadores de infraestrutura e segurança.", status: "not_started" },
-      { meta: "OpenVAS (varredura)", desc: "Configurar o OpenVAS para realização de varreduras e identificação de vulnerabilidades.", status: "not_started" }
     ]
   },
 
   endpoint: {
-    label: "Endpoint", accent: "#5EC98A",
+    label: "Endpoint", accent: "#1B9455",
     blurb: "Proteção dos dispositivos que acessam os sistemas da Cyberappfin, cobrindo desde antivírus/EDR até a gestão de atualizações e patches.",
     slides: [
       { type:"cover", brand:"Impacta · Simulação Empresarial", eyebrow:"Endpoint Security", title:"Time de Endpoint", kicker:"Descreva aqui o escopo do time: dispositivos, antivírus/EDR, patching." },
@@ -745,7 +693,6 @@ const TEAM_ORDER = ["network","iam","grc","soc","endpoint"];
 
 let currentTeam = TEAM_ORDER[0];
 let current = 0;
-let currentView = 'slides';
 
 /* ---------- HOME ---------- */
 function fillCompanyInfo(){
@@ -784,12 +731,8 @@ function goHome(){
 /* ---------- DECK (apresentação) ---------- */
 const deck = document.getElementById('deck');
 const navbar = document.getElementById('navbar');
-const arrowsEl = document.getElementById('arrows');
 const tabsEl = document.getElementById('tabs');
-const viewTabsEl = document.getElementById('viewTabs');
-const tasksPanel = document.getElementById('tasksPanel');
 const topbarEl = document.getElementById('topbar');
-const TASK_STATUS_LABEL = { not_started:'Não iniciado', in_progress:'Em andamento', done:'Concluído' };
 
 function cardHTML(c){
   return `<div class="card"><span class="num mono">${c.num||''}</span><h3>${c.title}</h3><p>${c.text}</p></div>`;
@@ -1118,13 +1061,10 @@ function buildTabs(){
 function switchTeam(key){
   currentTeam = key;
   current = 0;
-  currentView = 'slides';
   document.documentElement.style.setProperty('--accent', TEAMS[key].accent);
   buildTabs();
-  buildViewTabs();
   buildDeck();
-  buildTasksPanel();
-  applyView();
+  updateTopbarHeight();
 }
 
 function openDeck(key){
@@ -1132,69 +1072,8 @@ function openDeck(key){
   switchTeam(key);
 }
 
-/* ---------- Abas Apresentação / Tarefas ---------- */
-function buildViewTabs(){
-  viewTabsEl.innerHTML = '';
-  const tasks = TEAMS[currentTeam].tasks || [];
-  if(tasks.length === 0){
-    viewTabsEl.classList.remove('show');
-    updateTopbarHeight();
-    return;
-  }
-  viewTabsEl.classList.add('show');
-  [['slides','Apresentação'], ['tasks','Tarefas']].forEach(([key,label]) => {
-    const btn = document.createElement('button');
-    btn.className = 'view-tab' + (currentView === key ? ' active' : '');
-    btn.textContent = label;
-    btn.addEventListener('click', () => switchView(key));
-    viewTabsEl.appendChild(btn);
-  });
-  updateTopbarHeight();
-}
-
-function switchView(view){
-  currentView = view;
-  viewTabsEl.querySelectorAll('.view-tab').forEach((btn,i) => btn.classList.toggle('active', (i===0 ? 'slides' : 'tasks') === view));
-  applyView();
-}
-
-function applyView(){
-  const showSlides = currentView === 'slides';
-  deck.style.display = showSlides ? '' : 'none';
-  arrowsEl.style.display = showSlides ? '' : 'none';
-  navbar.style.display = showSlides ? '' : 'none';
-  tasksPanel.style.display = showSlides ? 'none' : 'block';
-  updateTopbarHeight();
-}
-
 function updateTopbarHeight(){
   document.documentElement.style.setProperty('--topbar-h', topbarEl.offsetHeight + 'px');
-}
-
-function buildTasksPanel(){
-  const t = TEAMS[currentTeam];
-  const tasks = t.tasks || [];
-  tasksPanel.innerHTML = '';
-  const wrap = document.createElement('div');
-  wrap.className = 'tasks-wrap';
-  wrap.innerHTML = `<div class="eyebrow">Tarefas</div><h2 class="title">Tarefas do time ${t.label}</h2>`;
-
-  const list = document.createElement('div');
-  list.className = 'task-list';
-  tasks.forEach(task => {
-    const status = task.status || 'not_started';
-    const row = document.createElement('div');
-    row.className = 'task-row';
-    row.innerHTML = `
-      <div class="task-main">
-        <div class="task-meta">${task.meta||''}</div>
-        <div class="task-desc">${task.desc||''}</div>
-      </div>
-      <span class="task-badge ${status}">${TASK_STATUS_LABEL[status] || TASK_STATUS_LABEL.not_started}</span>`;
-    list.appendChild(row);
-  });
-  wrap.appendChild(list);
-  tasksPanel.appendChild(wrap);
 }
 
 function buildDeck(){
@@ -1233,12 +1112,10 @@ document.getElementById('prevBtn').addEventListener('click', prev);
 
 window.addEventListener('keydown', (e) => {
   if(!document.body.classList.contains('deck-mode')) return;
-  if(currentView === 'slides'){
-    if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
-    if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
-    if(e.key === 'Home'){ goTo(0); }
-    if(e.key === 'End'){ const s=TEAMS[currentTeam].slides; goTo(s.length-1); }
-  }
+  if(['ArrowRight','ArrowDown',' ','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
+  if(['ArrowLeft','ArrowUp','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+  if(e.key === 'Home'){ goTo(0); }
+  if(e.key === 'End'){ const s=TEAMS[currentTeam].slides; goTo(s.length-1); }
   if(e.key === 'Escape'){ goHome(); }
   if(e.key === 'Tab'){
     e.preventDefault();
@@ -1252,11 +1129,9 @@ let touchStartY = null;
 window.addEventListener('touchstart', e => { if(document.body.classList.contains('deck-mode')) touchStartY = e.touches[0].clientY; });
 window.addEventListener('touchend', e => {
   if(touchStartY === null) return;
-  if(currentView === 'slides'){
-    const dy = e.changedTouches[0].clientY - touchStartY;
-    if(dy < -50) next();
-    if(dy > 50) prev();
-  }
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if(dy < -50) next();
+  if(dy > 50) prev();
   touchStartY = null;
 });
 
