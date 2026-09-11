@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberAppFin · Documentação do Scan OpenVAS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#C2700A; --orange:#1D6FE0; --ink:#0E1A26; --muted:#5C6B7A;
+  --bg:#F4F7FA; --card:#FFFFFF; --line:#D8E0E9; --good:#1B9455;
+  --critical:#D23A57; --high:#D45435; --medium:#B07D0A; --low:#1D6FE0; --log:#5C6B7A;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif}
+h1,h2,h3,.kicker,nav .brand,.panel h3,.card h3,td.num,th,.smallcaps,.badge{font-family:'Space Mono',monospace}
+nav{position:fixed;top:0;left:0;right:0;z-index:20;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(14,26,38,.92);color:#fff;backdrop-filter:blur(8px)}
+nav .brand{font-weight:700;letter-spacing:.04em;font-size:13px} nav .brand span{color:var(--blue)} nav .links{display:flex;align-items:center;gap:14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em} nav a{color:#c9d3db;text-decoration:none}
+nav a:hover{color:#fff} nav .back{color:#fff;font-weight:700;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:6px 12px}
+.slide{width:min(1440px,calc(100% - 28px));min-height:calc(100vh - 28px);margin:14px auto;padding:82px 72px 60px;background:var(--card);border-radius:20px;box-shadow:0 14px 40px rgba(14,26,38,.08);position:relative;overflow:hidden;border:1px solid var(--line)}
+.cover{display:grid;grid-template-columns:1.35fr .65fr;align-items:center;background:linear-gradient(135deg,#0E1A26 0%,#3a2a12 65%,#C2700A 100%);color:#fff;border:none}
+.cover:after{content:"";position:absolute;width:520px;height:520px;right:-160px;top:-130px;border-radius:50%;border:70px solid rgba(194,112,10,.18)}
+.kicker{text-transform:uppercase;letter-spacing:.18em;font-size:13px;font-weight:700;color:var(--blue)}
+.cover .kicker{color:#F0A94D}
+h1{font-weight:700;font-size:clamp(34px,5.4vw,60px);line-height:1.06;margin:18px 0;letter-spacing:-.01em}
+h2{font-weight:700;font-size:30px;margin:0 0 10px;letter-spacing:-.01em}
+h3{font-weight:700;font-size:16px;margin:0 0 8px}
+.cover p{font-size:18px;line-height:1.6;color:#dce9ee;max-width:820px;font-family:'Inter',sans-serif}
+.lead{margin:0 0 26px;color:var(--muted);font-size:16px;line-height:1.6;max-width:88ch}
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin:26px 0}
+.metric{padding:20px;border:1px solid var(--line);border-radius:16px;background:var(--bg);text-align:center}
+.metric b{display:block;font-size:34px} .metric span{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-family:'Inter',sans-serif;margin-top:4px}
+.panel{border:1px solid var(--line);border-radius:16px;padding:22px;background:var(--card)}
+.split2{display:grid;grid-template-columns:1fr 1fr;gap:22px}
+.card{border:1px solid var(--line);border-radius:14px;padding:20px;background:var(--bg)}
+.card p{color:var(--muted);font-size:.94rem;line-height:1.6;margin:0}
+table{width:100%;border-collapse:collapse;font-size:12.5px;font-family:'Inter',sans-serif}
+th{text-align:left;color:var(--muted);font-weight:700;border-bottom:2px solid var(--line);padding:10px 8px;font-size:10.5px;text-transform:uppercase;letter-spacing:.04em}
+td{border-bottom:1px solid var(--line);padding:11px 8px;vertical-align:top;line-height:1.5}
+td.num{text-align:right;font-weight:700;font-family:'Space Mono',monospace}
+.badge{display:inline-block;padding:3px 9px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;text-transform:uppercase}
+.badge.crit{background:var(--critical)} .badge.high{background:var(--high)} .badge.med{background:var(--medium)} .badge.low{background:var(--low)} .badge.info{background:var(--log)}
+.callout{margin-top:22px;padding:20px 22px;border-left:5px solid var(--blue);background:#FBF1DF;border-radius:0 14px 14px 0;line-height:1.6;font-size:14px}
+.callout b{font-family:'Inter',sans-serif}
+.numlist{counter-reset:step;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px}
+.numlist>li{counter-increment:step;position:relative;padding-left:44px}
+.numlist>li::before{content:counter(step);position:absolute;left:0;top:0;width:30px;height:30px;border-radius:9px;background:var(--blue);color:#fff;font-family:'Space Mono',monospace;font-weight:700;font-size:14px;display:flex;align-items:center;justify-content:center}
+.numlist h3{margin-bottom:6px}
+.numlist ul{margin:6px 0 0;padding-left:18px;color:var(--muted);font-size:.94rem;line-height:1.65}
+.numlist ul li{margin-bottom:4px}
+.gloss{display:grid;grid-template-columns:200px 1fr;gap:4px 18px;font-size:13px;line-height:1.6}
+.gloss dt{font-family:'Space Mono',monospace;font-weight:700;padding:10px 0;border-top:1px solid var(--line)}
+.gloss dd{margin:0;padding:10px 0;border-top:1px solid var(--line);color:var(--muted)}
+.footer{position:absolute;right:28px;bottom:18px;color:#9AA7B0;font-size:10px;font-family:'Space Mono',monospace}
+.source-list{margin:18px 0 0;padding-left:20px;color:var(--muted);font-size:13.5px;line-height:1.7}
+@media(max-width:980px){nav .links{display:none} .slide{padding:78px 24px 40px;min-height:auto} .cover{grid-template-columns:1fr;gap:24px} .grid-5{grid-template-columns:repeat(2,1fr)} .split2{grid-template-columns:1fr} .gloss{grid-template-columns:1fr}}
+@media print{body{background:#fff} nav{display:none} .slide{width:100%;min-height:100vh;margin:0;border-radius:0;box-shadow:none;page-break-after:always}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">CYBER<span>APPFIN</span> · GUIA DO SCAN OPENVAS</div>
+  <div class="links"><a href="#resumo">Resumo</a><a href="#comoler">Como ler</a><a href="#servicos">Serviço por serviço</a><a href="#plano">Plano de ação</a><a href="#glossario">Glossário</a><a class="back" href="prototipo-v2.html">← Voltar ao SOC</a></div>
+</nav>
+
+<section class="slide cover">
+  <div>
+    <div class="kicker">Blue Team · Documentação da Análise · 11/09/2026</div>
+    <h1>Documentação do Scan OpenVAS</h1>
+    <p>Registro em linguagem acessível da varredura de segurança feita com o OpenVAS e da reclassificação de risco elaborada em cima dela — pra qualquer pessoa da equipe entender o que foi examinado, o que foi encontrado, o que cada achado significa e o que precisa ser feito, sem depender de conhecimento técnico prévio.</p>
+  </div>
+  <div class="grid-5" style="margin:0;grid-template-columns:1fr 1fr">
+    <div class="metric" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)"><b style="color:#F0A94D">744</b><span style="color:#dce8ed">ocorrências analisadas</span></div>
+    <div class="metric" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)"><b style="color:#F0A94D">20</b><span style="color:#dce8ed">hosts afetados</span></div>
+    <div class="metric" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)"><b style="color:#F0A94D">19</b><span style="color:#dce8ed">portas observadas</span></div>
+    <div class="metric" style="background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)"><b style="color:#F0A94D">4</b><span style="color:#dce8ed">frentes de ação</span></div>
+  </div>
+</section>
+
+<section class="slide" id="resumo">
+  <div class="kicker">01 · Resumo em uma página</div>
+  <h2>O que foi feito e o que foi encontrado</h2>
+  <p class="lead"><strong>O que foi feito.</strong> Uma varredura automática de segurança (OpenVAS) percorreu a rede e examinou 20 máquinas "de fora", como faria alguém conectado à rede sem usuário nem senha. Ela registrou 744 ocorrências. Como o scan foi sem credenciais, o OpenVAS classificou tudo como "informativo" (nota 0,0); a equipe então reclassificou cada ocorrência pelo risco real que ela representa.</p>
+  <p class="lead"><strong>O que foi encontrado, em uma frase.</strong> Serviços de administração remota de servidores (Área de Trabalho Remota, WinRM e SSH) estão acessíveis a partir da rede interna, e vários serviços web usam criptografia antiga. Juntos, esses dois pontos concentram a maior parte dos riscos altos e críticos.</p>
+
+  <div class="panel">
+    <table>
+      <thead><tr><th>Nível após a reclassificação</th><th class="num">Ocorrências</th><th>O que significa</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge crit">Crítico</span></td><td class="num">167</td><td>Porta de administração aberta para a rede: se uma senha vazar ou for adivinhada, o invasor controla a máquina.</td></tr>
+        <tr><td><span class="badge high">Alto</span></td><td class="num">221</td><td>Criptografia fraca ou serviço de acesso remoto exposto: permite interceptar tráfego ou tentar senhas em massa.</td></tr>
+        <tr><td><span class="badge med">Médio</span></td><td class="num">90</td><td>Proteções ausentes em páginas web: facilitam golpes por navegador e vazam detalhes da aplicação.</td></tr>
+        <tr><td><span class="badge low">Baixo</span></td><td class="num">116</td><td>Máquinas revelam nome, sistema e versões de software, o que facilita o planejamento de um ataque.</td></tr>
+        <tr><td><span class="badge info">Informativo</span></td><td class="num">150</td><td>Registro de reconhecimento sem risco direto.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout"><b>O que fazer primeiro.</b> Restringir quem alcança as portas de administração (só a rede de gerência), desligar a criptografia antiga nos serviços web e, em seguida, repetir a varredura com credenciais para enxergar o que está dentro de cada máquina (atualizações pendentes). O plano completo está na seção 5.</div>
+  <div class="footer">CyberAppFin · Resumo em uma página</div>
+</section>
+
+<section class="slide" id="comoler">
+  <div class="kicker">02 · Como ler este documento</div>
+  <h2>Conceitos-base antes da tabela técnica</h2>
+  <div class="split2">
+    <div class="card"><h3>O que é o OpenVAS</h3><p>Uma ferramenta gratuita que testa máquinas da rede em busca de serviços expostos e falhas conhecidas. Ela não invade nada: só observa e registra.</p></div>
+    <div class="card"><h3>Scan sem credenciais</h3><p>A ferramenta olhou as máquinas sem entrar nelas, como um visitante da rede. Por isso enxerga portas e serviços, mas não o que está instalado por dentro (atualizações faltando, configurações). É um retrato da "superfície" exposta.</p></div>
+    <div class="card"><h3>Por que o OpenVAS marcou tudo como Log (0,0)</h3><p>Sem credenciais, ele registra o que encontrou como informação, não como falha comprovada. Isso não quer dizer que não há risco: quer dizer que a ferramenta não pôde medir.</p></div>
+    <div class="card"><h3>O que é a reclassificação</h3><p>A equipe reavaliou cada ocorrência com uma pergunta prática: se alguém mal-intencionado estivesse nesta rede, o que conseguiria fazer com isso? O resultado são os cinco níveis da tabela anterior.</p></div>
+    <div class="card"><h3>Ocorrência não é máquina</h3><p>744 ocorrências são registros. Uma mesma máquina gera várias (uma por porta, por teste). São 20 máquinas ao todo.</p></div>
+    <div class="card"><h3>Porta e serviço</h3><p>Uma porta é a "entrada" numérica pela qual um serviço conversa na rede. Porta 3389 é a Área de Trabalho Remota; 22 é o SSH; 443 é HTTPS. Porta aberta para todos = qualquer um na rede pode bater nela.</p></div>
+  </div>
+  <div class="footer">CyberAppFin · Como ler este documento</div>
+</section>
+
+<section class="slide" id="servicos">
+  <div class="kicker">03 · O que foi encontrado, serviço por serviço</div>
+  <h2>Cada achado traduzido em linguagem simples</h2>
+  <p class="lead">Cada linha traduz um achado do relatório: o que é o serviço, por que ele pesa na classificação e o que fazer. Os números de ocorrências vêm do relatório original.</p>
+  <div class="panel">
+    <table>
+      <thead><tr><th>Nível</th><th>Serviço (porta)</th><th>O que é</th><th class="num">Ocorr.</th><th>Por que importa</th><th>O que fazer</th></tr></thead>
+      <tbody>
+        <tr><td><span class="badge crit">Crítico</span></td><td><strong>Área de Trabalho Remota, RDP (3389)</strong></td><td>Permite controlar um computador Windows à distância, como se estivesse sentado nele.</td><td class="num">70</td><td>Aberta para a rede inteira, é alvo direto de tentativas de senha em massa e de falhas conhecidas do próprio serviço. Quem entra, controla a máquina.</td><td>Liberar só para a rede de gerência no firewall; exigir autenticação de nível de rede (NLA).</td></tr>
+        <tr><td><span class="badge crit">Crítico</span></td><td><strong>WinRM (5985) e compartilhamentos SMB/CIFS (445, 139, 135)</strong></td><td>WinRM executa comandos em servidores Windows pela rede. SMB é o compartilhamento de arquivos e impressoras do Windows.</td><td class="num">42 + 31</td><td>Com uma credencial vazada, permitem executar programas e acessar arquivos em outras máquinas, saltando de uma para outra.</td><td>Restringir ao segmento de gerência; desativar SMBv1; exigir assinatura SMB.</td></tr>
+        <tr><td><span class="badge crit">Crítico</span></td><td><strong>VMware ESXi (902) e DNS (53)</strong></td><td>ESXi é o sistema que hospeda máquinas virtuais; o DNS traduz nomes em endereços.</td><td class="num">24</td><td>A gerência do ESXi exposta dá acesso a todas as máquinas virtuais; o DNS pode revelar o mapa da rede (transferência de zona).</td><td>Gerência do ESXi só pela rede de gerência; DNS sem transferência de zona para qualquer um.</td></tr>
+        <tr><td><span class="badge high">Alto</span></td><td><strong>Criptografia SSL/TLS nos serviços web (443, 8900, 9080)</strong></td><td>É o "cadeado" das páginas. As versões e cifras antigas ainda estão ligadas.</td><td class="num">83 + 66 + 60</td><td>Criptografia antiga pode ser quebrada ou rebaixada, permitindo ler ou alterar o tráfego no meio do caminho.</td><td>Aceitar só TLS 1.2 ou superior; usar apenas cifras modernas com sigilo futuro (PFS) e AES-GCM.</td></tr>
+        <tr><td><span class="badge high">Alto</span></td><td><strong>SSH (22)</strong></td><td>Acesso remoto por linha de comando, comum em servidores Linux e equipamentos.</td><td class="num">32</td><td>Exposto sem restrição, vira alvo de tentativas de senha e chave em massa.</td><td>Liberar só para a rede de gerência; preferir chave a senha; limitar tentativas.</td></tr>
+        <tr><td><span class="badge med">Médio</span></td><td><strong>Cabeçalhos de segurança HTTP (80, 443, 8080)</strong></td><td>Instruções que o servidor web manda ao navegador para ele se proteger.</td><td class="num">24 + parte de 83 e 30</td><td>Sem HSTS, X-Frame-Options e CSP, o site fica mais fácil de embutir em páginas falsas (clickjacking) e de sofrer injeção de código (XSS).</td><td>Ativar os cabeçalhos no servidor web ou no proxy da frente.</td></tr>
+        <tr><td><span class="badge med">Médio</span></td><td><strong>Aplicações web em geral (7070, 8901, 8182, 1515, 9402 e outras)</strong></td><td>Interfaces web de sistemas internos, entre eles Wazuh (monitoramento de segurança), Zabbix (monitoramento) e Veeam (backup).</td><td class="num">28 + 18 + 28 + 11</td><td>Páginas de erro genéricas e respostas padrão revelam como a aplicação é construída, o que ajuda um atacante a escolher o ataque.</td><td>Páginas de erro personalizadas; revisar o que cada interface expõe; manter versões atualizadas.</td></tr>
+        <tr><td><span class="badge med">Médio</span></td><td><strong>HTTP sem criptografia (80) e WS-Discovery (5357)</strong></td><td>Páginas sem cadeado e um serviço de descoberta automática de dispositivos do Windows.</td><td class="num">parte de 24 e 30</td><td>Tráfego legível na rede; descoberta facilita o mapeamento de máquinas.</td><td>Redirecionar para HTTPS; desligar descoberta onde não é usada.</td></tr>
+        <tr><td><span class="badge low">Baixo</span></td><td><strong>Reconhecimento geral (general/tcp)</strong></td><td>Testes que identificam nome da máquina, sistema operacional e versões de programas pelas respostas que eles dão.</td><td class="num">116</td><td>Não abre nenhuma porta nova, mas entrega de bandeja o que cada máquina é e roda, encurtando o trabalho de quem planeja um ataque.</td><td>Ocultar versões nos serviços (banners); manter nomes de host sem informação sensível.</td></tr>
+        <tr><td><span class="badge info">Info</span></td><td><strong>Zabbix Agent (10051), Wazuh Agent (1514)</strong></td><td>Agentes de monitoramento que conversam com seus servidores.</td><td class="num">1 + 3</td><td>Registro de presença; sem risco direto quando restritos aos servidores de monitoramento.</td><td>Confirmar que só os servidores de monitoramento alcançam essas portas.</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="callout"><b>Importante.</b> Este resumo não lista quais máquinas têm cada porta aberta. Essa informação está no relatório completo do OpenVAS e deve ser consultada na hora de executar cada ação.</div>
+  <div class="footer">CyberAppFin · Achados por serviço</div>
+</section>
+
+<section class="slide" id="mensagem">
+  <div class="kicker">04 · A mensagem central do relatório</div>
+  <h2>Dois problemas explicam a maior parte dos itens críticos e altos</h2>
+  <div class="split2">
+    <div class="card">
+      <h3>1. Portas de administração abertas para toda a rede interna</h3>
+      <p>RDP, WinRM e SSH deveriam ser alcançáveis apenas a partir de uma rede separada, usada só por quem administra. Hoje qualquer máquina da rede consegue bater nelas. Isso torna imediatos três ataques: tentativa de senhas em massa (força bruta), salto de uma máquina comprometida para outra (movimentação lateral) e interceptação de tráfego (Man-in-the-Middle).</p>
+    </div>
+    <div class="card">
+      <h3>2. Criptografia antiga nos serviços web</h3>
+      <p>Versões e cifras obsoletas de SSL/TLS continuam habilitadas em 443, 8900 e 9080.</p>
+    </div>
+  </div>
+  <div class="callout">Vale lembrar que um scan sem credenciais só vê a superfície. O que existe dentro das máquinas, como atualizações pendentes, ainda não foi medido. Por isso a última frente do plano é repetir a varredura com credenciais.</div>
+  <div class="footer">CyberAppFin · Mensagem central</div>
+</section>
+
+<section class="slide" id="plano">
+  <div class="kicker">05 · Plano de ação, na ordem</div>
+  <h2>As quatro frentes e a ficha de acompanhamento</h2>
+
+  <ol class="numlist">
+    <li>
+      <h3>Acesso remoto (Crítico)</h3>
+      <ul>
+        <li>Restringir as portas 3389 (RDP), 5985 (WinRM) e 22 (SSH) no firewall, permitindo somente os endereços da rede de gerência.</li>
+        <li>Exigir NLA (autenticação no nível da rede) nas conexões RDP dos servidores Windows.</li>
+        <li>Desativar o SMBv1 e exigir assinatura de pacotes SMB nas portas 445 e 139.</li>
+      </ul>
+    </li>
+    <li>
+      <h3>Web e criptografia (Alto e Médio)</h3>
+      <ul>
+        <li>Remover TLS 1.0 e 1.1 nas portas HTTPS (443, 8900, 9080); aceitar apenas TLS 1.2 ou superior.</li>
+        <li>Configurar somente cifras com sigilo futuro (PFS) e AES-GCM.</li>
+        <li>Adicionar os cabeçalhos Strict-Transport-Security, X-Frame-Options e X-Content-Type-Options no servidor web ou no proxy.</li>
+      </ul>
+    </li>
+    <li>
+      <h3>Ocultar informações (Baixo)</h3>
+      <ul>
+        <li>Esconder a versão de Apache, Nginx e OpenSSH nas respostas (por exemplo, <code>server_tokens off</code> no Nginx).</li>
+        <li>Páginas de erro 404 e 500 personalizadas, sem detalhes internos da aplicação.</li>
+      </ul>
+    </li>
+    <li>
+      <h3>Próxima etapa</h3>
+      <ul>
+        <li>Rodar o OpenVAS de novo com credenciais administrativas locais (WinRM e SSH), para enxergar o interior das máquinas.</li>
+        <li>Identificar vulnerabilidades no nível do sistema operacional, em especial atualizações ausentes, além da superfície de rede.</li>
+      </ul>
+    </li>
+  </ol>
+
+  <h3 style="margin-top:32px">Ficha de acompanhamento</h3>
+  <p class="lead" style="margin-bottom:14px">Para preencher conforme as ações forem sendo executadas.</p>
+  <div class="panel">
+    <table>
+      <thead><tr><th>Ação</th><th>Máquinas envolvidas</th><th>Responsável</th><th>Prazo</th><th>Situação</th></tr></thead>
+      <tbody>
+        <tr><td>Restringir RDP, WinRM e SSH à rede de gerência</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Exigir NLA no RDP</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Desativar SMBv1 e exigir assinatura SMB</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Restringir gerência do ESXi e transferência de zona DNS</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Só TLS 1.2+ e cifras modernas em 443, 8900, 9080</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Cabeçalhos de segurança HTTP</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Ocultar versões e páginas de erro personalizadas</td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Varredura com credenciais</td><td></td><td></td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">CyberAppFin · Plano de ação</div>
+</section>
+
+<section class="slide" id="glossario">
+  <div class="kicker">06 · Glossário</div>
+  <h2>Termos usados neste documento</h2>
+  <dl class="gloss">
+    <dt>OpenVAS / NVT</dt><dd>Ferramenta de varredura e cada um dos seus testes (NVT = Network Vulnerability Test).</dd>
+    <dt>CVE / CVSS</dt><dd>Catálogo público de falhas conhecidas e a escala de 0 a 10 que mede a gravidade delas.</dd>
+    <dt>Host</dt><dd>Uma máquina na rede: servidor, computador ou equipamento.</dd>
+    <dt>Porta</dt><dd>Número que identifica um serviço dentro de uma máquina. Porta aberta = serviço aceitando conexões.</dd>
+    <dt>RDP</dt><dd>Área de Trabalho Remota do Windows (porta 3389).</dd>
+    <dt>WinRM</dt><dd>Gerenciamento remoto do Windows por comandos (porta 5985).</dd>
+    <dt>SMB / CIFS</dt><dd>Compartilhamento de arquivos do Windows (portas 445 e 139). SMBv1 é a versão antiga e insegura. "Assinatura" garante que os pacotes não foram alterados.</dd>
+    <dt>SSH</dt><dd>Acesso remoto por linha de comando (porta 22).</dd>
+    <dt>SSL / TLS</dt><dd>A criptografia do "cadeado". TLS 1.0 e 1.1 são versões antigas; 1.2 e 1.3 são as atuais.</dd>
+    <dt>Cifra, PFS, AES-GCM</dt><dd>Cifra é o algoritmo da criptografia. PFS (sigilo futuro) impede que uma chave roubada hoje abra conversas gravadas no passado. AES-GCM é uma cifra moderna.</dd>
+    <dt>HSTS, X-Frame-Options, CSP, X-Content-Type-Options</dt><dd>Cabeçalhos que o site envia ao navegador para forçar HTTPS, impedir que a página seja embutida em outra e limitar de onde scripts podem vir.</dd>
+    <dt>Clickjacking / XSS</dt><dd>Golpes por navegador: enganar o usuário com uma página sobreposta, ou injetar código numa página legítima.</dd>
+    <dt>Man-in-the-Middle</dt><dd>Alguém se coloca entre duas máquinas e lê ou altera o que passa.</dd>
+    <dt>Força bruta</dt><dd>Tentar senhas ou chaves em massa até acertar.</dd>
+    <dt>Movimentação lateral</dt><dd>Depois de entrar numa máquina, usar credenciais ou serviços para chegar a outras.</dd>
+    <dt>NLA</dt><dd>Autenticação no nível da rede: exige usuário e senha antes de abrir a tela de RDP.</dd>
+    <dt>Banner</dt><dd>A "apresentação" que um serviço faz ao conectar, muitas vezes com nome e versão do programa.</dd>
+    <dt>Transferência de zona</dt><dd>Pedido ao DNS para entregar a lista completa de nomes e endereços de um domínio.</dd>
+    <dt>ESXi, Wazuh, Zabbix, Veeam, WS-Discovery</dt><dd>Respectivamente: plataforma de máquinas virtuais da VMware; monitoramento de segurança; monitoramento de infraestrutura; backup; descoberta automática de dispositivos no Windows.</dd>
+  </dl>
+
+  <h3 style="margin-top:30px">Sobre a fonte</h3>
+  <ul class="source-list">
+    <li>Documento base: "CyberAppFin · Reclassificação de Riscos OpenVAS", análise complementar de 11/09/2026, 744 ocorrências, 20 hosts, 19 portas.</li>
+    <li>Varredura não autenticada (sem credenciais). Todas as ocorrências saíram do OpenVAS como Log (CVSS 0,0) e foram reclassificadas qualitativamente pela equipe, segundo o vetor de exposição e o risco operacional.</li>
+    <li>Esta documentação não acrescenta achados nem altera a classificação: apenas explica e organiza o que consta no documento base. Os números por porta e por nível são os do original.</li>
+  </ul>
+  <div class="footer">CyberAppFin · Glossário · uso interno</div>
+</section>
+
+<script>
+document.addEventListener('keydown',function(e){
+ const slides=[...document.querySelectorAll('.slide')],y=window.scrollY+80;let idx=0;
+ for(let i=0;i<slides.length;i++) if(slides[i].offsetTop<=y) idx=i;
+ if(['ArrowDown','PageDown','ArrowRight'].includes(e.key)){e.preventDefault();slides[Math.min(idx+1,slides.length-1)].scrollIntoView({behavior:'smooth'})}
+ if(['ArrowUp','PageUp','ArrowLeft'].includes(e.key)){e.preventDefault();slides[Math.max(idx-1,0)].scrollIntoView({behavior:'smooth'})}
+});
+</script>
+</body>
+</html>
