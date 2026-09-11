@@ -77,9 +77,12 @@
   .level-hud .lv{
     display:flex; align-items:center; gap:10px;
     font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.12em;
-    text-transform:uppercase; color:var(--text-muted); transition:color .3s ease;
+    text-transform:uppercase; color:var(--text-muted); transition:color .2s ease;
+    background:none; border:none; padding:5px 2px; margin:0; cursor:pointer; pointer-events:auto;
   }
-  .level-hud .lv .bar{ width:22px; height:2px; background:var(--line); transition:all .3s ease; }
+  .level-hud .lv .bar{ width:22px; height:2px; background:var(--line); transition:all .2s ease; }
+  .level-hud .lv:hover{ color:var(--text-primary); }
+  .level-hud .lv:hover .bar{ width:32px; }
   .level-hud .lv.on{ color:var(--text-primary); }
   .level-hud .lv.on .bar{ width:42px; background:var(--lv-color); }
 
@@ -123,8 +126,6 @@
   }
   .floor-hint .dot{ width:8px; height:8px; border-radius:50%; background:var(--floor-color); animation:blink 2s ease-in-out infinite; }
   @keyframes blink{ 0%,100%{opacity:1;} 50%{opacity:.25;} }
-  .lottie-slot{ width:100%; max-width:210px; margin-top:2px; }
-  .lottie-slot:empty{ display:none; }
   .floor-scene{ min-width:0; }
   .floor-scene svg{ width:100%; height:auto; display:block; }
 
@@ -281,8 +282,6 @@
   <div id="panelStatus" class="p-status"></div>
   <div id="panelBody"></div>
 </aside>
-
-<script src="https://cdn.jsdelivr.net/npm/lottie-web@5.12.2/build/player/lottie_light.min.js"></script>
 
 <script type="importmap">
 { "imports": {
@@ -468,22 +467,55 @@ function highlightFloor(activeKey){
       o.material.transparent = dim || base < 1;
     });
   });
+}
+
+function updateHudOn(key){
   document.querySelectorAll('.level-hud .lv').forEach(el => {
-    el.classList.toggle('on', el.dataset.floor === activeKey);
+    el.classList.toggle('on', el.dataset.floor === key);
   });
+}
+
+/* clique no HUD pula direto pro andar (útil na apresentação, sem depender só do scroll) */
+function scrollToFloor(i){
+  const sec = floorSecs[i] && floorSecs[i].el;
+  if(!sec) return;
+  window.scrollTo({ top: sec.offsetTop + sec.offsetHeight * 0.5, behavior: 'smooth' });
+}
+function scrollToDashboard(){
+  window.scrollTo({ top: dashSpacer.offsetTop + dashSpacer.offsetHeight * 0.5, behavior: 'smooth' });
+}
+
+/* o HUD só aparece se sobrar espaço ao lado do card sem sobrepor o texto —
+   medido no card real, então funciona em qualquer largura de tela */
+function hudFits(){
+  if(!floorSecs.length) return true;
+  const rect = floorSecs[0].inner.getBoundingClientRect();
+  return rect.left > 210;
 }
 
 function buildLevelHud(){
   const hud = document.getElementById('levelHud');
   hud.innerHTML = '';
-  TEAMS.forEach(t => {   // TEAMS = 01..05 ; column-reverse deixa 05 no topo
-    const el = document.createElement('div');
+  TEAMS.forEach((t, i) => {   // TEAMS = 01..05 ; column-reverse deixa 05 no topo
+    const el = document.createElement('button');
+    el.type = 'button';
     el.className = 'lv';
     el.dataset.floor = t.floor;
+    el.setAttribute('aria-label', `Ir para o Nível ${t.num} — ${t.name}`);
     el.style.setProperty('--lv-color', t.color);
     el.innerHTML = `<span class="bar"></span><span>${t.num} · ${t.name}</span>`;
+    el.addEventListener('click', () => scrollToFloor(i));
     hud.appendChild(el);
   });
+  const dashBtn = document.createElement('button');
+  dashBtn.type = 'button';
+  dashBtn.className = 'lv';
+  dashBtn.dataset.floor = '__dash';
+  dashBtn.setAttribute('aria-label', 'Ir para o status do projeto');
+  dashBtn.style.setProperty('--lv-color', '#1D6FE0');
+  dashBtn.innerHTML = `<span class="bar"></span><span>Status</span>`;
+  dashBtn.addEventListener('click', scrollToDashboard);
+  hud.appendChild(dashBtn);   // aparece acima do 05 (column-reverse)
 }
 
 function render(){ if(renderer) renderer.render(scene, camera); }
@@ -591,7 +623,6 @@ const OVERVIEW = {
 const FLOOR_CONTENT = {
   iam: {
     blurb: 'Identidades, grupos e acesso administrativo controlado. Define quem é quem na empresa e por onde cada acesso privilegiado tem que passar.',
-    lottie: null,
     points: [
       { id:'ad', label:'AD-01 / AD-02', short:'AD-01/02',
         what:'O par de servidores que hospeda o Active Directory — o cadastro central de todos os usuários, máquinas e permissões. São dois para redundância: se um cai, o outro segura.',
@@ -617,7 +648,6 @@ const FLOOR_CONTENT = {
   },
   soc: {
     blurb: 'Monitoramento contínuo, correlação de eventos e resposta a incidentes. O time mais avançado depois do Network — Wazuh já rodando com 5 agentes.',
-    lottie: 'Pcguy.json',
     points: [
       { id:'wazuh', label:'Wazuh / SIEM', short:'Wazuh',
         what:'O cérebro do SOC. Um agente instalado em cada servidor manda os logs para o manager central, que correlaciona tudo e gera alertas. Hoje com 5 agentes ativos: NT-001, NT-002, zabbixgrafana, openvaz e FIREFLY.',
@@ -647,7 +677,6 @@ const FLOOR_CONTENT = {
   },
   endpoint: {
     blurb: 'Segurança dos dispositivos dos usuários — EDR/antivírus, hardening e patches. Ainda não iniciado.',
-    lottie: null,
     points: [
       { id:'edr', label:'EDR / Antivírus', short:'EDR',
         what:'Software instalado em cada máquina que observa o comportamento (processos, arquivos, conexões) e bloqueia ou isola o que parece malicioso — vai além do antivírus clássico por assinatura.',
@@ -669,7 +698,6 @@ const FLOOR_CONTENT = {
   },
   grc: {
     blurb: 'Política, risco, conformidade e continuidade de negócio. Backup, testes de restauração e o runbook que o regulador exige. Ainda não iniciado.',
-    lottie: null,
     points: [
       { id:'bkpsrv', label:'Servidor de backup', short:'Backup server',
         what:'Máquina dedicada que guarda cópias de todos os sistemas críticos, isolada do resto para não ser atingida junto num ataque.',
@@ -748,15 +776,6 @@ const TASKS = {
 };
 const teamPct = key => Math.round(TASKS[key].items.reduce((s,t)=>s+t.pct,0) / TASKS[key].items.length);
 const teamStarted = key => TASKS[key].items.filter(t=>t.pct>0).length;
-
-/* ---------------- Lottie (guarda: nunca quebra a página) ---------------- */
-const LOTTIE = window.lottie || window.bodymovin || null;
-function loadLottie(container, path){
-  try {
-    if(container && LOTTIE && typeof LOTTIE.loadAnimation === 'function')
-      LOTTIE.loadAnimation({ container, renderer:'svg', loop:true, autoplay:true, path });
-  } catch(e){ console.warn('lottie:', e); }
-}
 
 /* ---------------- construção ---------------- */
 const panel      = document.getElementById('panel');
@@ -885,7 +904,6 @@ function buildFloors(){
     const blurb  = team.key === 'network'
       ? 'Infraestrutura de rede segmentada por VLANs, com firewall de borda e monitoramento de disponibilidade — a espinha dorsal sobre a qual os demais times operam com segurança.'
       : FLOOR_CONTENT[team.key].blurb;
-    const lottie = team.key === 'network' ? 'Tech.json' : FLOOR_CONTENT[team.key].lottie;
 
     sec.innerHTML = `
       <div class="floor-pin">
@@ -900,7 +918,6 @@ function buildFloors(){
               <span class="track"><i style="width:${pct}%"></i></span>
             </div>
             <div class="floor-hint"><span class="dot"></span>clique nos pontos para explorar</div>
-            <div class="lottie-slot"></div>
           </div>
           <div class="floor-scene"><svg viewBox="0 0 980 600" role="img" aria-label="Planta isométrica do andar ${team.name}"></svg></div>
         </div>
@@ -910,7 +927,6 @@ function buildFloors(){
     const svg = sec.querySelector('svg');
     if(team.key === 'network') buildNetworkPlan(svg);
     else buildFloorPlan(svg, team);
-    if(lottie) loadLottie(sec.querySelector('.lottie-slot'), lottie);
     sec.querySelector('.ov-btn').style.setProperty('--floor-color', team.color);
     sec.querySelector('.ov-btn').addEventListener('click', () => openOverviewPanel(team));
 
@@ -1054,8 +1070,9 @@ function onScroll(){
 
   let activeIdx = -1;
   floorSecs.forEach((f, i) => { if(progressOf(f.el) > 0.05) activeIdx = i; });
-  levelHud.classList.toggle('show', activeIdx >= 0);
+  levelHud.classList.toggle('show', (activeIdx >= 0 || dp > 0) && hudFits());
   highlightFloor(activeIdx >= 0 && dp < 0.2 ? floorSecs[activeIdx].floor : null);
+  updateHudOn(dp >= 0.2 ? '__dash' : (activeIdx >= 0 ? floorSecs[activeIdx].floor : null));
 
   floorSecs.forEach(f => {
     const p = progressOf(f.el);
@@ -1077,6 +1094,7 @@ window.addEventListener('scroll', () => {
 /* ---------------- init ---------------- */
 buildFloors();
 buildDashboard();
+buildLevelHud();   // idempotente — a chamada dentro do load do glb (se houver) só reconstrói o mesmo HUD
 onScroll();
 </script>
 </body>
