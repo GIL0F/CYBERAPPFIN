@@ -171,6 +171,7 @@
 
   .p-block{ padding:18px 0; border-bottom:1px solid var(--line); }
   .p-block:last-child{ border-bottom:none; }
+  .p-links{ display:flex; flex-wrap:wrap; gap:10px; }
   .p-link{
     display:inline-flex; align-items:center; gap:9px; margin-top:4px;
     font-family:'Space Mono',monospace; font-weight:700; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
@@ -718,7 +719,10 @@ const FLOOR_CONTENT = {
         what:'Scanner de vulnerabilidades. Varre a rede procurando falhas conhecidas — serviço desatualizado, senha fraca, configuração exposta. Baselines não autenticados já concluídos para Firefly e Wazuh (sem vulnerabilidades críticas encontradas); Zabbix/Grafana em andamento e NT-001 em preparação. Falta corrigir um problema de Notus/GPG antes dos próximos scans, já autenticados.',
         why:'Melhor você achar a porta aberta antes do atacante. O scan periódico vira uma lista priorizada de "conserte isto".',
         connects:'Aponta o que o Endpoint precisa corrigir (patches) e o que o Network precisa fechar. Roda de um segmento isolado (VLAN 30), acessível só via Jump Server.',
-        link:{ label:'Ver scan completo', href:'openvas-scan.html' } }
+        links:[
+          { label:'Ver scan completo', href:'openvas-scan.html' },
+          { label:'Ver matriz de risco', href:'openvas-risk-matrix.html' }
+        ] }
     ]
   },
   endpoint: {
@@ -1047,11 +1051,12 @@ function openHostPanel(z){
 }
 
 function infoBlocks(o){
+  const links = o.links || (o.link ? [o.link] : []);
   return `
     <div class="p-block"><h4>O que é</h4><p>${o.what}</p></div>
     <div class="p-block"><h4>Por que existe</h4><p>${o.why}</p></div>
     <div class="p-block connects"><h4>Como se conecta com os outros times</h4><p>${o.connects}</p></div>
-    ${o.link ? `<div class="p-block"><a class="p-link" href="${o.link.href}" target="_blank" rel="noopener noreferrer">${o.link.label}</a></div>` : ''}`;
+    ${links.length ? `<div class="p-block p-links">${links.map(l => `<a class="p-link" href="${l.href}" target="_blank" rel="noopener noreferrer">${l.label}</a>`).join('')}</div>` : ''}`;
 }
 
 /* hotspot de uma peça (andares 2-5) */

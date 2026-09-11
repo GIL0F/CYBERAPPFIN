@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberAppFin · Reclassificação de Riscos OpenVAS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  /* retintado pra bater com a paleta do prototipo-v2.html (SOC = laranja) */
+  --blue:#C2700A; --orange:#1D6FE0; --ink:#0E1A26; --muted:#5C6B7A;
+  --bg:#F4F7FA; --card:#FFFFFF; --line:#D8E0E9; --good:#1B9455;
+  --critical:#D23A57; --high:#D45435; --medium:#B07D0A; --low:#1D6FE0; --log:#5C6B7A;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif}
+h1,h2,.kicker,nav .brand,.panel h3,.metric b,.statbox b,.cover-metric .big,td.num,th,.smallcaps{font-family:'Space Mono',monospace}
+nav{position:fixed;top:0;left:0;right:0;z-index:20;height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:rgba(14,26,38,.92);color:#fff;backdrop-filter:blur(8px)}
+nav .brand{font-weight:700;letter-spacing:.04em;font-size:13px} nav .brand span{color:var(--blue)} nav .links{display:flex;align-items:center;gap:14px;font-size:11px;text-transform:uppercase;letter-spacing:.06em} nav a{color:#c9d3db;text-decoration:none}
+nav a:hover{color:#fff} nav .back{color:#fff;font-weight:700;border:1px solid rgba(255,255,255,.28);border-radius:999px;padding:6px 12px}
+.slide{width:min(1440px,calc(100% - 28px));min-height:calc(100vh - 28px);margin:14px auto;padding:82px 72px 60px;background:var(--card);border-radius:20px;box-shadow:0 14px 40px rgba(14,26,38,.08);position:relative;overflow:hidden;border:1px solid var(--line)}
+.cover{display:grid;grid-template-columns:1.35fr .65fr;align-items:center;background:linear-gradient(135deg,#0E1A26 0%,#3a2a12 65%,#C2700A 100%);color:#fff;border:none}
+.cover:after{content:"";position:absolute;width:520px;height:520px;right:-160px;top:-130px;border-radius:50%;border:70px solid rgba(194,112,10,.18)}
+.kicker{text-transform:uppercase;letter-spacing:.18em;font-size:13px;font-weight:700;color:var(--blue)}
+.cover .kicker{color:#F0A94D}
+h1{font-weight:700;font-size:clamp(38px,6vw,72px);line-height:1.02;margin:18px 0;letter-spacing:-.01em}
+h2{font-weight:700;font-size:32px;margin:0 0 10px;letter-spacing:-.01em}
+.cover p{font-size:19px;line-height:1.6;color:#dce9ee;max-width:820px;font-family:'Inter',sans-serif}
+.lead{margin:0 0 30px;color:var(--muted);font-size:16px;line-height:1.6}
+.cover-metric{position:relative;z-index:2;padding:28px;border:1px solid rgba(255,255,255,.18);border-radius:18px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px)}
+.cover-metric .big{font-size:76px;font-weight:700;color:#F0A94D;line-height:1} .cover-metric span{display:block;margin-top:10px;color:#dce8ed;font-family:'Inter',sans-serif}
+.grid-5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.metric{padding:22px;border:1px solid var(--line);border-radius:16px;background:var(--bg)}
+.metric span{display:block;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;font-family:'Inter',sans-serif} .metric b{display:block;font-size:36px;margin-top:6px}
+.metric.crit b{color:var(--critical)} .metric.high b{color:var(--high)} .metric.med b{color:var(--medium)} .metric.low b{color:var(--low)} .metric.log b{color:var(--blue)}
+.callout{margin-top:24px;padding:22px 24px;border-left:5px solid var(--blue);background:#FBF1DF;border-radius:0 14px 14px 0;line-height:1.6}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.panel{border:1px solid var(--line);border-radius:16px;padding:22px;background:var(--card)}
+.panel h3{margin:0 0 16px;font-size:17px;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:12px;font-family:'Inter',sans-serif} th{text-align:left;color:var(--muted);font-weight:700;border-bottom:2px solid var(--line);padding:9px 7px;font-size:11px} td{border-bottom:1px solid var(--line);padding:9px 7px;vertical-align:top} td.num{text-align:right;font-weight:700}
+.sub{color:var(--muted);font-size:11px;margin-top:3px} .muted{color:var(--muted);font-size:12px} .smallcaps{text-transform:uppercase;letter-spacing:.08em;font-size:10px;color:var(--muted)}
+.statline{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:20px 0} .statbox{padding:18px;border-radius:14px;background:var(--bg);border:1px solid var(--line)} .statbox span{font-size:10px;color:var(--muted);text-transform:uppercase;font-family:'Inter',sans-serif} .statbox b{display:block;font-size:26px;margin-top:4px}
+.badge{display:inline-block;padding:3px 8px;border-radius:4px;font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;font-family:'Space Mono',monospace}
+.badge.crit{background:var(--critical)} .badge.high{background:var(--high)} .badge.med{background:var(--medium)} .badge.low{background:var(--low)} .badge.log{background:var(--log)}
+.risk-banner{display:flex;gap:18px;align-items:center;margin:24px 0;padding:20px 24px;border-radius:16px;background:#FBEAEA;border:1px solid #F3C9C9} .risk-icon{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:var(--high);color:#fff;font-size:28px;font-weight:900} .risk-banner h3{margin:0 0 4px;font-family:'Inter',sans-serif;font-weight:700;font-size:16px} .risk-banner p{margin:0;color:#6b3a3a;font-size:13px;font-family:'Inter',sans-serif}
+.footer{position:absolute;right:28px;bottom:18px;color:#9AA7B0;font-size:10px;font-family:'Space Mono',monospace}
+.note{font-size:11px;color:var(--muted);line-height:1.6}
+@media(max-width:980px){nav .links{display:none} .slide{padding:78px 24px 40px;min-height:auto} .cover{grid-template-columns:1fr;gap:28px} .grid-5,.statline{grid-template-columns:repeat(2,1fr)} .split{grid-template-columns:1fr}}
+@media print{body{background:#fff} nav{display:none} .slide{width:100%;min-height:100vh;margin:0;border-radius:0;box-shadow:none;page-break-after:always}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">CYBER<span>APPFIN</span> · RECLASSIFICAÇÃO DE RISCO</div>
+  <div class="links"><a href="#executivo">Resumo Executivo</a><a href="#portas">Análise por Porta</a><a href="#classificacao">Classificação CVEs</a><a href="#mitigacao">Plano de Mitigação</a><a class="back" href="prototipo-v2.html">← Voltar ao SOC</a></div>
+</nav>
+
+<section class="slide cover">
+  <div>
+    <div class="kicker">Blue Team · Análise Qualitativa de Segurança</div>
+    <h1>Reclassificação<br>de Riscos NTV</h1>
+    <p>Apresentação executiva e readequação de severidade das detecções não autenticadas do OpenVAS baseadas no vetor de exposição e risco operacional.</p>
+    <div class="sub" style="color:#b9ccd4;margin-top:28px">Análise Complementar · 11/09/2026 · Base de Dados: 744 Ocorrências Globais</div>
+  </div>
+  <div class="cover-metric">
+    <div class="smallcaps" style="color:#d3e5ec">Eventos Analisados</div>
+    <div class="big">744</div>
+    <span>Ocorrências reclassificadas de Log para Matriz de Severidade RSN</span>
+    <hr style="border:0;border-top:1px solid rgba(255,255,255,.18);margin:22px 0">
+    <b style="font-size:28px">20</b><span>hosts afetados · 19 portas observadas</span>
+  </div>
+</section>
+
+<section class="slide" id="executivo">
+  <div class="kicker">01 · Resumo Executivo</div>
+  <h2>Reclassificação Qualitativa do Ambiente</h2>
+  <p class="lead">O OpenVAS reportou originalmente 744 itens como Log/Informativo (CVSS 0.0) devido ao scan ser executado sem credenciais. Esta reclassificação prioriza os achados por vetor de ataque potencial.</p>
+  
+  <div class="grid-5">
+    <div class="metric crit"><span>Crítico</span><b>167</b></div>
+    <div class="metric high"><span>Alto</span><b>221</b></div>
+    <div class="metric med"><span>Médio</span><b>90</b></div>
+    <div class="metric low"><span>Baixo</span><b>116</b></div>
+    <div class="metric log"><span>Informativo</span><b>150</b></div>
+  </div>
+
+  <div class="risk-banner">
+    <div class="risk-icon">!</div>
+    <div>
+      <h3>Exposição de Serviços Administrativos e Criptografia Fraca</h3>
+      <p>A maior parte dos riscos Críticos e Altos origina-se da exposição de portas de gerenciamento remoto (RDP 3389, WinRM 5985 e SSH 22) aliada ao uso de suítes de cifras SSL/TLS desatualizadas em serviços Web.</p>
+    </div>
+  </div>
+
+  <div class="callout">
+    <b>Por que reclassificar?</b> Scans não autenticados identificam apenas portas e serviços. No entanto, portas de gerência abertas para a rede interna representam um vetor iminente para força bruta, movimentação lateral e ataques Man-in-the-Middle.
+  </div>
+  <div class="footer">CyberAppFin · Resumo Executivo</div>
+</section>
+
+<section class="slide" id="portas">
+  <div class="kicker">02 · Mapeamento de Superfície</div>
+  <h2>Volume de Ocorrências por Porta e Serviço</h2>
+  <p class="lead">Distribuição das detecções agregadas por porta de comunicação e protocolos mapeados.</p>
+
+  <div class="split">
+    <div class="panel">
+      <h3>Top Portas Observadas</h3>
+      <table>
+        <thead><tr><th>Porta / Protocolo</th><th>Serviço Associado</th><th class="num">Ocorrências</th></tr></thead>
+        <tbody>
+          <tr><td><strong>general/tcp</strong></td><td>Reconhecimento geral, SO e Hostname</td><td class="num">116</td></tr>
+          <tr><td><strong>443/tcp</strong></td><td>Aplicações Web HTTPS / ESXi</td><td class="num">83</td></tr>
+          <tr><td><strong>3389/tcp</strong></td><td>Microsoft Remote Desktop Protocol (RDP)</td><td class="num">70</td></tr>
+          <tr><td><strong>8900/tcp</strong></td><td>Interface de Gerenciamento Web</td><td class="num">66</td></tr>
+          <tr><td><strong>9080/tcp</strong></td><td>Aplicações Web / Services</td><td class="num">60</td></tr>
+          <tr><td><strong>5985/tcp</strong></td><td>Windows Remote Management (WinRM)</td><td class="num">42</td></tr>
+          <tr><td><strong>22/tcp</strong></td><td>OpenSSH Remote Access</td><td class="num">32</td></tr>
+          <tr><td><strong>7070/tcp</strong></td><td>Serviços Web / Aplicações</td><td class="num">28</td></tr>
+          <tr><td><strong>80/tcp</strong></td><td>Servidor Web HTTP (Não Seguro)</td><td class="num">24</td></tr>
+          <tr><td><strong>8901/tcp</strong></td><td>Serviços HTTP Secundários</td><td class="num">18</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="panel">
+      <h3>Outras Portas Notáveis</h3>
+      <table>
+        <thead><tr><th>Porta / Protocolo</th><th>Serviço Associado</th><th class="num">Ocorrências</th></tr></thead>
+        <tbody>
+          <tr><td><strong>8080/tcp / 5357/tcp</strong></td><td>HTTP Alternativo / WS-Discovery</td><td class="num">30</td></tr>
+          <tr><td><strong>445/tcp</strong></td><td>SMB/CIFS (Compartilhamento Windows)</td><td class="num">15</td></tr>
+          <tr><td><strong>8182/tcp / 1515/tcp</strong></td><td>Wazuh / Services Web</td><td class="num">28</td></tr>
+          <tr><td><strong>53/tcp / 902/tcp</strong></td><td>DNS Server (TCP) / VMware ESXi Mgmt</td><td class="num">24</td></tr>
+          <tr><td><strong>9402/tcp</strong></td><td>Veeam / Backup Services</td><td class="num">11</td></tr>
+          <tr><td><strong>135/tcp / 139/tcp</strong></td><td>MSRPC / NetBIOS SMB</td><td class="num">16</td></tr>
+          <tr><td><strong>1514/tcp</strong></td><td>Wazuh Agent Service</td><td class="num">3</td></tr>
+          <tr><td><strong>10051/tcp</strong></td><td>Zabbix Agent Server</td><td class="num">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="footer">CyberAppFin · Análise por Porta</div>
+</section>
+
+<section class="slide" id="classificacao">
+  <div class="kicker">03 · Matriz de Vulnerabilidades</div>
+  <h2>Classificação dos NVTs por Nível de Severidade</h2>
+  <p class="lead">Reagrupamento técnico dos achados do OpenVAS categorizados por criticidade operacional.</p>
+
+  <div class="panel">
+    <table>
+      <thead>
+        <tr>
+          <th>Severidade</th>
+          <th>Detecção / NVT</th>
+          <th>Família</th>
+          <th>Portas Afetadas</th>
+          <th>Impacto de Segurança</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><span class="badge crit">Crítico</span></td>
+          <td><strong>Microsoft Remote Desktop Protocol (RDP)</strong></td>
+          <td>Service detection</td>
+          <td>3389/tcp</td>
+          <td>Risco de força bruta de credenciais e exploração de RCE no serviço de terminal.</td>
+        </tr>
+        <tr>
+          <td><span class="badge crit">Crítico</span></td>
+          <td><strong>WinRM & SMB/CIFS Server Detection</strong></td>
+          <td>Service detection</td>
+          <td>5985/tcp, 445/tcp, 139/tcp</td>
+          <td>Acesso a compartilhamentos e execução remota de código via credenciais vazadas.</td>
+        </tr>
+        <tr>
+          <td><span class="badge crit">Crítico</span></td>
+          <td><strong>VMware ESX / ESXi & DNS Server</strong></td>
+          <td>Product detection</td>
+          <td>902/tcp, 53/tcp</td>
+          <td>Exposição de gerência de hipervisores e enumeração de zone transfer.</td>
+        </tr>
+        <tr>
+          <td><span class="badge high">Alto</span></td>
+          <td><strong>SSL/TLS Supported & PFS Cipher Suites</strong></td>
+          <td>SSL and TLS</td>
+          <td>443/tcp, 8900/tcp, 9080/tcp</td>
+          <td>Suporte a cifras obsoletas/fracas, permitindo ataques Man-in-the-Middle.</td>
+        </tr>
+        <tr>
+          <td><span class="badge high">Alto</span></td>
+          <td><strong>OpenSSH Detection & Algorithms</strong></td>
+          <td>Product detection</td>
+          <td>22/tcp</td>
+          <td>Serviços SSH expostos sem restrição de rede para força bruta de chaves.</td>
+        </tr>
+        <tr>
+          <td><span class="badge med">Médio</span></td>
+          <td><strong>HTTP Security Headers Detection</strong></td>
+          <td>Web application abuses</td>
+          <td>80/tcp, 443/tcp, 8080/tcp</td>
+          <td>Ausência de cabeçalhos HSTS, X-Frame-Options e CSP facilitando Clickjacking/XSS.</td>
+        </tr>
+        <tr>
+          <td><span class="badge med">Médio</span></td>
+          <td><strong>Web App Scanning Consolidation</strong></td>
+          <td>Web application abuses</td>
+          <td>Diversas (HTTP/HTTPS)</td>
+          <td>Páginas de erro genéricas e vazamento de estruturas da aplicação web.</td>
+        </tr>
+        <tr>
+          <td><span class="badge low">Baixo</span></td>
+          <td><strong>Unknown OS and Banner Reporting</strong></td>
+          <td>General</td>
+          <td>general/tcp</td>
+          <td>Divulgação explícita de versões de software, SO e banners do sistema.</td>
+        </tr>
+        <tr>
+          <td><span class="badge low">Baixo</span></td>
+          <td><strong>Hostname & OS Determination</strong></td>
+          <td>General</td>
+          <td>general/tcp</td>
+          <td>Enumeração do nome de host e fingerprinting de rede para reconhecimento.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="footer">CyberAppFin · Classificação de CVEs/NVTs</div>
+</section>
+
+<section class="slide" id="mitigacao">
+  <div class="kicker">04 · Plano de Ação</div>
+  <h2>Sugestões de Mitigação Técnica</h2>
+  <p class="lead">Ações recomendadas para correção e hardening dos ativos mapeados no ambiente.</p>
+
+  <div class="split">
+    <div class="panel">
+      <h3>1. Hardening de Acesso Remoto (Crítico)</h3>
+      <p class="note">
+        • <strong>Isolamento de RDP/WinRM/SSH:</strong> Restringir o acesso às portas 3389, 5985 e 22 exclusivamente para IPs da VLAN de Gerência via Firewall.<br><br>
+        • <strong>NLA Obrigatorio:</strong> Exigir autenticação no nível da rede (NLA) para conexões RDP no Windows.<br><br>
+        • <strong>Segmentação SMB:</strong> Desativar o SMBv1 e exigir assinatura de pacote (SMB Signing) nas portas 445 e 139.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h3>2. Hardening Web e Criptografia (Alto / Médio)</h3>
+      <p class="note">
+        • <strong>Desativação de TLS Legado:</strong> Remover suporte a TLS 1.0/1.1 nas portas HTTPS (443, 8900, 9080) aceitando apenas TLS 1.2+.<br><br>
+        • <strong>Suítes de Cifras Fortes:</strong> Configurar apenas cifras com suporte a Perfect Forward Secrecy (PFS) e AES-GCM.<br><br>
+        • <strong>Cabeçalhos HTTP:</strong> Injetar os cabeçalhos <code>Strict-Transport-Security</code>, <code>X-Frame-Options</code> e <code>X-Content-Type-Options</code> no proxy/servidor web.
+      </p>
+    </div>
+  </div>
+
+  <div class="split" style="margin-top:18px">
+    <div class="panel">
+      <h3>3. Ocultamento de Informações (Baixo)</h3>
+      <p class="note">
+        • <strong>Remoção de Banners:</strong> Ocultar a versão do Apache/Nginx/OpenSSH em respostas HTTP (ex.: <code>server_tokens off;</code> no Nginx).<br><br>
+        • <strong>Páginas de Erro Personalizadas:</strong> Configurar páginas de erro 404/500 customizadas para evitar vazamento do stack trace da aplicação.
+      </p>
+    </div>
+
+    <div class="panel">
+      <h3>4. Próxima Etapa do Projeto</h3>
+      <p class="note">
+        • <strong>Varredura Credenciada:</strong> Executar um rescan do OpenVAS fornecendo credenciais locais administrativas (WinRM/SSH).<br><br>
+        • <strong>Validação de CVEs Internas:</strong> Identificar vulnerabilidades executáveis no nível de sistema operacional (patches ausentes) além da superfície de rede.
+      </p>
+    </div>
+  </div>
+  <div class="footer">CyberAppFin · Plano de Mitigação</div>
+</section>
+
+<script>
+document.addEventListener('keydown',function(e){
+ const slides=[...document.querySelectorAll('.slide')],y=window.scrollY+80;let idx=0;
+ for(let i=0;i<slides.length;i++) if(slides[i].offsetTop<=y) idx=i;
+ if(['ArrowDown','PageDown','ArrowRight'].includes(e.key)){e.preventDefault();slides[Math.min(idx+1,slides.length-1)].scrollIntoView({behavior:'smooth'})}
+ if(['ArrowUp','PageUp','ArrowLeft'].includes(e.key)){e.preventDefault();slides[Math.max(idx-1,0)].scrollIntoView({behavior:'smooth'})}
+});
+</script>
+</body>
+</html>
