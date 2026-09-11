@@ -93,7 +93,7 @@
     justify-content:center; padding:24px;
   }
   .floor-inner{
-    width:min(1280px,95vw); display:grid; grid-template-columns:minmax(250px,360px) 1fr;
+    width:min(1180px,88vw); display:grid; grid-template-columns:minmax(250px,360px) 1fr;
     gap:42px; align-items:center; will-change:transform,opacity;
     background:rgba(244,247,250,.84); backdrop-filter:blur(9px);
     border:1px solid var(--line); border-radius:14px; padding:32px 36px;
@@ -171,6 +171,14 @@
 
   .p-block{ padding:18px 0; border-bottom:1px solid var(--line); }
   .p-block:last-child{ border-bottom:none; }
+  .p-link{
+    display:inline-flex; align-items:center; gap:9px; margin-top:4px;
+    font-family:'Space Mono',monospace; font-weight:700; font-size:12px; letter-spacing:.08em; text-transform:uppercase;
+    color:#fff; background:var(--pc); border:1px solid var(--pc);
+    border-radius:999px; padding:10px 18px; text-decoration:none; transition:filter .18s ease;
+  }
+  .p-link::after{ content:"↗"; font-size:13px; }
+  .p-link:hover, .p-link:focus{ filter:brightness(1.1); outline:none; }
   .p-block h4{
     font-family:'Space Mono',monospace; font-size:11px; letter-spacing:.12em;
     text-transform:uppercase; color:var(--text-muted); margin-bottom:8px;
@@ -485,12 +493,15 @@ function scrollToDashboard(){
   window.scrollTo({ top: dashSpacer.offsetTop + dashSpacer.offsetHeight * 0.5, behavior: 'smooth' });
 }
 
-/* o HUD só aparece se sobrar espaço ao lado do card sem sobrepor o texto —
-   medido no card real, então funciona em qualquer largura de tela */
-function hudFits(){
-  if(!floorSecs.length) return true;
-  const rect = floorSecs[0].inner.getBoundingClientRect();
-  return rect.left > 210;
+/* o HUD só aparece se sobrar espaço ao lado do card ATIVO (o do andar, ou o
+   do dashboard — são larguras diferentes) sem sobrepor o texto. Mede a
+   largura real do próprio HUD (não um número chutado), então se ajusta
+   sozinho e funciona em qualquer largura de tela / conteúdo do HUD. */
+function hudFits(activeCardEl){
+  if(!activeCardEl) return true;
+  const cardLeft = activeCardEl.getBoundingClientRect().left;
+  const hud = levelHud.getBoundingClientRect();
+  return cardLeft > hud.left + hud.width + 16;
 }
 
 function buildLevelHud(){
@@ -672,7 +683,8 @@ const FLOOR_CONTENT = {
       { id:'openvas', label:'OpenVAS', short:'OpenVAS',
         what:'Scanner de vulnerabilidades. Varre a rede procurando falhas conhecidas — serviço desatualizado, senha fraca, configuração exposta. Baselines não autenticados já concluídos para Firefly e Wazuh (sem vulnerabilidades críticas encontradas); Zabbix/Grafana em andamento e NT-001 em preparação. Falta corrigir um problema de Notus/GPG antes dos próximos scans, já autenticados.',
         why:'Melhor você achar a porta aberta antes do atacante. O scan periódico vira uma lista priorizada de "conserte isto".',
-        connects:'Aponta o que o Endpoint precisa corrigir (patches) e o que o Network precisa fechar. Roda de um segmento isolado (VLAN 30), acessível só via Jump Server.' }
+        connects:'Aponta o que o Endpoint precisa corrigir (patches) e o que o Network precisa fechar. Roda de um segmento isolado (VLAN 30), acessível só via Jump Server.',
+        link:{ label:'Ver scan completo', href:'openvas-scan.html' } }
     ]
   },
   endpoint: {
@@ -1004,7 +1016,8 @@ function infoBlocks(o){
   return `
     <div class="p-block"><h4>O que é</h4><p>${o.what}</p></div>
     <div class="p-block"><h4>Por que existe</h4><p>${o.why}</p></div>
-    <div class="p-block connects"><h4>Como se conecta com os outros times</h4><p>${o.connects}</p></div>`;
+    <div class="p-block connects"><h4>Como se conecta com os outros times</h4><p>${o.connects}</p></div>
+    ${o.link ? `<div class="p-block"><a class="p-link" href="${o.link.href}" target="_blank" rel="noopener noreferrer">${o.link.label}</a></div>` : ''}`;
 }
 
 /* hotspot de uma peça (andares 2-5) */
@@ -1080,9 +1093,11 @@ function onScroll(){
 
   let activeIdx = -1;
   floorSecs.forEach((f, i) => { if(progressOf(f.el) > 0.05) activeIdx = i; });
-  levelHud.classList.toggle('show', (activeIdx >= 0 || dp > 0) && hudFits());
+  const onDash = dp >= 0.2;
+  const activeCard = onDash ? dashCard : (activeIdx >= 0 ? floorSecs[activeIdx].inner : null);
+  levelHud.classList.toggle('show', (activeIdx >= 0 || dp > 0) && hudFits(activeCard));
   highlightFloor(activeIdx >= 0 && dp < 0.2 ? floorSecs[activeIdx].floor : null);
-  updateHudOn(dp >= 0.2 ? '__dash' : (activeIdx >= 0 ? floorSecs[activeIdx].floor : null));
+  updateHudOn(onDash ? '__dash' : (activeIdx >= 0 ? floorSecs[activeIdx].floor : null));
 
   floorSecs.forEach(f => {
     const p = progressOf(f.el);
