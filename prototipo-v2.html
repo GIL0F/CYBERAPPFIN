@@ -625,32 +625,32 @@ const FLOOR_CONTENT = {
     blurb: 'Identidades, grupos e acesso administrativo controlado. Define quem é quem na empresa e por onde cada acesso privilegiado tem que passar.',
     points: [
       { id:'ad', label:'AD-01 / AD-02', short:'AD-01/02',
-        what:'O par de servidores que hospeda o Active Directory — o cadastro central de todos os usuários, máquinas e permissões. São dois para redundância: se um cai, o outro segura.',
-        why:'Sem um diretório central, cada sistema teria seu próprio login e ninguém conseguiria desligar de uma vez o acesso de quem saiu da empresa.',
-        connects:'É o alvo nº 1 de monitoramento do SOC. O Endpoint usa o AD para autenticar as máquinas. Roda na VLAN de serviços do Network.' },
+        what:'O par de servidores que hospeda o Active Directory — o cadastro central de todos os usuários, máquinas e permissões. AD-01 e AD-02 já estão no ar, testados e com replicação confirmada entre os dois, no domínio cyberappfin.local.',
+        why:'Sem um diretório central, cada sistema teria seu próprio login e ninguém conseguiria desligar de uma vez o acesso de quem saiu da empresa. Ter dois DCs em replicação evita que a queda de um derrube o login de todo mundo.',
+        connects:'É o alvo nº 1 de monitoramento do SOC — os logs dos dois DCs já chegam ao Wazuh. O Endpoint usa o AD para autenticar as máquinas. Roda na VLAN de serviços do Network.' },
       { id:'dns', label:'DNS integrado', short:'DNS',
-        what:'O serviço que traduz nome (servidor-x) em endereço IP, rodando junto com o Active Directory.',
+        what:'O serviço que traduz nome (servidor-x) em endereço IP, rodando junto com o Active Directory — já operacional e validado nos testes de diagnóstico do domínio.',
         why:'No ambiente Windows quase tudo depende de DNS: logon, acesso a compartilhamento, replicação entre os DCs. DNS quebrado = domínio quebrado.',
         connects:'O Network define a topologia onde o DNS resolve. O SOC monitora consultas anômalas — um sinal clássico de malware tentando "telefonar para casa".' },
       { id:'gpo', label:'GPOs', short:'GPOs',
-        what:'Regras aplicadas automaticamente a grupos de máquinas e usuários — senha mínima, tela de bloqueio, o que pode ou não ser instalado.',
+        what:'Regras aplicadas automaticamente a grupos de máquinas e usuários. Já configuradas: senha mínima de 10 caracteres e bloqueio automático da conta após 5 tentativas erradas.',
         why:'Configurar máquina por máquina não escala e sempre sobra uma esquecida. A GPO garante todo mundo no mesmo padrão, sem depender de disciplina individual.',
         connects:'É a fonte das regras que o Endpoint aplica no hardening. Desvios do padrão são alertados pelo SOC.' },
       { id:'ou', label:'OUs e grupos', short:'OUs/grupos',
-        what:'A organização do diretório em "gavetas" (Unidades Organizacionais) por área e função, com grupos que concentram permissões.',
+        what:'A organização do diretório em "gavetas" (Unidades Organizacionais) por área e função, com grupos que concentram permissões. Já estruturadas: 11 OUs e 18 grupos de segurança, um para cada perfil de acesso da matriz RBAC.',
         why:'É o que torna o menor privilégio viável na prática — você dá acesso ao grupo "Financeiro", não a 15 pessoas uma a uma; quem troca de área só troca de grupo.',
-        connects:'Reflete o organograma real da empresa. O GRC audita se os grupos batem com quem deveria ter acesso a quê.' },
+        connects:'Reflete o organograma real da empresa (5 times, cada um com coordenador e analistas). O GRC audita se os grupos batem com quem deveria ter acesso a quê.' },
       { id:'pam', label:'Jump Server / PAM', short:'Jump Server',
-        what:'Um servidor-ponte que é o único caminho para acessar os segmentos mais sensíveis. Todo acesso administrativo passa por ele, que grava a sessão inteira.',
+        what:'Um servidor-ponte que deve ser o único caminho para acessar os segmentos mais sensíveis, com toda sessão administrativa gravada. O modelo de acesso privilegiado sob demanda (PAM) já está definido na política; a implantação do Jump Server como ponto único ainda está em andamento.',
         why:'Acesso direto a servidor crítico é risco duplo — credencial que vaza e ação que ninguém viu. O Jump Server força um funil auditável: quem entrou, quando, o que fez.',
-        connects:'Fica na VLAN de serviços do Network e é a única porta para a VLAN de security. As gravações são evidência para o GRC; o SOC alerta acesso fora de hora.' }
+        connects:'Vai ficar na VLAN de serviços do Network e ser a única porta para a VLAN de security. As gravações viram evidência para o GRC; o SOC alerta acesso fora de hora.' }
     ]
   },
   soc: {
-    blurb: 'Monitoramento contínuo, correlação de eventos e resposta a incidentes. O time mais avançado depois do Network — Wazuh já rodando com 5 agentes.',
+    blurb: 'Monitoramento contínuo, correlação de eventos e resposta a incidentes — Wazuh validado com 5 agentes, detecção e alertas funcionando; scans de vulnerabilidade em andamento.',
     points: [
       { id:'wazuh', label:'Wazuh / SIEM', short:'Wazuh',
-        what:'O cérebro do SOC. Um agente instalado em cada servidor manda os logs para o manager central, que correlaciona tudo e gera alertas. Hoje com 5 agentes ativos: NT-001, NT-002, zabbixgrafana, openvaz e FIREFLY.',
+        what:'O cérebro do SOC. Um agente instalado em cada servidor manda os logs para o manager central, que correlaciona tudo e gera alertas. Hoje com 5 agentes ativos (NT-001, NT-002, zabbixgrafana, openvaz e FIREFLY), regras customizadas para detectar tentativas de invasão, um monitor passivo (honeypot) e alertas por e-mail já funcionando.',
         why:'Cada servidor gera milhares de linhas de log por dia — ninguém lê isso na mão. O SIEM junta, cruza e só chama atenção quando o padrão foge do normal.',
         connects:'Depende do Network para a rede entre agentes e manager, e do IAM (os Domain Controllers são alvo prioritário de enrollment).' },
       { id:'dash', label:'Dashboard "Cyber"', short:'Dashboard',
@@ -670,20 +670,20 @@ const FLOOR_CONTENT = {
         why:'Cada ferramenta tem sua própria tela. O Grafana dá a visão consolidada — útil para a apresentação executiva e para o plantão.',
         connects:'Consome dados do Zabbix e do Wazuh. Painéis podem virar evidência para o GRC.' },
       { id:'openvas', label:'OpenVAS', short:'OpenVAS',
-        what:'Scanner de vulnerabilidades. Varre a rede procurando falhas conhecidas — serviço desatualizado, senha fraca, configuração exposta.',
+        what:'Scanner de vulnerabilidades. Varre a rede procurando falhas conhecidas — serviço desatualizado, senha fraca, configuração exposta. Baselines não autenticados já concluídos para Firefly e Wazuh (sem vulnerabilidades críticas encontradas); Zabbix/Grafana em andamento e NT-001 em preparação. Falta corrigir um problema de Notus/GPG antes dos próximos scans, já autenticados.',
         why:'Melhor você achar a porta aberta antes do atacante. O scan periódico vira uma lista priorizada de "conserte isto".',
         connects:'Aponta o que o Endpoint precisa corrigir (patches) e o que o Network precisa fechar. Roda de um segmento isolado (VLAN 30), acessível só via Jump Server.' }
     ]
   },
   endpoint: {
-    blurb: 'Segurança dos dispositivos dos usuários — EDR/antivírus, hardening e patches. Ainda não iniciado.',
+    blurb: 'Segurança dos dispositivos dos usuários — EDR/antivírus e firewall de host já aplicados nos servidores; gestão de patches e cobertura das estações de trabalho ainda pendentes.',
     points: [
       { id:'edr', label:'EDR / Antivírus', short:'EDR',
-        what:'Software instalado em cada máquina que observa o comportamento (processos, arquivos, conexões) e bloqueia ou isola o que parece malicioso — vai além do antivírus clássico por assinatura.',
+        what:'Software que observa o comportamento (processos, arquivos, conexões) e bloqueia ou isola o que parece malicioso. Hoje o ClamAV já está integrado ao Wazuh nos servidores, com detecção validada via teste EICAR — falta estender a cobertura às estações de trabalho dos usuários.',
         why:'O endpoint é o alvo nº 1: phishing, download infectado, pendrive. Proteger só o servidor não resolve se a máquina que o acessa está comprometida.',
-        connects:'Cada EDR vira uma fonte de alertas para o SOC (Wazuh). Usa as identidades do IAM para amarrar "máquina X, usuário Y".' },
+        connects:'Cada detecção vira um alerta para o SOC (Wazuh). Usa as identidades do IAM para amarrar "máquina X, usuário Y".' },
       { id:'hardening', label:'Hardening e baseline', short:'Hardening',
-        what:'Aplicar uma configuração segura padrão a todas as máquinas — desativar serviços inúteis, fechar portas, exigir tela de bloqueio, tirar o direito de administrador local.',
+        what:'Configuração segura padrão nas máquinas — desativar serviços inúteis, fechar portas, exigir tela de bloqueio, tirar o direito de administrador local. Nos servidores já está aplicado via UFW (deny inbound, allow outbound, SSH restrito) e Windows Firewall; falta padronizar nas estações dos usuários.',
         why:'Máquina "de fábrica" vem aberta demais. Hardening reduz a superfície de ataque antes mesmo de qualquer ameaça aparecer.',
         connects:'As regras vêm das GPOs do IAM. O SOC monitora desvios do baseline.' },
       { id:'patch', label:'Gestão de patches', short:'Patches',
@@ -697,24 +697,32 @@ const FLOOR_CONTENT = {
     ]
   },
   grc: {
-    blurb: 'Política, risco, conformidade e continuidade de negócio. Backup, testes de restauração e o runbook que o regulador exige. Ainda não iniciado.',
+    blurb: 'Política, risco, conformidade e continuidade de negócio — do inventário de ativos e da política de segurança até o plano de backup e recuperação.',
     points: [
+      { id:'inv', label:'Inventário de ativos', short:'Inventário',
+        what:'Mapeamento de todos os sistemas, servidores, serviços e recursos críticos do ambiente, com suas responsabilidades e importância para a operação.',
+        why:'Não dá para proteger, auditar ou priorizar recuperação do que não está catalogado. É o ponto de partida de qualquer programa de segurança.',
+        connects:'Serve de base pros outros times: o SOC prioriza o que monitorar, o Endpoint sabe quais dispositivos cobrir, e a própria GRC usa esse inventário pra avaliar risco.' },
+      { id:'psi', label:'Política de Segurança da Informação (PSI)', short:'PSI',
+        what:'A PSI e as políticas complementares — organização da segurança, recursos humanos, conformidade — que definem como a segurança deve ser tratada na empresa.',
+        why:'O regulador (Bacen, LGPD) exige política escrita, não só prática informal. É o documento que formaliza as regras que os times já seguem no dia a dia.',
+        connects:'Várias políticas são específicas por time (ex: as políticas de acesso do IAM, as de endpoint) — a GRC coordena, mas cada time contribui com o conteúdo da sua área.' },
+      { id:'playbook', label:'Playbooks de resposta a incidentes', short:'Playbooks',
+        what:'Procedimentos estruturados por cenário de segurança — etapas, responsabilidades, critérios de acionamento, contenção, recuperação e registro. O playbook-mestre (PB-000) já pronto serve de modelo para os demais.',
+        why:'Num incidente real não dá tempo de decidir o processo na hora. Ter o passo a passo pronto antes reduz o tempo de resposta e evita improviso.',
+        connects:'Formaliza em papel o ciclo de resposta que o SOC já opera no dia a dia — o playbook documenta o que o SOC faz na prática.' },
+      { id:'doc', label:'Documentação do projeto', short:'Documentação',
+        what:'Organização das informações do ambiente — configurações, procedimentos, responsabilidades, evidências e decisões — desde a criação da PSI até o cenário atual de scan de vulnerabilidades.',
+        why:'Garante rastreabilidade: se alguém sai do time ou o auditor pergunta por que uma decisão foi tomada, a resposta está registrada, não só na memória de quem fez.',
+        connects:'Consolida o trabalho de todos os times num só lugar — mesma lógica de um playbook, só que cobrindo o projeto inteiro, não só resposta a incidente.' },
       { id:'bkpsrv', label:'Servidor de backup', short:'Backup server',
-        what:'Máquina dedicada que guarda cópias de todos os sistemas críticos, isolada do resto para não ser atingida junto num ataque.',
+        what:'Máquina dedicada que guarda cópias de todos os sistemas críticos, isolada do resto para não ser atingida junto num ataque. A estratégia definida é backup por agente (Windows/Linux) com destino em repositório externo, mas o servidor ainda não foi implantado.',
         why:'Se um ransomware criptografa a produção, o backup é a única forma de voltar sem pagar resgate — desde que ele próprio não tenha sido criptografado junto.',
-        connects:'Precisa de uma VLAN própria e regras de firewall restritas (Network). Guarda dados que só o IAM deveria poder acessar.' },
-      { id:'rotina', label:'Rotinas de backup e réplica', short:'Rotinas',
-        what:'Agendamento automático de cópias (diárias/semanais) e réplica dos dados para um segundo local.',
-        why:'Backup manual é backup que ninguém faz. E uma cópia só, no mesmo lugar, não protege contra incêndio ou roubo do equipamento.',
-        connects:'Depende dos sistemas do IAM e do ERP (Dolibarr, no Network) estarem estáveis para definir a janela de backup.' },
+        connects:'Vai precisar de uma VLAN própria e regras de firewall restritas (Network). Vai guardar dados que só o IAM deveria poder acessar.' },
       { id:'restore', label:'Testes de restauração', short:'Restauração',
         what:'Simular periodicamente a volta de um sistema a partir do backup, para confirmar que a cópia realmente funciona.',
         why:'A maioria das empresas só descobre que o backup estava corrompido no dia do desastre. O teste é o que transforma "temos backup" em "sabemos nos recuperar".',
-        connects:'Envolve o Network (recriar o ambiente) e o SOC (validar que o sistema restaurado não traz junto o problema original).' },
-      { id:'runbook', label:'Runbook e documentação', short:'Runbook',
-        what:'O manual passo a passo de "o que fazer quando" — quem aciona, em que ordem restaurar, quais os contatos. Reúne também as políticas de segurança e o mapeamento para as normas (Bacen, LGPD, ISO 27001).',
-        why:'Num incidente às 3 da manhã ninguém improvisa bem. E o regulador exige política escrita e evidência — o runbook é parte dessa prova.',
-        connects:'Consolida o trabalho de todos os times num só lugar. É o que o auditor lê.' }
+        connects:'Depende do servidor de backup existir primeiro. Envolve o Network (recriar o ambiente) e o SOC (validar que o sistema restaurado não traz junto o problema original).' }
     ]
   }
 };
@@ -722,55 +730,57 @@ const FLOOR_CONTENT = {
 /* ---------------- tarefas + progresso (dashboard) ---------------- */
 const TASKS = {
   network: {
-    done: 'Topologia física e VLANs de pé; faltam firewall/NAT, DHCP/DNS, virtualização e os segmentos DMZ/PCI.',
+    done: 'VLANs, DHCP/DNS e os segmentos DMZ/PCI praticamente prontos; firewall em validação final e virtualização/redundância entre hosts ainda em desenvolvimento.',
     items: [
       { label:'Topologia física — pfSense, switch, hosts ESX', pct:55 },
       { label:'Links de saída WAN1 / WAN2', pct:50 },
       { label:'SD-WAN entre os links', pct:35 },
-      { label:'VLANs e trunks 802.1Q', pct:60 },
-      { label:'Firewall e regras de NAT', pct:0 },
-      { label:'DHCP e DNS', pct:0 },
-      { label:'Virtualização — ESXi, vCenter, cluster HA', pct:10 },
-      { label:'Segmentos DMZ e PCI', pct:0 }
+      { label:'VLANs e trunks 802.1Q', pct:95 },
+      { label:'Firewall e regras de segmentação', pct:80 },
+      { label:'DHCP e DNS', pct:85 },
+      { label:'Virtualização — ESXi, vCenter, cluster HA', pct:55 },
+      { label:'Segmentos DMZ e PCI', pct:90 }
     ]
   },
   iam: {
-    done: 'Ainda não iniciado.',
+    done: 'Active Directory no ar com replicação confirmada, políticas de senha e RBAC definidos; falta só formalizar o Jump Server/PAM como ponto único de acesso.',
     items: [
-      { label:'Domain Controllers AD-01 / AD-02', pct:0 },
-      { label:'DNS integrado ao AD', pct:0 },
-      { label:'GPOs (políticas de grupo)', pct:0 },
-      { label:'OUs e grupos', pct:0 },
-      { label:'Jump Server / PAM', pct:0 }
+      { label:'Domain Controllers AD-01 / AD-02', pct:100 },
+      { label:'DNS integrado ao AD', pct:95 },
+      { label:'GPOs (políticas de grupo)', pct:90 },
+      { label:'OUs e grupos', pct:100 },
+      { label:'Jump Server / PAM', pct:75 }
     ]
   },
   soc: {
-    done: 'Wazuh rodando com 5 agentes e 3 de 5 painéis no ar; faltam as workstations Windows e formalizar Zabbix, Grafana e OpenVAS.',
+    done: 'Wazuh validado com detecção e alertas funcionando, dashboard com 3 de 5 painéis prontos e os primeiros baselines de vulnerabilidade concluídos; faltam as workstations Windows e formalizar Zabbix, Grafana e os scans autenticados.',
     items: [
-      { label:'Wazuh / SIEM — 5 agentes ativos', pct:70 },
+      { label:'Wazuh / SIEM — 5 agentes ativos', pct:85 },
       { label:'Dashboard "Cyber" — 3 de 5 painéis', pct:60 },
       { label:'Enrollment das workstations Windows', pct:0 },
-      { label:'Zabbix (monitoramento)', pct:0 },
-      { label:'Grafana (visualização)', pct:0 },
-      { label:'OpenVAS (varredura)', pct:5 }
+      { label:'Zabbix (monitoramento)', pct:25 },
+      { label:'Grafana (visualização)', pct:20 },
+      { label:'OpenVAS (varredura)', pct:50 }
     ]
   },
   endpoint: {
-    done: 'Ainda não iniciado.',
+    done: 'ClamAV integrado ao Wazuh e firewall de host (UFW/Windows Firewall) aplicados nos servidores; falta gestão de patches, inventário e cobertura nas estações dos usuários.',
     items: [
-      { label:'EDR / Antivírus', pct:0 },
-      { label:'Hardening e baseline', pct:0 },
+      { label:'EDR / Antivírus', pct:55 },
+      { label:'Hardening e baseline', pct:50 },
       { label:'Gestão de patches', pct:0 },
       { label:'Inventário de dispositivos', pct:0 }
     ]
   },
   grc: {
-    done: 'Ainda não iniciado.',
+    done: 'Inventário de ativos concluído e PSI/playbooks em desenvolvimento; servidor de backup e testes de restauração ainda não começaram.',
     items: [
+      { label:'Inventário de ativos', pct:100 },
+      { label:'Política de Segurança da Informação (PSI)', pct:45 },
+      { label:'Playbooks de resposta a incidentes', pct:25 },
+      { label:'Documentação do projeto', pct:40 },
       { label:'Servidor de backup', pct:0 },
-      { label:'Rotinas de backup e réplica', pct:0 },
-      { label:'Testes de restauração', pct:0 },
-      { label:'Runbook e documentação', pct:0 }
+      { label:'Testes de restauração', pct:0 }
     ]
   }
 };
