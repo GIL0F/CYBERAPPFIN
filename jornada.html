@@ -93,7 +93,24 @@
   body.com-foto #stage{ opacity:0 !important; }
   body.com-foto #sala{ background:transparent; }
   body.com-foto .s-corpo{ max-width:47vw; }
-  @media (prefers-reduced-motion: reduce){ #capa-midia img{ animation:none; } }
+  /* foto ao fundo de outras telas de sala (mais escura, sem estreitar o texto) */
+  body.foto-fundo #capa-midia{ opacity:1; }
+  body.foto-fundo #capa-midia::after{ background:rgba(11,21,32,.86); }
+  body.foto-fundo #stage{ opacity:0 !important; }
+  body.foto-fundo #sala{ background:transparent; }
+  /* "entrar no prédio": zoom contínuo até a porta de entrada e dissolve no mapa */
+  body.entrando #capa-midia{ opacity:1; }
+  body.entrando #capa-midia::after{ background:rgba(11,21,32,.1); transition:background .5s ease; }
+  body.entrando #capa-midia img{ transform-origin:57% 77%; animation:entrar 1.7s cubic-bezier(.55,0,.35,1) forwards; }
+  body.entrando #sala, body.entrando #painel, body.entrando #stage{ opacity:0 !important; }
+  /* fora das telas com foto, ela some na hora (sem reaparecer depois do zoom) */
+  body:not(.com-foto):not(.foto-fundo):not(.entrando) #capa-midia{ transition:none; }
+  @keyframes entrar{
+    0%  { transform:translateX(7%) scale(1.02); filter:blur(0) brightness(1); opacity:1; }
+    70% { filter:blur(2px) brightness(1.25); opacity:1; }
+    100%{ transform:translateX(7%) scale(7); filter:blur(8px) brightness(1.6); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){ #capa-midia img{ animation:none !important; } }
 
   /* ---------- modo "sala de reunião": telas cheias de processo e gestão ---------- */
   #stage, #painel{ transition:opacity .5s ease, transform .6s cubic-bezier(.22,.61,.36,1), filter .5s ease; }
@@ -502,7 +519,7 @@ const PARADAS = [
     notas:'Apresentar o grupo e a empresa. Ela guarda dados financeiros de vários clientes e acessa bancos e meios de pagamento: alvo valioso. Regulada pelo Banco Central, precisa provar que é segura. Explicar o formato: primeiro vamos seguir o caminho que um pacote faz dentro da rede; depois, em telas como esta, mostramos os processos e a gestão.'
   },
   {
-    quem:P1, cor:COR.brand, titulo:'Como organizamos', sub:'Cinco times, um inventário único, seis fases de subida (21/08 a 14/09/2026)',
+    quem:P1, cor:COR.brand, titulo:'Como organizamos', foto:'fundo', sub:'Cinco times, um inventário único, seis fases de subida (21/08 a 14/09/2026)',
     sala:`<div class="s-corpo">
         <div class="linha" style="grid-template-columns:repeat(5, 1fr)">
           <div class="bloco" style="--cor:${COR.net}"><h4>Network</h4><p>Rede, perímetro e virtualização</p></div>
@@ -925,6 +942,8 @@ async function rodarIncidente(passo){
 function ir(i){
   i = Math.max(0, Math.min(PARADAS.length - 1, i));
   const p = PARADAS[i];
+  const anterior = PARADAS[atual];
+  const avancando = i > atual;
   atual = i;
   limparAnimacoes();
 
@@ -940,8 +959,20 @@ function ir(i){
   $('conteudo').scrollTop = 0;
   $('notas').textContent = p.notas || '';
 
-  // foto do prédio ao fundo da abertura
-  document.body.classList.toggle('com-foto', !!p.foto);
+  // foto do prédio: capa (foto:true), fundo escuro (foto:'fundo') e,
+  // ao sair dela para o mapa, o zoom de "entrar no prédio"
+  const corpo = document.body;
+  corpo.classList.remove('entrando');
+  if(anterior && anterior.foto && !p.foto && !p.sala && avancando){
+    corpo.classList.remove('com-foto', 'foto-fundo');
+    void corpo.offsetWidth; // reinicia a animação
+    corpo.classList.add('entrando');
+    const minhaEntrada = geracao;
+    setTimeout(() => { if(minhaEntrada === geracao) corpo.classList.remove('entrando'); }, 1650);
+  } else {
+    corpo.classList.toggle('com-foto', p.foto === true);
+    corpo.classList.toggle('foto-fundo', p.foto === 'fundo');
+  }
 
   // modo sala (processo e gestão) ou modo mapa (técnico)
   const sala = !!p.sala;
@@ -963,7 +994,7 @@ function ir(i){
     if(minha !== geracao) return;
     if(p.anim) p.anim();
     if(p.incidente !== undefined) rodarIncidente(p.incidente);
-  }, sala ? 0 : 950);
+  }, sala ? 0 : (corpo.classList.contains('entrando') ? 1900 : 950));
 
   $('contador').textContent = `${i + 1} / ${PARADAS.length}`;
   [...$('pontos').children].forEach((b, k) => {
