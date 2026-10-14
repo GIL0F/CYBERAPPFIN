@@ -81,6 +81,15 @@
           font-size:16px; line-height:1.5; color:var(--soft); max-height:32vh; overflow-y:auto; box-shadow:0 12px 30px rgba(0,0,0,.4); }
   body.com-notas #notas{ display:block; }
 
+  /* ---------- prédio 3D da abertura (fintech-hq.glb) ---------- */
+  #predio{ position:fixed; left:0; top:0; width:100%; height:calc(100% - 64px); display:block; opacity:0; pointer-events:none; transition:opacity .7s ease; }
+  body.modo-3d.predio-ok #predio{ opacity:1; }
+  body.modo-3d #stage{ opacity:0 !important; }
+  body.modo-3d.predio-ok #sala{ background:rgba(11,21,32,.88); }
+  body.modo-3d.predio-ok.predio-palco #sala{ background:linear-gradient(90deg, rgba(11,21,32,.96) 0%, rgba(11,21,32,.8) 45%, rgba(11,21,32,0) 74%); }
+  body.predio-ok.predio-palco .s-corpo{ max-width:54vw; }
+  body.voando #sala, body.voando #painel{ opacity:0 !important; pointer-events:none; transition:opacity .35s ease !important; }
+
   /* ---------- modo "sala de reunião": telas cheias de processo e gestão ---------- */
   #stage, #painel{ transition:opacity .5s ease, transform .6s cubic-bezier(.22,.61,.36,1), filter .5s ease; }
   body.modo-sala #stage{ opacity:.12; transform:scale(.94); filter:blur(3px); }
@@ -191,6 +200,8 @@
 </style>
 </head>
 <body>
+
+<canvas id="predio" aria-hidden="true"></canvas>
 
 <div id="stage">
   <svg id="mapa" viewBox="0 0 1600 920" preserveAspectRatio="xMidYMid meet" aria-label="Topologia da Cyberappfin"></svg>
@@ -469,7 +480,7 @@ const P1 = 'Apresentador 1 · Abertura', P2N = 'Apresentador 2 · Network', P2I 
 const PARADAS = [
   /* =================== ABERTURA (sala) =================== */
   {
-    quem:P1, cor:COR.brand, titulo:'Cyberappfin',
+    quem:P1, cor:COR.brand, titulo:'Cyberappfin', predio:'palco',
     sala:`<div class="s-corpo" style="justify-content:center">
         <p class="s-rot" style="color:#8DB6F9">Defesa Cibernética · Impacta</p>
         <h2 class="gigante">Cyberappfin</h2>
@@ -486,7 +497,7 @@ const PARADAS = [
     notas:'Apresentar o grupo e a empresa. Ela guarda dados financeiros de vários clientes e acessa bancos e meios de pagamento: alvo valioso. Regulada pelo Banco Central, precisa provar que é segura. Explicar o formato: primeiro vamos seguir o caminho que um pacote faz dentro da rede; depois, em telas como esta, mostramos os processos e a gestão.'
   },
   {
-    quem:P1, cor:COR.brand, titulo:'Como organizamos', sub:'Cinco times, um inventário único, seis fases de subida (21/08 a 14/09/2026)',
+    quem:P1, cor:COR.brand, titulo:'Como organizamos', predio:'fundo', sub:'Cinco times, um inventário único, seis fases de subida (21/08 a 14/09/2026)',
     sala:`<div class="s-corpo">
         <div class="linha" style="grid-template-columns:repeat(5, 1fr)">
           <div class="bloco" style="--cor:${COR.net}"><h4>Network</h4><p>Rede, perímetro e virtualização</p></div>
@@ -909,8 +920,31 @@ async function rodarIncidente(passo){
 function ir(i){
   i = Math.max(0, Math.min(PARADAS.length - 1, i));
   const p = PARADAS[i];
+  const anterior = PARADAS[atual];
+  const avancando = i > atual;
   atual = i;
   limparAnimacoes();
+
+  // prédio 3D: aparece nas paradas de abertura; ao avançar para o mapa, a câmera mergulha no térreo
+  const corpo = document.body;
+  const predio = window.Predio && window.Predio.pronto ? window.Predio : null;
+  if(p.predio){
+    corpo.classList.remove('voando');
+    corpo.classList.add('modo-3d');
+    corpo.classList.toggle('predio-palco', p.predio === 'palco');
+    if(predio) predio.modo(p.predio === 'palco');
+  } else if(anterior && anterior.predio && avancando && predio && corpo.classList.contains('modo-3d')){
+    corpo.classList.remove('predio-palco');
+    corpo.classList.add('voando');
+    predio.modo(false);
+    const minha = geracao;
+    predio.voar().then(() => {
+      if(minha !== geracao) return;
+      corpo.classList.remove('voando', 'modo-3d');
+    });
+  } else {
+    corpo.classList.remove('voando', 'modo-3d', 'predio-palco');
+  }
 
   // estação W10 volta ao lugar; os passos 2 e 3 do incidente a movem de novo
   devolverW10();
@@ -944,7 +978,7 @@ function ir(i){
     if(minha !== geracao) return;
     if(p.anim) p.anim();
     if(p.incidente !== undefined) rodarIncidente(p.incidente);
-  }, sala ? 0 : 950);
+  }, sala ? 0 : (corpo.classList.contains('voando') ? 2400 : 950));
 
   $('contador').textContent = `${i + 1} / ${PARADAS.length}`;
   [...$('pontos').children].forEach((b, k) => {
@@ -978,6 +1012,135 @@ window.addEventListener('hashchange', () => { if(paradaDoEndereco() !== atual) i
 
 montarPontos();
 ir(paradaDoEndereco());
+</script>
+
+<!-- =====================================================================
+     Prédio 3D da abertura (mesmo modelo do prototipo-v2.html).
+     Opcional: se o WebGL ou o .glb falharem, a apresentação segue sem ele.
+     Precisa de HTTP (GitHub Pages ou servidor local); via file:// o .glb não carrega.
+     ===================================================================== -->
+<script type="importmap">
+{ "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.169.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.169.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+const tela = document.getElementById('predio');
+let renderer = null;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas: tela, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+} catch(e) { console.warn('WebGL indisponível: abertura sem o prédio 3D.', e); }
+
+if(renderer){
+  const cena = new THREE.Scene();
+  const cam = new THREE.PerspectiveCamera(34, 1, 0.1, 300);
+  cena.add(new THREE.AmbientLight(0xffffff, 1.2));
+  const luz = new THREE.DirectionalLight(0xffffff, 2.2); luz.position.set(7, 12, 9); cena.add(luz);
+  const contra = new THREE.DirectionalLight(0x9cc2ff, 1.1); contra.position.set(-8, 5, -6); cena.add(contra);
+
+  // cores dos andares = cores dos times na apresentação
+  const CORES = { floor_1:'#14B8A6', floor_2:'#8B5CF6', floor_3:'#F59E0B', floor_4:'#22C55E', floor_5:'#EAB308' };
+  let pronto = false, centro = new THREE.Vector3(), tam = new THREE.Vector3(), dist = 20, yTerreo = 0;
+  let ang = 0.75;                 // ângulo da órbita
+  let desloc = 0, deslocAlvo = 0; // quanto o prédio fica à direita (modo palco)
+  let voo = null;
+  const figuras = [];
+
+  function ajustar(){
+    const w = tela.clientWidth, h = tela.clientHeight;
+    if(!w || !h) return;
+    renderer.setSize(w, h, false);
+    cam.aspect = w / h;
+    cam.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', ajustar);
+  ajustar();
+
+  new GLTFLoader().load('fintech-hq.glb', gltf => {
+    const predio = gltf.scene;
+    cena.add(predio);
+    Object.entries(CORES).forEach(([nome, cor]) => {
+      const g = predio.getObjectByName(nome);
+      if(!g) return;
+      if(nome === 'floor_1') yTerreo = new THREE.Box3().setFromObject(g).getCenter(new THREE.Vector3()).y;
+      g.traverse(o => {
+        if(!o.isMesh || !/glow|accent/i.test(o.name)) return;
+        o.material = o.material.clone();
+        o.material.color.set(cor);
+        if(o.material.emissive){ o.material.emissive.set(cor); o.material.emissiveIntensity = 0.35; }
+      });
+    });
+    // bonequinhos: pulinho no lugar, como no site do prédio
+    predio.traverse(o => {
+      if(/^(lobby_)?figure_\d+(_\d+)?$/.test(o.name))
+        figuras.push({ o, base:o.position.clone(), fase:Math.random() * 6.28, vel:2.8 + Math.random() });
+    });
+    const caixa = new THREE.Box3().setFromObject(predio);
+    caixa.getCenter(centro); caixa.getSize(tam);
+    dist = (tam.y * 0.62) / Math.tan(cam.fov * Math.PI / 360) * 1.35;
+    // a página pode ter aberto antes do modelo terminar de carregar
+    if(document.body.classList.contains('predio-palco')) desloc = deslocAlvo = tam.x * 1.15;
+    pronto = true;
+    document.body.classList.add('predio-ok');
+  }, undefined, () => console.warn('fintech-hq.glb não carregou: abertura sem o prédio 3D.'));
+
+  // posição da órbita: câmera girando devagar em volta do prédio
+  function orbita(){
+    const dir = new THREE.Vector3(Math.cos(ang), 0.42, Math.sin(ang)).normalize();
+    const pos = centro.clone().add(dir.multiplyScalar(dist));
+    const frente = centro.clone().sub(pos).normalize();
+    const direita = new THREE.Vector3().crossVectors(frente, new THREE.Vector3(0, 1, 0)).normalize();
+    // olhar para um ponto à esquerda do prédio faz o prédio aparecer à direita da tela
+    const alvo = centro.clone().add(new THREE.Vector3(0, tam.y * 0.04, 0)).sub(direita.multiplyScalar(desloc));
+    return { pos, alvo };
+  }
+  const suave = k => k < .5 ? 4*k*k*k : 1 - Math.pow(-2*k + 2, 3) / 2;
+
+  function quadro(t){
+    requestAnimationFrame(quadro);
+    if(!pronto) return;
+    const ativo = document.body.classList.contains('modo-3d') || voo;
+    if(!ativo) return;
+    let c;
+    if(voo){
+      const k = Math.min(1, (t - voo.t0) / voo.dur), e = suave(k);
+      c = { pos:new THREE.Vector3().lerpVectors(voo.de.pos, voo.para.pos, e), alvo:new THREE.Vector3().lerpVectors(voo.de.alvo, voo.para.alvo, e) };
+      if(k >= 1){ const fim = voo.fim; voo = null; fim(); }
+    } else {
+      ang += 0.0012;
+      desloc += (deslocAlvo - desloc) * 0.06;
+      c = orbita();
+    }
+    cam.position.copy(c.pos); cam.lookAt(c.alvo);
+    const s = t / 1000;
+    figuras.forEach(f => { f.o.position.y = f.base.y + Math.max(0, Math.sin(s * f.vel + f.fase)) * 0.05; });
+    if(tela.clientWidth !== renderer.domElement.width / renderer.getPixelRatio()) ajustar();
+    renderer.render(cena, cam);
+  }
+  requestAnimationFrame(quadro);
+
+  window.Predio = {
+    get pronto(){ return pronto; },
+    // palco = prédio à direita, texto à esquerda; fundo = prédio centralizado atrás do conteúdo
+    modo(palco){ deslocAlvo = palco ? tam.x * 1.15 : 0; },
+    // mergulho até o andar térreo (Network), onde começa o mapa da rede
+    voar(){
+      return new Promise(resolve => {
+        if(!pronto || matchMedia('(prefers-reduced-motion: reduce)').matches){ resolve(); return; }
+        const de = orbita();
+        const horiz = new THREE.Vector3(Math.cos(ang), 0, Math.sin(ang)).normalize();
+        const alvo = new THREE.Vector3(centro.x, yTerreo, centro.z);
+        const pos = alvo.clone().add(horiz.multiplyScalar(Math.max(tam.x, tam.z) * 0.55)).add(new THREE.Vector3(0, tam.y * 0.02, 0));
+        voo = { de, para:{ pos, alvo }, t0:performance.now(), dur:1700, fim:resolve };
+      });
+    }
+  };
+}
 </script>
 </body>
 </html>
