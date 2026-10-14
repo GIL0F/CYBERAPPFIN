@@ -81,6 +81,20 @@
           font-size:16px; line-height:1.5; color:var(--soft); max-height:32vh; overflow-y:auto; box-shadow:0 12px 30px rgba(0,0,0,.4); }
   body.com-notas #notas{ display:block; }
 
+  /* ---------- foto (ou vídeo) do prédio na abertura ---------- */
+  #capa-midia{ position:fixed; left:0; top:0; width:100%; height:calc(100% - 64px); overflow:hidden; background:#0B1A2E; opacity:0; pointer-events:none; transition:opacity .8s ease; }
+  #capa-midia img, #capa-midia video{ width:100%; height:100%; object-fit:cover; object-position:70% 50%; transform-origin:72% 55%; }
+  #capa-midia img{ animation:aproxima 24s ease-in-out infinite alternate; }
+  #capa-midia::after{ content:""; position:absolute; inset:0;
+    background:linear-gradient(90deg, rgba(11,21,32,.96) 0%, rgba(11,21,32,.82) 34%, rgba(11,21,32,.25) 60%, rgba(11,21,32,0) 78%),
+               linear-gradient(0deg, rgba(11,21,32,.7) 0%, rgba(11,21,32,0) 30%); }
+  @keyframes aproxima{ from{ transform:translateX(7%) scale(1) } to{ transform:translateX(7%) scale(1.09) } }
+  body.com-foto #capa-midia{ opacity:1; }
+  body.com-foto #stage{ opacity:0 !important; }
+  body.com-foto #sala{ background:transparent; }
+  body.com-foto .s-corpo{ max-width:47vw; }
+  @media (prefers-reduced-motion: reduce){ #capa-midia img{ animation:none; } }
+
   /* ---------- modo "sala de reunião": telas cheias de processo e gestão ---------- */
   #stage, #painel{ transition:opacity .5s ease, transform .6s cubic-bezier(.22,.61,.36,1), filter .5s ease; }
   body.modo-sala #stage{ opacity:.12; transform:scale(.94); filter:blur(3px); }
@@ -191,6 +205,8 @@
 </style>
 </head>
 <body>
+
+<div id="capa-midia" aria-hidden="true"><img src="midia/predio-capa.jpg" alt=""></div>
 
 <div id="stage">
   <svg id="mapa" viewBox="0 0 1600 920" preserveAspectRatio="xMidYMid meet" aria-label="Topologia da Cyberappfin"></svg>
@@ -469,7 +485,7 @@ const P1 = 'Apresentador 1 · Abertura', P2N = 'Apresentador 2 · Network', P2I 
 const PARADAS = [
   /* =================== ABERTURA (sala) =================== */
   {
-    quem:P1, cor:COR.brand, titulo:'Cyberappfin',
+    quem:P1, cor:COR.brand, titulo:'Cyberappfin', foto:true,
     sala:`<div class="s-corpo" style="justify-content:center">
         <p class="s-rot" style="color:#8DB6F9">Defesa Cibernética · Impacta</p>
         <h2 class="gigante">Cyberappfin</h2>
@@ -923,6 +939,9 @@ function ir(i){
   $('conteudo').innerHTML = p.html || '';
   $('conteudo').scrollTop = 0;
   $('notas').textContent = p.notas || '';
+
+  // foto do prédio ao fundo da abertura
+  document.body.classList.toggle('com-foto', !!p.foto);
 
   // modo sala (processo e gestão) ou modo mapa (técnico)
   const sala = !!p.sala;
