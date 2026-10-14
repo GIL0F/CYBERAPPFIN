@@ -1,0 +1,1033 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cyberappfin: a jornada do pacote</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1520; --bg-2:#101E2C; --panel:#13212F; --line:#26384A; --line-2:#344B61;
+    --text:#EEF3F8; --muted:#9FB1C3; --soft:#C7D4E1;
+    --net:#14B8A6; --iam:#8B5CF6; --soc:#F59E0B; --end:#22C55E; --grc:#EAB308;
+    --brand:#4C8DF6; --danger:#F87171;
+    --panel-w:560px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans', system-ui, sans-serif; overflow:hidden; }
+  .mono{ font-family:'JetBrains Mono', ui-monospace, monospace; }
+
+  /* ---------- palco ---------- */
+  #stage{ position:fixed; inset:0 var(--panel-w) 64px 0; }
+  #mapa{ width:100%; height:100%; display:block; }
+  #mapa text{ font-family:'DM Sans', system-ui, sans-serif; fill:var(--text); }
+  #mapa .t-title{ font-family:'Sora', system-ui, sans-serif; font-weight:700; }
+  #mapa .t-mono{ font-family:'JetBrains Mono', ui-monospace, monospace; fill:var(--muted); }
+  #mapa .t-muted{ fill:var(--muted); }
+  .no{ transition:opacity .45s ease; }
+  body.focando .no{ opacity:.18; }
+  body.focando .no.foco{ opacity:1; }
+  .lig{ fill:none; stroke:var(--line-2); stroke-width:2.5; }
+  .lig.trac{ stroke-dasharray:7 7; }
+  .barramento{ fill:none; stroke:#3E5A75; stroke-width:7; stroke-linecap:round; }
+  .host rect{ transition:stroke .3s, fill .3s; }
+  .host.alerta rect{ stroke:var(--danger) !important; fill:#3A1C21 !important; }
+  .pulso{ animation:pulso 1.4s ease-in-out infinite; }
+  @keyframes pulso{ 0%,100%{ opacity:1 } 50%{ opacity:.35 } }
+
+  /* ---------- painel lateral ---------- */
+  #painel{
+    position:fixed; top:0; right:0; bottom:64px; width:var(--panel-w);
+    background:var(--panel); border-left:1px solid var(--line);
+    display:flex; flex-direction:column; overflow:hidden;
+  }
+  #painel .topo{ padding:28px 36px 0; display:flex; flex-direction:column; gap:10px; }
+  #quem{ align-self:flex-start; font-size:13px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+         padding:6px 12px; border-radius:999px; background:#1C2F42; color:var(--soft); }
+  #painel h1{ font-family:'Sora', system-ui, sans-serif; font-size:32px; line-height:1.15; font-weight:700; }
+  #painel .sub{ color:var(--muted); font-size:16px; }
+  #conteudo{ padding:20px 36px 32px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:16px; }
+  #conteudo p{ font-size:17px; line-height:1.55; color:var(--soft); }
+  #conteudo b{ color:var(--text); }
+  #conteudo h3{ font-family:'Sora', system-ui, sans-serif; font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+  #conteudo ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
+  #conteudo li{ font-size:16.5px; line-height:1.45; color:var(--soft); padding-left:18px; position:relative; }
+  #conteudo li::before{ content:""; position:absolute; left:0; top:.6em; width:7px; height:7px; border-radius:50%; background:var(--cor, var(--brand)); }
+  #conteudo table{ width:100%; border-collapse:collapse; font-size:15px; }
+  #conteudo th{ text-align:left; color:var(--muted); font-weight:700; padding:7px 8px; border-bottom:1px solid var(--line-2); }
+  #conteudo td{ padding:7px 8px; border-bottom:1px solid var(--line); color:var(--soft); vertical-align:top; }
+  #conteudo tr.dest td{ color:var(--text); background:#2A2112; }
+  #conteudo tr.perigo td{ color:var(--text); background:#2C1A1E; }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{ font-size:14px; padding:5px 11px; border-radius:999px; background:#1C2F42; color:var(--soft); }
+  .cards{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .card{ background:var(--bg-2); border:1px solid var(--line); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:4px; }
+  .card .n{ font-family:'Sora', system-ui, sans-serif; font-size:28px; font-weight:800; color:var(--cor, var(--brand)); line-height:1.1; }
+  .card .l{ font-size:14px; color:var(--muted); }
+  .barras{ display:flex; flex-direction:column; gap:7px; }
+  .barra{ display:grid; grid-template-columns:100px 1fr 44px; align-items:center; gap:10px; font-size:15px; color:var(--soft); }
+  .barra i{ display:block; height:14px; border-radius:4px; }
+  .aviso{ font-size:14px; color:#F5B95A; border-left:3px solid #F5B95A; padding:6px 10px; background:#241C10; border-radius:0 8px 8px 0; }
+  .passos{ display:flex; flex-direction:column; gap:8px; counter-reset:p; }
+  .passo{ display:flex; gap:12px; align-items:flex-start; font-size:16px; color:var(--muted); transition:color .3s; }
+  .passo::before{ counter-increment:p; content:counter(p); flex-shrink:0; width:26px; height:26px; border-radius:50%;
+                  display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; background:#1C2F42; color:var(--muted); }
+  .passo.ativo{ color:var(--text); }
+  .passo.ativo::before{ background:var(--danger); color:#1A0E10; }
+  /* notas de fala: flutuam acima do rodapé, nos dois modos */
+  #notas{ display:none; position:fixed; left:24px; bottom:80px; width:min(760px, 60vw); z-index:20; padding:16px 18px;
+          background:rgba(9,18,27,.96); border:1px dashed #4B6580; border-radius:12px;
+          font-size:16px; line-height:1.5; color:var(--soft); max-height:32vh; overflow-y:auto; box-shadow:0 12px 30px rgba(0,0,0,.4); }
+  body.com-notas #notas{ display:block; }
+
+  /* ---------- foto (ou vídeo) do prédio na abertura ---------- */
+  #capa-midia{ position:fixed; left:0; top:0; width:100%; height:calc(100% - 64px); overflow:hidden; background:#0B1A2E; opacity:0; pointer-events:none; transition:opacity .8s ease; }
+  #capa-midia img, #capa-midia video{ width:100%; height:100%; object-fit:cover; object-position:70% 50%; transform-origin:72% 55%; }
+  #capa-midia img{ animation:aproxima 24s ease-in-out infinite alternate; }
+  #capa-midia::after{ content:""; position:absolute; inset:0;
+    background:linear-gradient(90deg, rgba(11,21,32,.96) 0%, rgba(11,21,32,.82) 34%, rgba(11,21,32,.25) 60%, rgba(11,21,32,0) 78%),
+               linear-gradient(0deg, rgba(11,21,32,.7) 0%, rgba(11,21,32,0) 30%); }
+  @keyframes aproxima{ from{ transform:translateX(7%) scale(1) } to{ transform:translateX(7%) scale(1.09) } }
+  body.com-foto #capa-midia{ opacity:1; }
+  body.com-foto #stage{ opacity:0 !important; }
+  body.com-foto #sala{ background:transparent; }
+  body.com-foto .s-corpo{ max-width:47vw; }
+  /* foto ao fundo de outras telas de sala (mais escura, sem estreitar o texto) */
+  body.foto-fundo #capa-midia{ opacity:1; }
+  body.foto-fundo #capa-midia::after{ background:rgba(11,21,32,.86); }
+  body.foto-fundo #stage{ opacity:0 !important; }
+  body.foto-fundo #sala{ background:transparent; }
+  /* "entrar no prédio": zoom contínuo até a porta de entrada e dissolve no mapa */
+  body.entrando #capa-midia{ opacity:1; }
+  body.entrando #capa-midia::after{ background:rgba(11,21,32,.1); transition:background .5s ease; }
+  body.entrando #capa-midia img{ transform-origin:57% 77%; animation:entrar 1.7s cubic-bezier(.55,0,.35,1) forwards; }
+  body.entrando #sala, body.entrando #painel, body.entrando #stage{ opacity:0 !important; }
+  /* fora das telas com foto, ela some na hora (sem reaparecer depois do zoom) */
+  body:not(.com-foto):not(.foto-fundo):not(.entrando) #capa-midia{ transition:none; }
+  @keyframes entrar{
+    0%  { transform:translateX(7%) scale(1.02); filter:blur(0) brightness(1); opacity:1; }
+    70% { filter:blur(2px) brightness(1.25); opacity:1; }
+    100%{ transform:translateX(7%) scale(7); filter:blur(8px) brightness(1.6); opacity:0; }
+  }
+  @media (prefers-reduced-motion: reduce){ #capa-midia img{ animation:none !important; } }
+
+  /* ---------- modo "sala de reunião": telas cheias de processo e gestão ---------- */
+  #stage, #painel{ transition:opacity .5s ease, transform .6s cubic-bezier(.22,.61,.36,1), filter .5s ease; }
+  body.modo-sala #stage{ opacity:.12; transform:scale(.94); filter:blur(3px); }
+  body.modo-sala #painel{ opacity:0; transform:translateX(40px); pointer-events:none; }
+  #sala{
+    position:fixed; inset:0 0 64px 0; display:flex; flex-direction:column; gap:3.2vh;
+    padding:6vh 6vw 5vh; overflow-y:auto;
+    background:radial-gradient(ellipse at 20% 15%, rgba(26,48,74,.92) 0%, rgba(11,21,32,.97) 60%);
+    opacity:0; pointer-events:none; transform:translateY(16px);
+    transition:opacity .5s ease .1s, transform .6s cubic-bezier(.22,.61,.36,1) .1s;
+  }
+  body.modo-sala #sala{ opacity:1; pointer-events:auto; transform:none; }
+  .s-head{ display:flex; flex-direction:column; gap:1.2vh; }
+  .s-quem{ align-self:flex-start; font-size:clamp(12px, .9vw, 15px); font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+           padding:6px 14px; border-radius:999px; background:#1C2F42; }
+  .s-titulo{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(34px, 3.6vw, 64px); font-weight:800; line-height:1.05; letter-spacing:-.01em; }
+  .s-sub{ font-size:clamp(16px, 1.2vw, 22px); color:var(--muted); }
+  .s-corpo{ flex:1; display:flex; flex-direction:column; gap:2.6vh; min-height:0; }
+  .s-txt{ font-size:clamp(16px, 1.15vw, 21px); line-height:1.5; color:var(--soft); }
+  .s-txt b{ color:var(--text); }
+  .s-rot{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(12px, .85vw, 15px); font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .linha{ display:grid; gap:1.4vw; }
+  .bloco{ background:#132233; border:1px solid var(--line); border-radius:16px; padding:clamp(16px, 1.6vw, 28px);
+          display:flex; flex-direction:column; gap:10px; position:relative; overflow:hidden; }
+  .bloco::before{ content:""; position:absolute; left:0; top:0; right:0; height:5px; background:var(--cor, var(--brand)); }
+  .bloco h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(18px, 1.45vw, 26px); font-weight:700; line-height:1.2; }
+  .bloco p{ font-size:clamp(14px, 1vw, 18px); line-height:1.45; color:var(--soft); }
+  .bloco .grande{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(34px, 3.4vw, 60px); font-weight:800; line-height:1; color:var(--cor, var(--brand)); }
+  .bloco .rot{ font-size:clamp(12px, .85vw, 15px); font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .bloco .rodape{ margin-top:auto; padding-top:10px; border-top:1px solid var(--line); font-size:clamp(14px, 1vw, 18px); color:var(--text); }
+  .chips2{ display:flex; flex-wrap:wrap; gap:10px; }
+  .chips2 span{ font-size:clamp(14px, 1vw, 18px); padding:7px 14px; border-radius:999px; background:#1C2F42; color:var(--soft); }
+  /* linha do tempo */
+  .tempo{ display:grid; grid-template-columns:repeat(var(--n), 1fr); gap:0; position:relative; }
+  .tempo::before{ content:""; position:absolute; left:4%; right:4%; top:22px; height:3px; background:linear-gradient(90deg, var(--brand), var(--soc)); opacity:.6; }
+  .etapa{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; padding:0 8px; position:relative; }
+  .etapa .bola{ width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+                font-family:'Sora', system-ui, sans-serif; font-weight:800; font-size:18px; background:#0B1520; border:3px solid var(--cor, var(--brand)); color:var(--text); }
+  .etapa h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(15px, 1.15vw, 21px); font-weight:700; line-height:1.2; }
+  .etapa p{ font-size:clamp(13px, .95vw, 17px); line-height:1.4; color:var(--muted); }
+  /* organograma do CSIRT */
+  .org{ display:flex; flex-direction:column; align-items:center; gap:0; }
+  .org .chefe{ background:#2A2112; border:2px solid var(--soc); border-radius:14px; padding:14px 26px; text-align:center; }
+  .org .chefe h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.3vw, 23px); }
+  .org .chefe p{ font-size:clamp(13px, .95vw, 16px); color:var(--soft); }
+  .org .tronco{ width:3px; height:22px; background:var(--line-2); }
+  .org .ramos{ display:grid; grid-template-columns:repeat(6, 1fr); gap:12px; width:100%; position:relative; padding-top:22px; }
+  .org .ramos::before{ content:""; position:absolute; top:0; left:8.3%; right:8.3%; height:3px; background:var(--line-2); }
+  .org .membro{ background:#132233; border:1px solid var(--line); border-top:4px solid var(--cor); border-radius:12px; padding:14px; position:relative; }
+  .org .membro::before{ content:""; position:absolute; top:-26px; left:50%; width:3px; height:22px; background:var(--line-2); }
+  .org .membro h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(14px, 1.05vw, 19px); margin-bottom:6px; }
+  .org .membro p{ font-size:clamp(12px, .9vw, 16px); line-height:1.4; color:var(--soft); }
+  /* barras de tempo (RTO) */
+  .rto{ display:flex; flex-direction:column; gap:14px; }
+  .rto .item{ display:grid; grid-template-columns:minmax(160px, 22%) 1fr; gap:16px; align-items:center; }
+  .rto .nome{ font-size:clamp(15px, 1.1vw, 20px); font-weight:700; }
+  .rto .trilho{ position:relative; height:38px; background:#132233; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .rto .trilho i{ position:absolute; left:0; top:0; bottom:0; border-radius:10px 0 0 10px; }
+  .rto .trilho span{ position:absolute; top:50%; transform:translateY(-50%); font-size:clamp(13px, .95vw, 17px); white-space:nowrap; color:var(--text); }
+  /* documentos */
+  .doc{ background:#F3F1EA; color:#1D2733; border-radius:6px 26px 6px 6px; padding:clamp(18px, 1.6vw, 28px); display:flex; flex-direction:column; gap:10px;
+        box-shadow:0 18px 40px rgba(0,0,0,.35); position:relative; }
+  .doc::after{ content:""; position:absolute; top:0; right:0; width:26px; height:26px; background:linear-gradient(225deg, #0B1520 50%, #CFCAB9 50%); border-radius:0 0 0 6px; }
+  .doc .cod{ font-family:'JetBrains Mono', monospace; font-size:clamp(12px, .85vw, 15px); color:#5B6573; }
+  .doc h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.3vw, 23px); line-height:1.2; }
+  .doc p{ font-size:clamp(13px, .95vw, 17px); line-height:1.45; color:#3B4654; }
+  .doc .selo2{ align-self:flex-start; margin-top:auto; font-size:clamp(12px, .85vw, 15px); font-weight:700; padding:5px 12px; border-radius:999px; }
+  /* camadas da aplicação */
+  .pilha{ display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:14px; align-items:stretch; }
+  .seta{ align-self:center; font-size:34px; color:var(--line-2); }
+  .s-aviso{ font-size:clamp(13px, .95vw, 17px); color:#F5B95A; border-left:3px solid #F5B95A; padding:8px 12px; background:#241C10; border-radius:0 8px 8px 0; align-self:flex-start; }
+  .lema2{ display:flex; gap:20px; flex-wrap:wrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 2vw, 34px); font-weight:700; color:var(--soft); }
+  .lema2 span:nth-child(even){ color:#4B6580; }
+  .faixa{ height:6px; width:min(520px, 60%); border-radius:3px; background:linear-gradient(90deg, var(--brand), var(--iam), var(--net), var(--soc), var(--end)); }
+  .gigante{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(56px, 7.5vw, 140px); font-weight:800; line-height:.95; letter-spacing:-.03em; }
+
+  /* ---------- rodapé de navegação ---------- */
+  #rodape{
+    position:fixed; left:0; right:0; bottom:0; height:64px; background:#09121B; border-top:1px solid var(--line);
+    display:flex; align-items:center; gap:20px; padding:0 24px;
+  }
+  #rodape button{ background:#1A2B3C; color:var(--text); border:1px solid var(--line-2); border-radius:10px;
+                  font:600 15px 'DM Sans', system-ui, sans-serif; padding:9px 16px; cursor:pointer; }
+  #rodape button:hover{ background:#22384D; }
+  #rodape button:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
+  #pontos{ flex:1; display:flex; gap:6px; align-items:center; overflow:hidden; }
+  #pontos button{ flex:1; min-width:6px; height:8px; padding:0; border-radius:4px; border:none; background:#22384D; }
+  #pontos button.feito{ background:#3D5F82; }
+  #pontos button.atual{ background:var(--brand); height:12px; }
+  #contador{ font-size:15px; color:var(--muted); min-width:64px; text-align:right; }
+  #dica{ font-size:13px; color:#5F7790; }
+
+  @media (max-width:1100px){
+    :root{ --panel-w:420px; }
+    #painel h1{ font-size:26px; }
+  }
+  @media (max-width:760px){
+    #stage{ inset:0 0 55vh 0; }
+    .linha{ grid-template-columns:1fr !important; }
+    .org .ramos, .pilha, .tempo{ grid-template-columns:1fr !important; }
+    .org .ramos::before, .org .membro::before, .tempo::before, .seta{ display:none; }
+    #painel{ top:45vh; width:100%; border-left:none; border-top:1px solid var(--line); }
+    #dica{ display:none; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .pulso{ animation:none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="capa-midia" aria-hidden="true"><img src="midia/predio-capa.jpg" alt=""></div>
+
+<div id="stage">
+  <svg id="mapa" viewBox="0 0 1600 920" preserveAspectRatio="xMidYMid meet" aria-label="Topologia da Cyberappfin"></svg>
+</div>
+
+<section id="sala" aria-live="polite"></section>
+
+<aside id="painel">
+  <div class="topo">
+    <span id="quem"></span>
+    <h1 id="titulo"></h1>
+    <p class="sub" id="subtitulo"></p>
+  </div>
+  <div id="conteudo"></div>
+</aside>
+<div id="notas" aria-label="Notas de fala"></div>
+
+<nav id="rodape" aria-label="Navegação da apresentação">
+  <button id="ant" aria-label="Parada anterior">← Anterior</button>
+  <div id="pontos"></div>
+  <span id="contador"></span>
+  <button id="prox" aria-label="Próxima parada">Próxima →</button>
+  <span id="dica">← → navega · N notas · F tela cheia</span>
+</nav>
+
+<script>
+/* =====================================================================
+   Cyberappfin: a jornada do pacote
+   Fonte dos dados: ambiente-bpo (inventário), plano V2 de provisionamento,
+   relatório OpenVAS de 11/09/2026 e as políticas POL-GI-001 / POL-CN-001.
+   ===================================================================== */
+
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('mapa');
+const MUNDO = [0, 0, 1600, 920];
+
+const COR = { net:'#14B8A6', iam:'#8B5CF6', soc:'#F59E0B', end:'#22C55E', grc:'#EAB308', brand:'#4C8DF6', danger:'#F87171', cinza:'#64809B' };
+
+/* ---------- VLANs e hosts ---------- */
+const VLANS = [
+  { n:10, uso:'Gerência',   rede:'10.10.10.0/24', cor:COR.brand, hosts:[['UniFi (gestão)','10.10.10.x'],['vCenter 8.x','10.10.10.x'],['Notebook Admin','10.10.10.x']] },
+  { n:20, uso:'Servidores', rede:'10.10.20.0/24', cor:COR.iam,   hosts:[['AD-01','10.10.20.10'],['AD-02','10.10.20.11']] },
+  { n:30, uso:'DMZ',        rede:'10.10.30.0/24', cor:COR.danger, hosts:[['Reverse Proxy','10.10.30.3']] },
+  { n:40, uso:'Usuários',   rede:'10.10.40.0/24', cor:COR.end,   hosts:[['W10','10.10.40.x'],['W10-2','10.10.40.x'],['WIN-10','10.10.40.x']] },
+  { n:50, uso:'Segurança / SOC', rede:'10.10.50.0/24', cor:COR.soc, hosts:[['Wazuh Manager','10.10.50.21'],['Zabbix + Grafana','10.10.50.15'],['OpenVAS','10.10.50.7'],['Jump Server','PAM · 10.10.50.x']] },
+  { n:60, uso:'Backup',     rede:'10.10.60.0/24', cor:COR.grc,   hosts:[['Backup Server','10.10.60.x']] },
+  { n:70, uso:'PCI / CDE',  rede:'10.10.70.0/24', cor:'#F472B6', hosts:[['PCI-APP-01','10.10.70.x']] },
+  { n:80, uso:'vSphere DR', rede:'10.10.80.0/24', cor:'#60A5FA', hosts:[['vSphere DR','10.10.80.x']] },
+  { n:99, uso:'Quarentena', rede:'10.10.99.0/24', cor:'#C084FC', hosts:[] }
+];
+const COL_X = i => 20 + i * 174;          // canto esquerdo da coluna
+const COL_CX = i => COL_X(i) + 80;        // centro da coluna
+const HOST_Y = j => 500 + j * 70;         // topo do host
+const hostCentro = (i, j) => ({ x: COL_CX(i), y: HOST_Y(j) + 29 });
+const BUS_Y = 360;
+
+/* ---------- desenho ---------- */
+function el(tag, attrs = {}, pai = svg){
+  const e = document.createElementNS(NS, tag);
+  for(const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+  pai.appendChild(e);
+  return e;
+}
+function texto(pai, x, y, str, attrs = {}){
+  const t = el('text', { x, y, ...attrs }, pai);
+  t.textContent = str;
+  return t;
+}
+function grupo(id, extra = ''){
+  return el('g', { 'data-id': id, class: 'no ' + extra });
+}
+
+// fundo com grade suave
+const defs = el('defs');
+defs.innerHTML = `
+  <pattern id="grade" width="40" height="40" patternUnits="userSpaceOnUse">
+    <path d="M40 0H0V40" fill="none" stroke="#132332" stroke-width="1"/>
+  </pattern>
+  <filter id="brilho" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>`;
+el('rect', { x:-2000, y:-2000, width:5600, height:4920, fill:'url(#grade)' });
+
+// rótulos de camada
+texto(svg, 30, 30, 'PERÍMETRO E VIRTUALIZAÇÃO', { class:'t-mono', 'font-size':13, 'letter-spacing':2 });
+texto(svg, 30, 395, 'VLANs · TRUNK 802.1Q', { class:'t-mono', 'font-size':13, 'letter-spacing':2 });
+
+// ligações do perímetro (desenhadas antes das caixas)
+const gLig = grupo('ligacoes');
+el('path', { d:'M200 100 C250 100 250 140 300 140', class:'lig trac' }, gLig);
+el('path', { d:'M200 230 C250 230 250 200 300 200', class:'lig trac' }, gLig);
+el('path', { d:'M600 170 H700', class:'lig' }, gLig);
+el('path', { d:'M940 170 H1040', class:'lig' }, gLig);
+el('path', { d:`M820 225 V${BUS_Y}`, class:'lig' }, gLig);
+
+// WAN1 / WAN2
+[['wan1', 60, 'WAN1', 'Link principal'], ['wan2', 190, 'WAN2', 'Link de backup']].forEach(([id, y, nome, sub]) => {
+  const g = grupo(id);
+  el('rect', { x:30, y, width:170, height:80, rx:40, fill:'#12263A', stroke:COR.net, 'stroke-width':2 }, g);
+  texto(g, 115, y + 36, nome, { 'text-anchor':'middle', class:'t-title', 'font-size':20 });
+  texto(g, 115, y + 58, sub, { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
+});
+
+// UniFi
+(() => {
+  const g = grupo('unifi');
+  el('rect', { x:300, y:95, width:300, height:150, rx:16, fill:'#10283A', stroke:COR.net, 'stroke-width':2.5 }, g);
+  texto(g, 324, 135, 'UniFi Controller', { class:'t-title', 'font-size':24 });
+  texto(g, 324, 165, 'Firewall · NAT · VLANs · APs', { class:'t-muted', 'font-size':15 });
+  texto(g, 324, 189, 'Gestão de switches e Wi-Fi', { class:'t-muted', 'font-size':15 });
+  texto(g, 324, 222, 'VM Ubuntu 22.04 · VLAN 10', { class:'t-mono', 'font-size':13 });
+})();
+
+// Cisco 2960
+(() => {
+  const g = grupo('cisco');
+  el('rect', { x:700, y:115, width:240, height:110, rx:16, fill:'#10283A', stroke:COR.net, 'stroke-width':2.5 }, g);
+  texto(g, 722, 153, 'Cisco 2960', { class:'t-title', 'font-size':22 });
+  texto(g, 722, 180, 'Layer 2 · VLANs', { class:'t-muted', 'font-size':15 });
+  texto(g, 722, 204, 'Trunks 802.1Q', { class:'t-muted', 'font-size':15 });
+})();
+
+// Cluster vSphere
+(() => {
+  const g = grupo('cluster');
+  el('rect', { x:1040, y:60, width:530, height:240, rx:18, fill:'#0F2133', stroke:COR.brand, 'stroke-width':2.5 }, g);
+  texto(g, 1062, 92, 'Cluster vSphere HA', { class:'t-title', 'font-size':20 });
+  texto(g, 1548, 92, 'vCenter 8.x', { class:'t-mono', 'font-size':13, 'text-anchor':'end' });
+  [['ESX-01', 1060, 'Serviços internos', 'AD · Backup · PCI-APP'], ['ESX-02', 1310, 'SOC · DMZ · OpenVAS', 'EDR · Laboratório']].forEach(([n, x, a, b]) => {
+    el('rect', { x, y:110, width:240, height:170, rx:12, fill:'#132A40', stroke:'#2E4E70', 'stroke-width':1.5 }, g);
+    texto(g, x + 18, 142, n, { class:'t-title', 'font-size':20 });
+    texto(g, x + 18, 170, a, { class:'t-muted', 'font-size':14 });
+    texto(g, x + 18, 191, b, { class:'t-muted', 'font-size':14 });
+    texto(g, x + 18, 226, '16 cores · 128 GB ECC', { class:'t-mono', 'font-size':12 });
+    texto(g, x + 18, 246, '2x480 GB cache + 4x2 TB', { class:'t-mono', 'font-size':12 });
+    texto(g, x + 18, 266, '2x10GbE + 2x10GbE vMotion', { class:'t-mono', 'font-size':12 });
+  });
+})();
+
+// Barramento (trunk) e colunas de VLAN
+const gBus = grupo('barramento');
+el('path', { d:`M${COL_CX(0)} ${BUS_Y} H${COL_CX(8)}`, class:'barramento' }, gBus);
+VLANS.forEach((v, i) => el('path', { d:`M${COL_CX(i)} ${BUS_Y} V400`, class:'lig' }, gBus));
+
+const hostEls = {};   // "col-indice" -> <g>
+VLANS.forEach((v, i) => {
+  const g = grupo('vlan' + v.n);
+  const x = COL_X(i);
+  el('rect', { x, y:400, width:160, height:500, rx:14, fill:'#0F1D2B', stroke:v.cor, 'stroke-width':2, 'stroke-opacity':.75 }, g);
+  el('rect', { x, y:400, width:160, height:6, rx:3, fill:v.cor }, g);
+  texto(g, x + 14, 444, String(v.n), { class:'t-title', 'font-size':30, fill:v.cor });
+  texto(g, x + 14, 466, v.uso, { 'font-size':14, 'font-weight':700 });
+  texto(g, x + 14, 485, v.rede, { class:'t-mono', 'font-size':11 });
+  v.hosts.forEach(([nome, ip], j) => {
+    const h = el('g', { class:'host', 'data-host': `${i}-${j}` }, g);
+    el('rect', { x:x + 10, y:HOST_Y(j), width:140, height:58, rx:9, fill:'#16283A', stroke:'#2C4560', 'stroke-width':1.5 }, h);
+    texto(h, x + 20, HOST_Y(j) + 25, nome, { 'font-size':14, 'font-weight':700 });
+    texto(h, x + 20, HOST_Y(j) + 45, ip, { class:'t-mono', 'font-size':11 });
+    hostEls[`${i}-${j}`] = h;
+  });
+});
+// vazio da quarentena
+const gQ = svg.querySelector('[data-id="vlan99"]');
+texto(gQ, COL_CX(8), 640, 'isolamento', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
+texto(gQ, COL_CX(8), 660, 'de host suspeito', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
+
+// camada de animações (pacotes) por cima de tudo
+const camada = el('g', { id:'camada' });
+
+/* ---------- pacotes animados ---------- */
+let geracao = 0;          // muda a cada parada: cancela animações antigas
+const loops = [];
+function limparAnimacoes(){
+  geracao++;
+  loops.length = 0;
+  camada.innerHTML = '';
+}
+// caminho em "L" passando pelo barramento: host -> trunk -> host
+function viaBus(a, b){
+  if(a.x === b.x) return [a, b];
+  return [a, { x:a.x, y:BUS_Y }, { x:b.x, y:BUS_Y }, b];
+}
+function pacote(pontos, cor, dur = 1600, raio = 7){
+  const minha = geracao;
+  return new Promise(resolve => {
+    const d = 'M' + pontos.map(p => `${p.x} ${p.y}`).join(' L');
+    const trilha = el('path', { d, fill:'none', stroke:cor, 'stroke-width':2, 'stroke-opacity':.35, 'stroke-dasharray':'4 6' }, camada);
+    const c = el('circle', { r:raio, fill:cor, filter:'url(#brilho)' }, camada);
+    const total = trilha.getTotalLength();
+    const reduzir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const t0 = performance.now();
+    function quadro(t){
+      if(minha !== geracao){ resolve(false); return; }
+      const k = reduzir ? 1 : Math.min(1, (t - t0) / dur);
+      const p = trilha.getPointAtLength(total * k);
+      c.setAttribute('cx', p.x); c.setAttribute('cy', p.y);
+      if(k < 1) requestAnimationFrame(quadro);
+      else { setTimeout(() => { trilha.remove(); c.remove(); resolve(true); }, 250); }
+    }
+    requestAnimationFrame(quadro);
+  });
+}
+// repete um conjunto de pacotes enquanto a parada estiver ativa
+function emLoop(fn, intervalo){
+  const minha = geracao;
+  (async function volta(){
+    while(minha === geracao){
+      fn();
+      await new Promise(r => setTimeout(r, intervalo));
+    }
+  })();
+}
+
+/* ---------- câmera (viewBox animado) ---------- */
+let vbAtual = [...MUNDO];
+let animCam = null;
+function camera(alvo, dur = 900){
+  const ini = [...vbAtual];
+  const t0 = performance.now();
+  cancelAnimationFrame(animCam);
+  const ease = k => k < .5 ? 4*k*k*k : 1 - Math.pow(-2*k + 2, 3) / 2;
+  const reduzir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function quadro(t){
+    const k = reduzir ? 1 : Math.min(1, (t - t0) / dur);
+    vbAtual = ini.map((v, i) => v + (alvo[i] - v) * ease(k));
+    svg.setAttribute('viewBox', vbAtual.join(' '));
+    if(k < 1) animCam = requestAnimationFrame(quadro);
+  }
+  animCam = requestAnimationFrame(quadro);
+}
+
+/* ---------- foco ---------- */
+function focar(ids){
+  document.querySelectorAll('.no.foco').forEach(e => e.classList.remove('foco'));
+  if(!ids || !ids.length){ document.body.classList.remove('focando'); return; }
+  document.body.classList.add('focando');
+  ids.forEach(id => svg.querySelector(`[data-id="${id}"]`)?.classList.add('foco'));
+}
+
+/* ---------- incidente: estação W10 indo para a quarentena ---------- */
+const W10 = hostEls['3-0'];
+function resetW10(){
+  W10.classList.remove('alerta');
+  W10.removeAttribute('transform');
+  W10.querySelector('.selo')?.remove();
+}
+function moverW10ParaQuarentena(){
+  const dx = COL_X(8) - COL_X(3), dur = 1400, t0 = performance.now();
+  const minha = geracao;
+  // a estação precisa ficar acima da coluna da quarentena enquanto se move
+  svg.insertBefore(W10, camada);
+  function quadro(t){
+    if(minha !== geracao) return;
+    const k = Math.min(1, (t - t0) / dur);
+    const e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2) / 2;
+    W10.setAttribute('transform', `translate(${dx * e} 0)`);
+    if(k < 1) requestAnimationFrame(quadro);
+    else {
+      // selo logo abaixo da estação, longe do cabeçalho da VLAN 99
+      const s = el('text', { x:COL_X(3) + 80, y:HOST_Y(0) + 82, 'text-anchor':'middle', class:'selo pulso', 'font-size':14, 'font-weight':700, 'letter-spacing':2, fill:COR.danger }, W10);
+      s.textContent = 'ISOLADO';
+    }
+  }
+  requestAnimationFrame(quadro);
+}
+function devolverW10(){
+  resetW10();
+  svg.querySelector('[data-id="vlan40"]').appendChild(W10);
+}
+
+/* ---------- conteúdo das paradas ---------- */
+const P1 = 'Apresentador 1 · Abertura', P2N = 'Apresentador 2 · Network', P2I = 'Apresentador 2 · IAM',
+      P3 = 'Apresentador 3 · SOC', P3E = 'Apresentador 3 · Endpoint', P34 = 'Apresentadores 3 e 4 · Incidente',
+      P4 = 'Apresentador 4 · GRC e fechamento';
+
+const PARADAS = [
+  /* =================== ABERTURA (sala) =================== */
+  {
+    quem:P1, cor:COR.brand, titulo:'Cyberappfin', foto:true,
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <p class="s-rot" style="color:#8DB6F9">Defesa Cibernética · Impacta</p>
+        <h2 class="gigante">Cyberappfin</h2>
+        <p class="s-txt" style="max-width:62ch">Braço financeiro do Grupo Cyberapp: uma BPO financeira e Sociedade de Crédito Direto que guarda dados financeiros de muitas empresas.</p>
+        <div class="linha" style="grid-template-columns:repeat(3, 1fr)">
+          <div class="bloco" style="--cor:${COR.brand}"><h4>BPO Financeiro</h4><p>Contas a pagar e a receber, conciliação e folha de pagamento.</p></div>
+          <div class="bloco" style="--cor:${COR.brand}"><h4>Crédito (SCD)</h4><p>Antecipação de recebíveis e capital de giro para PMEs.</p></div>
+          <div class="bloco" style="--cor:${COR.brand}"><h4>Valuation e M&amp;A</h4><p>Avaliação de empresas, fusões e aquisições.</p></div>
+        </div>
+        <div class="chips2"><span>CMN 4.656/2018</span><span>LGPD</span><span>LC 105/2001 (sigilo bancário)</span><span>Banco Central</span><span>ISO/IEC 27001</span></div>
+        <div class="lema2"><span>Segurança</span><span>·</span><span>Resiliência</span><span>·</span><span>Controle</span></div>
+        <div class="faixa"></div>
+      </div>`,
+    notas:'Apresentar o grupo e a empresa. Ela guarda dados financeiros de vários clientes e acessa bancos e meios de pagamento: alvo valioso. Regulada pelo Banco Central, precisa provar que é segura. Explicar o formato: primeiro vamos seguir o caminho que um pacote faz dentro da rede; depois, em telas como esta, mostramos os processos e a gestão.'
+  },
+  {
+    quem:P1, cor:COR.brand, titulo:'Como organizamos', foto:'fundo', sub:'Cinco times, um inventário único, seis fases de subida (21/08 a 14/09/2026)',
+    sala:`<div class="s-corpo">
+        <div class="linha" style="grid-template-columns:repeat(5, 1fr)">
+          <div class="bloco" style="--cor:${COR.net}"><h4>Network</h4><p>Rede, perímetro e virtualização</p></div>
+          <div class="bloco" style="--cor:${COR.iam}"><h4>IAM</h4><p>Identidades e acessos</p></div>
+          <div class="bloco" style="--cor:${COR.soc}"><h4>SOC</h4><p>Monitoramento e resposta</p></div>
+          <div class="bloco" style="--cor:${COR.end}"><h4>Endpoint</h4><p>Estações e correções</p></div>
+          <div class="bloco" style="--cor:${COR.grc}"><h4>GRC</h4><p>Governança, riscos e conformidade</p></div>
+        </div>
+        <p class="s-rot">Plano de subida do ambiente</p>
+        <div class="tempo" style="--n:6">
+          <div class="etapa" style="--cor:${COR.net}"><span class="bola">1</span><h4>Infraestrutura e conectividade</h4><p>Network</p></div>
+          <div class="etapa" style="--cor:${COR.net}"><span class="bola">2</span><h4>Virtualização</h4><p>Network</p></div>
+          <div class="etapa" style="--cor:${COR.iam}"><span class="bola">3</span><h4>Identidade</h4><p>IAM</p></div>
+          <div class="etapa" style="--cor:${COR.soc}"><span class="bola">4</span><h4>SOC e observabilidade</h4><p>SOC + Endpoint</p></div>
+          <div class="etapa" style="--cor:${COR.brand}"><span class="bola">5</span><h4>Aplicação e segurança</h4><p>Todos os times</p></div>
+          <div class="etapa" style="--cor:${COR.grc}"><span class="bola">6</span><h4>Backup, DR e documentação</h4><p>GRC e todos</p></div>
+        </div>
+        <p class="s-txt">Tudo registrado no <b>ambiente-bpo</b> em três níveis: <b>sistema</b> (o que existe) → <b>configuração</b> (como está ajustado) → <b>regra</b> (o que passa a valer).</p>
+      </div>`,
+    notas:'Cada time cuidou de uma área. O plano seguiu a ordem de dependência: sem rede não há servidor, sem servidor não há identidade, sem identidade o SOC não tem o que monitorar. Na próxima tela entramos no mapa.'
+  },
+
+  /* =================== MAPA: perímetro e virtualização =================== */
+  {
+    quem:P2N, cor:COR.net, titulo:'Entrada: WAN1 e WAN2', sub:'Dois links de internet com SD-WAN',
+    cam:[0, 20, 680, 320], foco:['wan1', 'wan2', 'unifi', 'ligacoes'],
+    anim(){ emLoop(() => { pacote([{x:200,y:100},{x:250,y:110},{x:300,y:140}], COR.net, 1100); setTimeout(() => pacote([{x:200,y:230},{x:300,y:200}], '#5EEAD4', 1100, 5), 550); }, 2000); },
+    html:`<p>Todo tráfego da Cyberappfin entra por dois links: <b>WAN1</b> (principal) e <b>WAN2</b> (backup).</p>
+      <ul><li style="--cor:${COR.net}">SD-WAN entre os links: se a WAN1 cair, o tráfego segue pela WAN2</li>
+      <li style="--cor:${COR.net}">Failover de rotas é papel do Network no DRP</li></ul>
+      <div class="cards"><div class="card" style="--cor:${COR.net}"><span class="n">50%</span><span class="l">Links WAN1/WAN2</span></div>
+      <div class="card" style="--cor:${COR.net}"><span class="n">35%</span><span class="l">SD-WAN</span></div></div>
+      <p class="aviso">Percentuais de 11/09. Confirmar com o Network.</p>`,
+    notas:'Redundância começa na borda. Um único link de internet seria um ponto único de falha: para uma financeira, ficar offline é parar operações de crédito.'
+  },
+  {
+    quem:P2N, cor:COR.net, titulo:'UniFi Controller', sub:'Firewall, NAT e separação das VLANs',
+    cam:[170, 50, 820, 260], foco:['unifi', 'cisco', 'ligacoes'],
+    anim(){ emLoop(() => pacote([{x:300,y:140},{x:450,y:170},{x:700,y:170}], COR.net, 1400), 2000); },
+    html:`<p>Primeiro ponto de controle: <b>todo pacote passa pelo firewall</b> antes de chegar a qualquer VLAN.</p>
+      <ul><li style="--cor:${COR.net}">Firewall e NAT na borda</li>
+      <li style="--cor:${COR.net}">Gestão das 9 VLANs, switches e APs</li>
+      <li style="--cor:${COR.net}">VM Ubuntu 22.04 · 2 vCPU · 4 GB · 30 GB · VLAN 10</li></ul>
+      <p>Firewall e regras de segmentação em <b>80%</b>. pfSense e Suricata foram descontinuados na V2.</p>`,
+    notas:'O UniFi é o porteiro da rede: decide o que pode passar de uma VLAN para outra. Na resposta a incidentes, é aqui que o Network bloqueia tráfego e isola segmentos.'
+  },
+  {
+    quem:P2N, cor:COR.net, titulo:'Cisco 2960 e as 9 VLANs', sub:'Trunks 802.1Q · rede 10.10.X.0/24',
+    cam:[0, 100, 1600, 560], foco:['cisco', 'barramento', 'ligacoes', ...VLANS.map(v => 'vlan' + v.n)],
+    anim(){ emLoop(() => VLANS.forEach((v, i) => setTimeout(() => pacote([{x:820,y:225},{x:820,y:BUS_Y},{x:COL_CX(i),y:BUS_Y},{x:COL_CX(i),y:400}], v.cor, 1600, 6), i * 140)), 3000); },
+    html:`<table><tr><th>VLAN</th><th>Uso</th><th>Sub-rede</th></tr>
+      <tr><td>10</td><td>Gerência</td><td class="mono">10.10.10.0/24</td></tr>
+      <tr><td>20</td><td>Servidores</td><td class="mono">10.10.20.0/24</td></tr>
+      <tr><td>30</td><td>DMZ</td><td class="mono">10.10.30.0/24</td></tr>
+      <tr><td>40</td><td>Usuários</td><td class="mono">10.10.40.0/24</td></tr>
+      <tr class="dest"><td>50</td><td>Segurança / SOC</td><td class="mono">10.10.50.0/24</td></tr>
+      <tr><td>60</td><td>Backup</td><td class="mono">10.10.60.0/24</td></tr>
+      <tr><td>70</td><td>PCI / CDE</td><td class="mono">10.10.70.0/24</td></tr>
+      <tr><td>80</td><td>vSphere DR</td><td class="mono">10.10.80.0/24</td></tr>
+      <tr><td>99</td><td>Quarentena</td><td class="mono">10.10.99.0/24</td></tr></table>
+      <p>Gateway de cada VLAN no <b>.1</b>. VLANs e trunks em <b>95%</b>, DMZ e PCI em <b>90%</b>, DHCP e DNS em <b>85%</b>.</p>`,
+    notas:'O Cisco 2960 leva todas as VLANs aos servidores por um único cabo (trunk 802.1Q), marcando cada pacote com o número da VLAN. Segmentar limita o movimento lateral: quem invade uma estação da VLAN 40 não chega direto aos controladores de domínio nem aos dados de cartão.'
+  },
+  {
+    quem:P2N, cor:COR.brand, titulo:'Cluster vSphere HA', sub:'Onde rodam as máquinas virtuais',
+    cam:[690, 30, 900, 300], foco:['cluster', 'cisco', 'ligacoes'],
+    anim(){ emLoop(() => pacote([{x:940,y:170},{x:1040,y:170},{x:1180,y:170}], COR.brand, 1100), 1800); },
+    html:`<table><tr><th>Host</th><th>Função</th></tr>
+      <tr><td>ESX-01</td><td>Serviços internos, AD, Backup, PCI-APP</td></tr>
+      <tr><td>ESX-02</td><td>SOC, DMZ, OpenVAS, EDR, laboratório</td></tr>
+      <tr><td>vSphere DR</td><td>Réplica do cluster na VLAN 80</td></tr></table>
+      <ul><li style="--cor:${COR.brand}">16 cores Xeon · 128 GB ECC por host</li>
+      <li style="--cor:${COR.brand}">2x 480 GB SSD cache + 4x 2 TB SSD/NVMe</li>
+      <li style="--cor:${COR.brand}">2x 10GbE gestão + 2x 10GbE vMotion</li></ul>
+      <p>Gerenciado pelo <b>vCenter 8.x</b> (4 vCPU · 12 GB · 100 GB). Virtualização e cluster HA em <b>55%</b>.</p>`,
+    notas:'Se um host físico falha, o vSphere HA religa as VMs no outro. ESXi não aceita agente Wazuh: é monitorado sem agente, pela API do vCenter.'
+  },
+
+  /* =================== MAPA: identidade =================== */
+  {
+    quem:P2I, cor:COR.iam, titulo:'VLAN 20: Active Directory', sub:'Domínio cyberappfin.local',
+    cam:[100, 330, 460, 420], foco:['vlan20', 'barramento'],
+    anim(){ emLoop(() => { pacote([{x:COL_CX(1),y:BUS_Y},hostCentro(1,0)], COR.iam, 900, 6); setTimeout(() => pacote(viaBus(hostCentro(1,0), hostCentro(1,1)), '#C4B5FD', 900, 5), 1100); }, 2600); },
+    html:`<div class="cards"><div class="card" style="--cor:${COR.iam}"><span class="n">AD-01</span><span class="l mono">10.10.20.10 · AD, DNS, DHCP</span></div>
+      <div class="card" style="--cor:${COR.iam}"><span class="n">AD-02</span><span class="l mono">10.10.20.11 · redundante</span></div></div>
+      <ul><li style="--cor:${COR.iam}">Windows Server 2022 · 4 vCPU · 8 GB · 80 GB</li>
+      <li style="--cor:${COR.iam}">Replicação confirmada entre os dois DCs</li>
+      <li style="--cor:${COR.iam}"><b>GPO:</b> senha mínima de 10 caracteres, bloqueio após 5 tentativas</li>
+      <li style="--cor:${COR.iam}"><b>11 OUs e 18 grupos</b> de segurança, um por perfil RBAC</li></ul>`,
+    notas:'Dois controladores evitam que a queda de um derrube o login de todos (a bolinha lilás clara é a replicação entre eles). A permissão vai para o grupo, nunca direto para a pessoa: menor privilégio. Os dois DCs são o alvo número 1 de monitoramento do SOC.'
+  },
+  {
+    quem:P2I, cor:COR.iam, titulo:'Jump Server / PAM', sub:'O único caminho para administrar',
+    cam:[0, 330, 940, 560], foco:['vlan10', 'vlan50', 'vlan20', 'barramento'],
+    anim(){
+      const nb = hostCentro(0, 2), js = hostCentro(4, 3), ad = hostCentro(1, 0);
+      emLoop(async () => { if(await pacote(viaBus(nb, js), COR.iam, 1800)) pacote(viaBus(js, ad), COR.iam, 1800); }, 4400);
+    },
+    html:`<p>Administrador nunca acessa servidor direto. O caminho é sempre <b>Notebook Admin (VLAN 10) → Jump Server (VLAN 50) → servidor</b>.</p>
+      <ul><li style="--cor:${COR.iam}">Acesso privilegiado sob demanda (PAM)</li>
+      <li style="--cor:${COR.iam}">Toda sessão administrativa é gravada</li>
+      <li style="--cor:${COR.iam}">Fonte oficial do inventário de ativos</li>
+      <li style="--cor:${COR.iam}">Ubuntu 22.04 · 2 vCPU · 4 GB · 60 GB</li></ul>
+      <p class="aviso">Status de 11/09: 75%. Confirmar com o IAM.</p>`,
+    notas:'Acesso direto a servidor crítico é risco duplo: credencial que vaza e ação que ninguém viu. O Jump Server força um funil auditável: quem entrou, quando e o que fez.'
+  },
+
+  /* =================== MAPA: SOC e endpoint =================== */
+  {
+    quem:P3, cor:COR.soc, titulo:'VLAN 50: o SOC', sub:'Wazuh, Zabbix, Grafana e OpenVAS',
+    cam:[540, 330, 480, 570], foco:['vlan50', 'barramento'],
+    html:`<table><tr><th>Ferramenta</th><th>IP</th><th>Recursos</th></tr>
+      <tr class="dest"><td>Wazuh 4.14.6 (SIEM/EDR)</td><td class="mono">.50.21</td><td>4 vCPU · 8 GB · 80+200 GB</td></tr>
+      <tr><td>Zabbix + Grafana</td><td class="mono">.50.15</td><td>4 vCPU · 8 GB · 60+200 GB</td></tr>
+      <tr><td>OpenVAS (GVM)</td><td class="mono">.50.7</td><td>4 vCPU · 8 GB · 60+200 GB</td></tr>
+      <tr><td>JumpServer</td><td class="mono">.50.x</td><td>2 vCPU · 4 GB · 60 GB</td></tr></table>
+      <ul><li style="--cor:${COR.soc}">Wazuh em Docker single-node, painéis no OpenSearch</li>
+      <li style="--cor:${COR.soc}">Agentes: porta <b>1514</b> (eventos) e <b>1515</b> (registro)</li>
+      <li style="--cor:${COR.soc}">Zabbix server na porta <b>10051</b>, Grafana consolida tudo</li></ul>`,
+    notas:'Toda a stack do SOC é open source e fica isolada na VLAN 50. Wazuh é o centro: cada servidor manda os logs para ele. Zabbix cobre o que não é ataque (disco cheio, serviço parado). OpenVAS procura vulnerabilidades.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Os agentes falando com o Wazuh', sub:'5 agentes ativos, coleta e detecção',
+    cam:[150, 330, 940, 570], foco:['vlan20', 'vlan30', 'vlan40', 'vlan50', 'barramento'],
+    anim(){
+      const wz = hostCentro(4, 0);
+      const fontes = [hostCentro(1,0), hostCentro(1,1), hostCentro(2,0), hostCentro(4,1), hostCentro(4,2)];
+      emLoop(() => fontes.forEach((f, k) => setTimeout(() => pacote(viaBus(f, wz), COR.soc, 1800, 6), k * 380)), 3600);
+    },
+    html:`<table><tr><th>Agente</th><th>IP</th><th>Host</th></tr>
+      <tr><td>NT-001</td><td class="mono">10.10.20.10</td><td>AD-01</td></tr>
+      <tr><td>NT-002</td><td class="mono">10.10.20.11</td><td>AD-02</td></tr>
+      <tr><td>FIREFLY</td><td class="mono">10.10.30.3</td><td>Reverse Proxy</td></tr>
+      <tr><td>zabbixgrafana</td><td class="mono">10.10.50.15</td><td>Zabbix + Grafana</td></tr>
+      <tr><td>openvaz</td><td class="mono">10.10.50.7</td><td>OpenVAS</td></tr>
+      <tr class="dest"><td>W10, W10-2, WIN-10</td><td class="mono">10.10.40.x</td><td>pendente</td></tr></table>
+      <ul><li style="--cor:${COR.soc}"><b>agent.conf</b> do grupo Servidores coleta o /var/log/auth.log</li>
+      <li style="--cor:${COR.soc}"><b>Regra 31533</b> ajustada: auto-refresh do Zabbix não é bot</li>
+      <li style="--cor:${COR.soc}">Dashboard "Cyber": eventos por agente, rule.level, logons <b>4624/4625</b></li>
+      <li style="--cor:${COR.soc}">IA do SOC em treinamento, decisão final do analista N2</li></ul>`,
+    notas:'Os pacotes laranja são logs indo para o Wazuh. Exemplo de trabalho real: o Zabbix atualiza a tela sozinho e o Wazuh achava que era um robô; ajustamos a regra 31533. 4624 é logon com sucesso, 4625 é falha. Pendentes: painel de alta severidade, contador de escalada de privilégio e o switch SW-001 via syslog.'
+  },
+  {
+    quem:P3E, cor:COR.end, titulo:'VLAN 40: as estações', sub:'Endpoint: onde a maioria dos ataques começa',
+    cam:[370, 330, 480, 570], foco:['vlan40', 'barramento'],
+    html:`<div class="cards">
+      <div class="card" style="--cor:${COR.end}"><span class="n">55%</span><span class="l">EDR e antivírus</span></div>
+      <div class="card" style="--cor:${COR.end}"><span class="n">50%</span><span class="l">Hardening e baseline</span></div>
+      <div class="card" style="--cor:${COR.soc}"><span class="n">0%</span><span class="l">Gestão de patches</span></div>
+      <div class="card" style="--cor:${COR.soc}"><span class="n">0%</span><span class="l">Inventário de dispositivos</span></div></div>
+      <ul><li style="--cor:${COR.end}">ClamAV integrado ao Wazuh nos servidores, validado com <b>EICAR</b></li>
+      <li style="--cor:${COR.end}">UFW nos Linux: deny inbound, allow outbound, SSH restrito</li>
+      <li style="--cor:${COR.end}">W10, W10-2 e WIN-10 ainda <b>sem agente Wazuh</b></li></ul>
+      <p class="aviso">Percentuais de 11/09. Confirmar com o Endpoint.</p>`,
+    notas:'EICAR é um arquivo de teste inofensivo que todo antivírus reconhece: prova que a detecção funciona. A maior lacuna: o SOC ainda não enxerga as estações, por onde entram phishing e pendrive infectado. Guardem esta VLAN: é aqui que o incidente vai começar.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'OpenVAS: a varredura', sub:'30/08 a 10/09/2026 · 20 hosts · 19 tasks',
+    cam:[0, 330, 1080, 570], foco:['vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
+    anim(){
+      const ov = hostCentro(4, 2);
+      emLoop(() => [0,1,2,3,5].forEach((i, k) => setTimeout(() => pacote(viaBus(ov, { x:COL_CX(i), y:420 }), '#FB923C', 1600, 5), k * 300)), 3400);
+    },
+    html:`<p>Scan <b>sem credenciais</b>: o GVM marcou as 744 ocorrências como Log (CVSS 0.0). O SOC reclassificou cada uma pelo vetor de ataque.</p>
+      <div class="barras">
+        <div class="barra"><span>Crítico</span><i style="width:76%;background:#EF4444"></i><b>167</b></div>
+        <div class="barra"><span>Alto</span><i style="width:100%;background:#F59E0B"></i><b>221</b></div>
+        <div class="barra"><span>Médio</span><i style="width:41%;background:#EAB308"></i><b>90</b></div>
+        <div class="barra"><span>Baixo</span><i style="width:52%;background:#64809B"></i><b>116</b></div>
+        <div class="barra"><span>Informativo</span><i style="width:68%;background:#3D5468"></i><b>150</b></div></div>
+      <table><tr><th>Porta</th><th>Serviço</th><th>Ocorr.</th></tr>
+        <tr><td class="mono">443</td><td>HTTPS / ESXi</td><td>83</td></tr>
+        <tr class="perigo"><td class="mono">3389</td><td>RDP</td><td>70</td></tr>
+        <tr><td class="mono">8900</td><td>Gerência web</td><td>66</td></tr>
+        <tr><td class="mono">9080</td><td>Aplicações web</td><td>60</td></tr>
+        <tr class="perigo"><td class="mono">5985</td><td>WinRM</td><td>42</td></tr>
+        <tr class="perigo"><td class="mono">22</td><td>SSH</td><td>32</td></tr></table>`,
+    notas:'Sem credenciais o OpenVAS só vê portas e serviços, por isso classificou tudo como informativo. O SOC refez a classificação perguntando: o que um atacante dentro da rede faria com isso? As portas em vermelho são de administração remota e explicam a maior parte dos críticos.'
+  },
+  {
+    quem:P3, cor:COR.danger, titulo:'VLANs 30 e 70: DMZ e PCI', sub:'O que é exposto e o que é mais protegido',
+    cam:[330, 330, 960, 570], foco:['vlan30', 'vlan70', 'barramento'],
+    html:`<h3>VLAN 30 · DMZ</h3>
+      <p><b>Reverse Proxy</b> (Apache, 10.10.30.3, agente FIREFLY): publica serviços sem abrir acesso direto à rede interna. Ubuntu 22.04 · 2 vCPU · 4 GB · 40 GB.</p>
+      <h3>VLAN 70 · PCI / CDE</h3>
+      <p><b>PCI-APP-01</b>: aplicação em escopo PCI (dados de cartão), classificação <b>Restrito</b>. Ubuntu 22.04 · 4 vCPU · 8 GB · 80+200 GB.</p>
+      <p class="aviso">A VLAN 70 ainda não entrou nas varreduras do OpenVAS.</p>`,
+    notas:'A DMZ é a única parte que conversa com a internet, por isso fica separada. O PCI é o oposto: o segmento mais fechado, porque guarda dados de cartão. Lacuna honesta: a VLAN 70 ainda não foi escaneada.'
+  },
+
+  /* =================== MAPA: simulação de incidente (4 passos) =================== */
+  ...[0, 1, 2, 3].map(passo => ({
+    quem:P34, cor:COR.danger, titulo:'Simulação de incidente', sub:'Phishing em Contas a Pagar',
+    cam:[0, 20, 1600, 900], incidente:passo,
+    foco: passo === 0 ? ['wan1', 'unifi', 'cisco', 'barramento', 'ligacoes', 'vlan40']
+        : passo === 1 ? ['vlan40', 'vlan50', 'barramento']
+        : passo === 2 ? ['vlan40', 'vlan99', 'barramento', 'unifi']
+        : [],
+    html:`<div class="passos">
+        <div class="passo ${passo >= 0 ? 'ativo' : ''}"><span><b>Entrada:</b> e-mail de phishing passa pela WAN1 e chega à estação W10 de Contas a Pagar.</span></div>
+        <div class="passo ${passo >= 1 ? 'ativo' : ''}"><span><b>Detecção:</b> falhas de logon (4625) seguidas de sucesso (4624) chegam ao Wazuh. O analista confirma o incidente.</span></div>
+        <div class="passo ${passo >= 2 ? 'ativo' : ''}"><span><b>Contenção:</b> Network move a W10 para a <b>VLAN 99</b>. IAM revoga a credencial. Endpoint isola via EDR.</span></div>
+        <div class="passo ${passo >= 3 ? 'ativo' : ''}"><span><b>Resposta:</b> o CSIRT é acionado. A seguir, o processo por trás de cada passo.</span></div></div>`,
+    notas: [
+      'Cenário fictício para mostrar o processo. O pacote vermelho é o e-mail malicioso: entra pela WAN1, passa pelo firewall e pelo switch e chega à estação W10. Lembrar que a W10 ainda não tem agente: no cenário, consideramos a meta com o agente instalado.',
+      'O Wazuh recebe a sequência de falhas de logon seguidas de um sucesso: padrão de credencial roubada. O analista faz a triagem (próximas telas mostram como ele classifica).',
+      'Contenção: a estação é movida para a VLAN 99 de quarentena e perde acesso ao resto da rede. Cada time tem um papel: Network isola, IAM revoga a senha, Endpoint isola e coleta memória para a forense.',
+      'Agora saímos do mapa e mostramos o processo: como o incidente é classificado, quem é acionado e como medimos o desempenho do SOC.'
+    ][passo]
+  })),
+
+  /* =================== SALA: processo de resposta a incidentes =================== */
+  {
+    quem:P3, cor:COR.soc, titulo:'Matriz de severidade', sub:'POL-GI-001 · cada incidente confirmado recebe um nível',
+    sala:`<div class="s-corpo">
+        <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="bloco" style="--cor:#4ADE80"><span class="rot">Nível 1</span><h4>Baixa</h4><p>Evento isolado, sem impacto.</p><p><b>Ex.:</b> malware bloqueado pelo EDR.</p><div class="rodape">Resposta em até <b>2 h</b></div></div>
+          <div class="bloco" style="--cor:#FACC15"><span class="rot">Nível 2</span><h4>Média</h4><p>Área pontual, sem parar serviço crítico.</p><p><b>Ex.:</b> credencial comum comprometida.</p><div class="rodape">Resposta em até <b>1 h</b></div></div>
+          <div class="bloco" style="--cor:#FB923C; box-shadow:0 0 0 2px #FB923C"><span class="rot">Nível 3 · nosso cenário</span><h4>Alta</h4><p>Parada parcial de BPO/Folha ou suspeita de vazamento.</p><p><b>Ex.:</b> phishing bem-sucedido em Contas a Pagar.</p><div class="rodape">Resposta em até <b>30 min</b></div></div>
+          <div class="bloco" style="--cor:#F87171"><span class="rot">Nível 4</span><h4>Crítica</h4><p>Parada total, vazamento massivo ou ransomware.</p><p><b>Ex.:</b> criptografia de servidores.</p><div class="rodape">Resposta em até <b>15 min</b></div></div>
+        </div>
+        <p class="s-txt">Níveis <b>3 e 4</b> acionam o CSIRT e exigem Relatório de Causa do Incidente (RCI) em até <b>5 dias úteis</b>.</p>
+      </div>`,
+    notas:'O phishing que acabamos de ver é nível 3: phishing bem-sucedido em Contas a Pagar pode desviar pagamentos de clientes. O nível define o prazo da primeira resposta e quem é acionado.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Ciclo de resposta e CSIRT', sub:'ISO/IEC 27035 · NIST SP 800-61',
+    sala:`<div class="s-corpo">
+        <div class="tempo" style="--n:5">
+          <div class="etapa" style="--cor:${COR.brand}"><span class="bola">1</span><h4>Preparação</h4><p>Ferramentas, playbooks e equipe prontos</p></div>
+          <div class="etapa" style="--cor:${COR.soc}"><span class="bola">2</span><h4>Detecção e análise</h4><p>Alerta do Wazuh, triagem e nível</p></div>
+          <div class="etapa" style="--cor:#F87171"><span class="bola">3</span><h4>Contenção</h4><p>Host para a VLAN 99</p></div>
+          <div class="etapa" style="--cor:${COR.end}"><span class="bola">4</span><h4>Erradicação e recuperação</h4><p>Remove a causa e restaura</p></div>
+          <div class="etapa" style="--cor:${COR.grc}"><span class="bola">5</span><h4>Pós-incidente</h4><p>RCI em 5 dias úteis e lições aprendidas</p></div>
+        </div>
+        <div class="org">
+          <div class="chefe"><h4>Líder do SOC</h4><p>Coordena o CSIRT (níveis 3 e 4)</p></div>
+          <div class="tronco"></div>
+          <div class="ramos">
+            <div class="membro" style="--cor:${COR.iam}"><h4>IAM</h4><p>Revoga credenciais</p></div>
+            <div class="membro" style="--cor:${COR.net}"><h4>Network</h4><p>Isola segmentos e bloqueia tráfego</p></div>
+            <div class="membro" style="--cor:${COR.end}"><h4>Endpoint</h4><p>Isola via EDR e coleta memória</p></div>
+            <div class="membro" style="--cor:${COR.grc}"><h4>GRC e DPO</h4><p>Notificam ANPD e BACEN</p></div>
+            <div class="membro" style="--cor:#94A3B8"><h4>Jurídico</h4><p>Obrigações legais</p></div>
+            <div class="membro" style="--cor:${COR.brand}"><h4>Diretoria</h4><p>CEO e CFO, comunicação externa</p></div>
+          </div>
+        </div>
+      </div>`,
+    notas:'No nosso phishing: detecção pelo Wazuh, contenção na VLAN 99, e como é nível 3 o CSIRT é acionado. Cada time tem um papel. Ninguém fala publicamente sobre o incidente sem a Diretoria. As lições aprendidas viram ajuste de regra no Wazuh.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Como medimos o SOC', sub:'Metas de desempenho da POL-GI-001',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">MTTD</span><span class="grande">&lt; 15 min</span><p>Tempo médio para <b>detectar</b>, na infraestrutura crítica.</p></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">MTTR</span><span class="grande">&lt; 30 min</span><p>Tempo médio para <b>responder</b> a incidentes alta e crítica.</p></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">Falsos positivos</span><span class="grande">&lt; 10%</span><p>Alertas que não eram incidente. A regra 31533 foi um ajuste disso.</p></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">RCIs no prazo</span><span class="grande">100%</span><p>Relatórios dos níveis 3 e 4 entregues em até 5 dias úteis.</p></div>
+        </div>
+        <p class="s-txt">Apoio contínuo: <b>IA do SOC</b> analisando logs 24/7 (em treinamento), com a decisão final sempre do <b>analista N2</b>.</p>
+      </div>`,
+    notas:'Metas dão objetividade ao SOC. Falsos positivos importam porque um SOC que alerta demais é ignorado. Fechar o bloco do SOC aqui.'
+  },
+
+  /* =================== MAPA: backup e DR =================== */
+  {
+    quem:P4, cor:COR.grc, titulo:'VLANs 60 e 80: Backup e DR', sub:'Onde a empresa se recupera de um desastre',
+    cam:[820, 330, 640, 570], foco:['vlan60', 'vlan80', 'barramento'],
+    anim(){ emLoop(() => pacote(viaBus(hostCentro(5, 0), hostCentro(7, 0)), COR.grc, 1800), 2600); },
+    html:`<ul><li style="--cor:${COR.grc}"><b>Backup Server</b> na VLAN 60: Windows Server 2022, 4 vCPU, 8 GB, 80 GB + 2 TB</li>
+      <li style="--cor:${COR.grc}">Software de backup: Veeam ou Bacula</li>
+      <li style="--cor:${COR.grc}">Backup por agente (Windows e Linux) com cópia em repositório externo</li>
+      <li style="--cor:${COR.grc}"><b>vSphere DR</b> na VLAN 80: réplica do cluster para failover</li></ul>
+      <p>As duas VLANs ficam isoladas: um ataque à produção não alcança as cópias.</p>`,
+    notas:'A bolinha amarela é a replicação do backup para o ambiente de DR. Na próxima tela, quanto tempo cada serviço pode ficar parado.'
+  },
+
+  /* =================== SALA: continuidade, GRC, riscos, plano, aplicação =================== */
+  {
+    quem:P4, cor:COR.grc, titulo:'Continuidade do negócio', sub:'POL-CN-001 · BIA e DRP',
+    sala:`<div class="s-corpo">
+        <p class="s-rot">Tempo máximo de parada (RTO) e perda de dados aceitável (RPO), escala de 24 h</p>
+        <div class="rto">
+          <div class="item"><span class="nome">Operações de Crédito</span><div class="trilho"><i style="width:8.3%;background:#F87171"></i><span style="left:10%">RTO 2 h · RPO 15 min · MTPD 6 h</span></div></div>
+          <div class="item"><span class="nome">BPO Financeiro</span><div class="trilho"><i style="width:16.7%;background:#FB923C"></i><span style="left:18.5%">RTO 4 h · RPO 1 h · MTPD 12 h</span></div></div>
+          <div class="item"><span class="nome">Folha de Pagamento</span><div class="trilho"><i style="width:16.7%;background:#FB923C"></i><span style="left:18.5%">RTO 4 h · RPO 1 h · MTPD 24 h</span></div></div>
+          <div class="item"><span class="nome">Valuation e M&amp;A</span><div class="trilho"><i style="width:100%;background:#3D5F82"></i><span style="left:2%">RTO 24 h · RPO 12 h · MTPD 72 h</span></div></div>
+        </div>
+        <div class="linha" style="grid-template-columns:1.2fr 1fr">
+          <div class="bloco" style="--cor:${COR.grc}"><h4>Backup 3-2-1 imutável</h4>
+            <div class="linha" style="grid-template-columns:repeat(3, 1fr)">
+              <div><span class="grande" style="--cor:${COR.grc}">3</span><p>cópias dos dados</p></div>
+              <div><span class="grande" style="--cor:${COR.grc}">2</span><p>tipos de mídia</p></div>
+              <div><span class="grande" style="--cor:${COR.grc}">1</span><p>offsite WORM, contra ransomware</p></div></div></div>
+          <div class="bloco" style="--cor:${COR.brand}"><h4>Testes</h4>
+            <p><b>Mensal:</b> restauração de backup (SOC e Endpoint)</p>
+            <p><b>Semestral:</b> simulado de failover (SOC e Network)</p>
+            <p><b>Anual:</b> exercício de mesa (SOC, GRC e Diretoria)</p></div>
+        </div>
+        <p class="s-aviso">Conferir com a BIA e o DRP oficiais do grupo.</p>
+      </div>`,
+    notas:'RTO é o tempo máximo para voltar, RPO quanto dado pode ser perdido, MTPD o limite do dano aceitável. Crédito é o mais sensível: 2 horas para voltar e no máximo 15 minutos de dados perdidos. O backup imutável é a defesa contra ransomware. Planos complementares: PCO, Comunicação em Crise e Trabalho Remoto por VPN.'
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:'GRC: políticas e conformidade', sub:'Uma financeira regulada precisa provar que é segura',
+    sala:`<div class="s-corpo">
+        <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="doc"><span class="cod">POL-GDI-001 · POL-CA-001</span><h4>Identidades e Controle de Acesso</h4><p>Ciclo de vida de identidades, MFA, contas privilegiadas via Jump Server e trilhas de auditoria.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.3 · vigente</span></div>
+          <div class="doc"><span class="cod">POL-CR-001</span><h4>Criptografia</h4><p>Algoritmos, gestão de chaves e proteção de dados em trânsito e em repouso.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.2 · vigente</span></div>
+          <div class="doc"><span class="cod">POL-GI-001</span><h4>Gestão de Incidentes</h4><p>Matriz de severidade, ciclo de resposta, CSIRT, notificação e KPIs.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.0 · SOC</span></div>
+          <div class="doc"><span class="cod">POL-CN-001</span><h4>Continuidade do Negócio</h4><p>BIA, RTO/RPO, backup 3-2-1, DRP e plano de testes.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.0 · SOC</span></div>
+        </div>
+        <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">100%</span><p>Inventário de ativos</p></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">45%</span><p>PSI e políticas complementares</p></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">25%</span><p>Playbooks (PB-000 pronto)</p></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">40%</span><p>Documentação do projeto</p></div>
+        </div>
+        <p class="s-aviso">Percentuais de 11/09. Confirmar com o GRC.</p>
+      </div>`,
+    notas:'Banco Central e LGPD exigem política escrita, não só prática. GRC coordena e cada time contribui com a política da sua área: o SOC escreveu as de incidentes e continuidade. O playbook mestre PB-000 serve de modelo para os demais.'
+  },
+  {
+    quem:P4, cor:COR.danger, titulo:'Onde estão os riscos', sub:'O que o scan e o inventário mostram',
+    sala:`<div class="s-corpo">
+        <div class="linha" style="grid-template-columns:repeat(3, 1fr); flex:1">
+          <div class="bloco" style="--cor:#F87171"><span class="rot" style="color:#F87171">Crítico</span><h4>Administração remota exposta</h4><p>RDP 3389, WinRM 5985 e SSH 22 alcançáveis de toda a rede interna.</p><p>Abre caminho para força bruta e movimento lateral.</p><div class="rodape"><b>167</b> ocorrências críticas no scan</div></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="rot" style="color:#FB923C">Alto</span><h4>Criptografia antiga</h4><p>TLS 1.0/1.1 e cifras fracas em 443, 8900 e 9080. Sem HSTS, X-Frame-Options e CSP.</p><p>Permite interceptar ou rebaixar a conexão.</p><div class="rodape"><b>221</b> ocorrências altas no scan</div></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="rot" style="color:#8DB6F9">Lacunas</span><h4>Cobertura incompleta</h4><p>Estações sem agente Wazuh. VLAN 70 (PCI) não escaneada. Nenhum teste de restauração. ITSM sem dados.</p><div class="rodape">Scan sem credenciais: patches ainda não medidos</div></div>
+        </div>
+      </div>`,
+    notas:'Dois problemas explicam a maior parte dos 388 achados críticos e altos. Além disso, lacunas de cobertura. O scan foi sem credenciais: o que está dentro das máquinas ainda não foi medido.'
+  },
+  {
+    quem:P4, cor:COR.brand, titulo:'Plano de ação', sub:'O que fazer primeiro, depois e por último',
+    sala:`<div class="s-corpo">
+        <div class="linha" style="grid-template-columns:repeat(3, 1fr); flex:1">
+          <div class="bloco" style="--cor:#F87171"><span class="rot" style="color:#F87171">Agora</span>
+            <h4>1. Acesso remoto</h4><p>3389, 5985 e 22 só a partir da VLAN 10. NLA no RDP. SMBv1 desligado e assinatura SMB.</p>
+            <h4>2. Criptografia</h4><p>Só TLS 1.2+ com PFS e AES-GCM. HSTS, X-Frame-Options e X-Content-Type-Options.</p></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="rot" style="color:#FB923C">Em seguida</span>
+            <h4>3. Ocultar informações</h4><p>server_tokens off, versões escondidas, páginas de erro genéricas.</p>
+            <h4>4. Nova varredura</h4><p>Scan autenticado, incluindo a VLAN 70.</p></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="rot" style="color:#8DB6F9">Depois</span>
+            <h4>5. Cobertura do SOC</h4><p>Agentes nas estações, syslog do SW-001, painéis de alta severidade e escalada de privilégio.</p>
+            <h4>6. Continuidade</h4><p>Primeiro teste de restauração e cadastro do ITSM.</p></div>
+        </div>
+      </div>`,
+    notas:'As frentes 1 a 4 vêm direto do plano do OpenVAS. A 1 fecha a maior parte dos críticos. Depois de aplicar, repetir o scan com credenciais.'
+  },
+  {
+    quem:P4, cor:COR.brand, titulo:'A aplicação do inventário', sub:'ambiente-bpo.vercel.app · onde tudo isto está registrado',
+    sala:`<div class="s-corpo">
+        <div class="pilha">
+          <div class="bloco" style="--cor:${COR.brand}"><span class="rot">Navegador</span><h4>React + TypeScript</h4><p>A tela só esconde o que o perfil não pode usar.</p><p>CSP, HSTS, X-Frame-Options DENY, nosniff.</p></div>
+          <span class="seta">→</span>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">API · Vercel</span><h4>Quem decide é a API</h4><p>Sessão JWT em cookie HttpOnly, Secure, SameSite=Lax, 8 h.</p><p>RBAC: outra área retorna <b>403</b>. Upload conferido por tipo, tamanho e assinatura.</p></div>
+          <span class="seta">→</span>
+          <div class="bloco" style="--cor:${COR.end}"><span class="rot">Banco · Neon</span><h4>Postgres</h4><p>Senhas com bcrypt. Triggers garantem a hierarquia sistema → configuração → regra.</p><p>O navegador nunca fala com o banco.</p></div>
+        </div>
+        <div class="linha" style="grid-template-columns:repeat(3, 1fr)">
+          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Perfis</span><p><b>Admin</b>, <b>Visualizador</b> e <b>Coordenador</b> preso à própria área. Sem cadastro público.</p></div>
+          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Árvore geral</span><p>Busca qualquer item do ambiente, útil para responder perguntas na hora.</p></div>
+          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Custo</span><p>Zero: Vercel e Neon em planos gratuitos.</p></div>
+        </div>
+      </div>`,
+    notas:'O portal do inventário também segue boas práticas, o que combina com a disciplina. A regra de acesso está na API, não só na tela: um coordenador que chamar a API de outra área recebe 403 (testado em produção).'
+  },
+  {
+    quem:P4, cor:COR.brand, titulo:'Encerramento',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <p class="s-rot" style="color:#8DB6F9">Cyberappfin</p>
+        <h2 class="gigante" style="font-size:clamp(44px, 5.4vw, 100px)">Segmentado, monitorado e com plano para o que falta.</h2>
+        <div class="linha" style="grid-template-columns:repeat(4, 1fr); max-width:1200px">
+          <div class="bloco" style="--cor:${COR.net}"><span class="grande">9</span><p>VLANs</p></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="grande">5</span><p>agentes Wazuh ativos</p></div>
+          <div class="bloco" style="--cor:#F87171"><span class="grande">744</span><p>achados reclassificados</p></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="grande">6</span><p>frentes de ação</p></div>
+        </div>
+        <div class="lema2"><span>Segurança</span><span>·</span><span>Resiliência</span><span>·</span><span>Controle</span></div>
+        <p class="s-txt" style="font-size:clamp(22px, 2vw, 36px)">Perguntas?</p>
+      </div>`,
+    notas:'Retomar o lema e abrir para perguntas. O ambiente-bpo tem a Árvore geral com busca para achar qualquer item rapidamente.'
+  }
+];
+
+/* ---------- navegação ---------- */
+const $ = id => document.getElementById(id);
+let atual = 0;
+
+function montarPontos(){
+  $('pontos').innerHTML = '';
+  PARADAS.forEach((p, i) => {
+    const b = document.createElement('button');
+    b.setAttribute('aria-label', `Ir para ${i + 1}: ${p.titulo}`);
+    b.title = p.titulo;
+    b.addEventListener('click', () => ir(i));
+    $('pontos').appendChild(b);
+  });
+}
+
+async function rodarIncidente(passo){
+  const minha = geracao;
+  const w10 = hostCentro(3, 0), wz = hostCentro(4, 0);
+  if(passo === 0){
+    resetW10();
+    await pacote([{x:115,y:100},{x:200,y:100},{x:300,y:140},{x:450,y:170},{x:700,y:170},{x:820,y:170},{x:820,y:BUS_Y},{x:w10.x,y:BUS_Y},w10], COR.danger, 3200, 9);
+    if(minha === geracao) W10.classList.add('alerta');
+  }
+  if(passo === 1){
+    W10.classList.add('alerta');
+    emLoop(() => pacote(viaBus(w10, wz), COR.danger, 1400, 7), 1700);
+  }
+  if(passo === 2){
+    W10.classList.add('alerta');
+    moverW10ParaQuarentena();
+  }
+}
+
+function ir(i){
+  i = Math.max(0, Math.min(PARADAS.length - 1, i));
+  const p = PARADAS[i];
+  const anterior = PARADAS[atual];
+  const avancando = i > atual;
+  atual = i;
+  limparAnimacoes();
+
+  // estação W10 volta ao lugar; os passos 2 e 3 do incidente a movem de novo
+  devolverW10();
+  if(p.incidente === 3){ W10.classList.add('alerta'); moverW10ParaQuarentena(); }
+
+  $('quem').textContent = p.quem;
+  $('quem').style.color = p.cor;
+  $('titulo').textContent = p.titulo;
+  $('subtitulo').textContent = p.sub || '';
+  $('conteudo').innerHTML = p.html || '';
+  $('conteudo').scrollTop = 0;
+  $('notas').textContent = p.notas || '';
+
+  // foto do prédio: capa (foto:true), fundo escuro (foto:'fundo') e,
+  // ao sair dela para o mapa, o zoom de "entrar no prédio"
+  const corpo = document.body;
+  corpo.classList.remove('entrando');
+  if(anterior && anterior.foto && !p.foto && !p.sala && avancando){
+    corpo.classList.remove('com-foto', 'foto-fundo');
+    void corpo.offsetWidth; // reinicia a animação
+    corpo.classList.add('entrando');
+    const minhaEntrada = geracao;
+    setTimeout(() => { if(minhaEntrada === geracao) corpo.classList.remove('entrando'); }, 1650);
+  } else {
+    corpo.classList.toggle('com-foto', p.foto === true);
+    corpo.classList.toggle('foto-fundo', p.foto === 'fundo');
+  }
+
+  // modo sala (processo e gestão) ou modo mapa (técnico)
+  const sala = !!p.sala;
+  document.body.classList.toggle('modo-sala', sala);
+  if(sala){
+    $('sala').innerHTML = `<div class="s-head">
+        <span class="s-quem" style="color:${p.cor}">${p.quem}</span>
+        ${p.titulo !== 'Cyberappfin' && p.titulo !== 'Encerramento' ? `<h2 class="s-titulo">${p.titulo}</h2>` : ''}
+        ${p.sub ? `<p class="s-sub">${p.sub}</p>` : ''}
+      </div>${p.sala}`;
+    $('sala').scrollTop = 0;
+  }
+
+  camera(sala ? MUNDO : (p.cam || MUNDO));
+  focar(sala ? null : p.foco);
+  // os pacotes só saem depois que a câmera termina de se mover, para não "se perderem"
+  const minha = geracao;
+  setTimeout(() => {
+    if(minha !== geracao) return;
+    if(p.anim) p.anim();
+    if(p.incidente !== undefined) rodarIncidente(p.incidente);
+  }, sala ? 0 : (corpo.classList.contains('entrando') ? 1900 : 950));
+
+  $('contador').textContent = `${i + 1} / ${PARADAS.length}`;
+  [...$('pontos').children].forEach((b, k) => {
+    b.classList.toggle('atual', k === i);
+    b.classList.toggle('feito', k < i);
+  });
+  try{ history.replaceState(null, '', '#' + (i + 1)); }catch(e){}
+}
+
+$('ant').addEventListener('click', () => ir(atual - 1));
+$('prox').addEventListener('click', () => ir(atual + 1));
+document.addEventListener('keydown', e => {
+  if(e.target.closest && e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;
+  if(['ArrowRight', 'PageDown', ' '].includes(e.key)){ e.preventDefault(); ir(atual + 1); }
+  else if(['ArrowLeft', 'PageUp'].includes(e.key)){ e.preventDefault(); ir(atual - 1); }
+  else if(e.key === 'Home') ir(0);
+  else if(e.key === 'End') ir(PARADAS.length - 1);
+  else if(e.key === 'n' || e.key === 'N') document.body.classList.toggle('com-notas');
+  else if(e.key === 'f' || e.key === 'F'){
+    if(document.fullscreenElement) document.exitFullscreen();
+    else document.documentElement.requestFullscreen?.();
+  }
+});
+
+// o endereço #N abre direto na parada N (útil para ensaiar uma parte)
+function paradaDoEndereco(){
+  const n = parseInt(location.hash.slice(1), 10);
+  return Number.isFinite(n) ? n - 1 : 0;
+}
+window.addEventListener('hashchange', () => { if(paradaDoEndereco() !== atual) ir(paradaDoEndereco()); });
+
+montarPontos();
+ir(paradaDoEndereco());
+</script>
+</body>
+</html>

@@ -612,27 +612,41 @@ function onFace(c,u,v){
   return {x:a.x+(b.x-a.x)*v, y:a.y+(b.y-a.y)*v};
 }
 
-/* ---------------- Nível 01: dados reais do Network (INTOCADO) ---------------- */
+/* ---------------- Nível 01: VLANs do Network (fonte: ambiente-bpo + scan OpenVAS, out/2026) ---------------- */
 const ZONES = [
-  { id:'vlan1', label:'VLAN 1 — física', color:'#1B9455', gx:1, gy:0.5, items:[
-    { name:'UniFi Firewall', meta:'192.168.1.2',  detail:'Roteador/firewall de borda. Ponto de entrada da internet para todas as VLANs.' },
-    { name:'ESXi 001',       meta:'192.168.1.11', detail:'Hipervisor VMware. Hospeda parte das VMs internas. Sem agente Wazuh nativo — monitoramento via API vCenter.' },
-    { name:'ESXi 002',       meta:'192.168.1.12', detail:'Hipervisor VMware. Mesma observação do ESXi 001 quanto a monitoramento agentless.' }
+  { id:'vlan10', label:'VLAN 10 · Gerência', color:'#1D6FE0', items:[
+    { name:'UniFi Controller', meta:'10.10.10.x', detail:'Gestão de rede, switches, APs, firewall e VLANs. Recebe os links WAN1 (principal) e WAN2 (backup) e entrega ao switch Cisco 2960.' },
+    { name:'vCenter Server',   meta:'10.10.10.x', detail:'Appliance vCenter 8.x. Gerencia os hosts ESX-01 e ESX-02 e o cluster vSphere HA.' },
+    { name:'ESX-01 / ESX-02',  meta:'Datacenter', detail:'Hosts físicos de virtualização. ESX-01 roda serviços internos, AD, Backup e PCI-APP. ESX-02 roda SOC, DMZ, OpenVAS e laboratório. Monitorados sem agente, via API do vCenter.' },
+    { name:'Notebook Admin',   meta:'10.10.10.x', detail:'Estação administrativa. Todo acesso aos servidores sai daqui e passa pelo Jump Server/PAM.' }
   ]},
-  { id:'vlan50', label:'VLAN 50 — serviços', color:'#1D6FE0', gx:6.2, gy:0.5, items:[
-    { name:'NT001 — DC',          meta:'10.0.50.80',  detail:'Domain Controller Windows. Prioridade 1 no enrolamento do agente Wazuh.' },
-    { name:'NT002 — File Server', meta:'10.0.50.81',  detail:'Servidor de arquivos Windows. Segundo host da fila de enrolamento.' },
-    { name:'Wazuh (SIEM)',        meta:'10.0.50.103', detail:'Onde o manager do Wazuh está planejado para rodar. IP fixo ainda a confirmar.' },
-    { name:'JumpServer',          meta:'10.0.50.118', detail:'Salto administrativo. Único caminho de acesso à VLAN 30 (security).' },
-    { name:'Dolibarr (ERP)',      meta:'10.0.50.116', detail:'Sistema ERP. Alvo de enrolamento após os hosts críticos de identidade.' },
-    { name:'Zabbix (NMS)',        meta:'10.0.50.10',  detail:'Monitoramento de rede. Ferramenta de observabilidade complementar ao Wazuh.' }
+  { id:'vlan20', label:'VLAN 20 · Servidores', color:'#6D3FD4', items:[
+    { name:'AD-01', meta:'10.10.20.10', detail:'Active Directory, DNS e DHCP em Windows Server 2022. No Wazuh aparece como agente NT-001.' },
+    { name:'AD-02', meta:'10.10.20.11', detail:'Controlador redundante, com replicação confirmada com o AD-01. No Wazuh aparece como agente NT-002.' }
   ]},
-  { id:'vlan99', label:'VLAN 99 — management', color:'#6D3FD4', gx:1, gy:4, items:[
-    { name:'vCenter',        meta:'10.0.99.70',  detail:'Gerência dos hosts ESXi. Endereço definitivo ainda pendente de confirmação.' },
-    { name:'OpenVAS (mgmt)', meta:'10.0.99.112', detail:'Interface de gerência do scanner de vulnerabilidades.' }
+  { id:'vlan30', label:'VLAN 30 · DMZ', color:'#D23A57', items:[
+    { name:'Reverse Proxy', meta:'10.10.30.3', detail:'Publica os serviços expostos sem abrir acesso direto à rede interna. Linux, agente Wazuh FIREFLY.' }
   ]},
-  { id:'vlan30', label:'VLAN 30 — security', color:'#D23A57', gx:6.2, gy:4, items:[
-    { name:'OpenVAS (scan)', meta:'10.0.30.80', detail:'Interface dedicada de varredura. Segmento isolado — acesso só via JumpServer.' }
+  { id:'vlan40', label:'VLAN 40 · Usuários', color:'#0E9C8B', items:[
+    { name:'Estações de trabalho', meta:'10.10.40.x', detail:'Máquinas dos colaboradores (W10, W10-2, WIN-10). Instalação do agente Wazuh ainda pendente.' }
+  ]},
+  { id:'vlan50', label:'VLAN 50 · SOC', color:'#C2700A', items:[
+    { name:'Wazuh Manager',     meta:'10.10.50.21', detail:'SIEM e EDR do SOC (v4.14.6, Docker single-node). Recebe os logs de todos os agentes.' },
+    { name:'Zabbix + Grafana',  meta:'10.10.50.15', detail:'Monitoramento de disponibilidade e painéis, instalados juntos no mesmo servidor.' },
+    { name:'OpenVAS',           meta:'10.10.50.7',  detail:'Scanner de vulnerabilidades. Faz as varreduras periódicas da rede.' },
+    { name:'Jump Server / PAM', meta:'10.10.50.x',  detail:'Ponto único e auditado de acesso administrativo. É também a fonte oficial do inventário de ativos.' }
+  ]},
+  { id:'vlan60', label:'VLAN 60 · Backup', color:'#1B9455', items:[
+    { name:'Backup Server', meta:'10.10.60.x', detail:'Windows Server 2022 com 2 TB. Estratégia 3-2-1 imutável: 3 cópias, 2 mídias, 1 cópia offsite protegida contra ransomware.' }
+  ]},
+  { id:'vlan70', label:'VLAN 70 · PCI', color:'#B07D0A', items:[
+    { name:'PCI-APP-01', meta:'10.10.70.x', detail:'Aplicação em escopo PCI (dados de cartão). Segmento isolado e classificado como Restrito.' }
+  ]},
+  { id:'vlan80', label:'VLAN 80 · DR', color:'#5C6B7A', items:[
+    { name:'vSphere DR', meta:'10.10.80.x', detail:'Replicação e recuperação de desastres do cluster vSphere.' }
+  ]},
+  { id:'vlan99', label:'VLAN 99 · Quarentena', color:'#8A3FB0', items:[
+    { name:'Segmento de isolamento', meta:'10.10.99.x', detail:'Para onde o SOC move uma máquina suspeita durante a contenção de um incidente, cortando o acesso ao resto da rede.' }
   ]}
 ];
 
@@ -783,7 +797,7 @@ const TASKS = {
   network: {
     done: 'VLANs, DHCP/DNS e os segmentos DMZ/PCI praticamente prontos; firewall em validação final e virtualização/redundância entre hosts ainda em desenvolvimento.',
     items: [
-      { label:'Topologia física — pfSense, switch, hosts ESX', pct:55 },
+      { label:'Topologia física: UniFi, Cisco 2960, hosts ESX', pct:55 },
       { label:'Links de saída WAN1 / WAN2', pct:50 },
       { label:'SD-WAN entre os links', pct:35 },
       { label:'VLANs e trunks 802.1Q', pct:95 },
@@ -920,7 +934,8 @@ const planProj = () => makeProj(490, 200, 66, 33, 27);
 const SLOTS = {
   4: [[1.3,0.7],[9.4,0.7],[1.3,4.7],[9.4,4.7]],
   5: [[1.3,0.7],[5.35,0.7],[9.4,0.7],[3.3,4.7],[7.4,4.7]],
-  6: [[1.3,0.7],[5.35,0.7],[9.4,0.7],[1.3,4.7],[5.35,4.7],[9.4,4.7]]
+  6: [[1.3,0.7],[5.35,0.7],[9.4,0.7],[1.3,4.7],[5.35,4.7],[9.4,4.7]],
+  9: [[1.3,0.2],[5.35,0.2],[9.4,0.2],[1.3,2.75],[5.35,2.75],[9.4,2.75],[1.3,5.3],[5.35,5.3],[9.4,5.3]]
 };
 
 /* Nível 01 — Network (peças = VLANs, painel de hosts como já era) */
@@ -928,11 +943,11 @@ function buildNetworkPlan(svg){
   svg.innerHTML = '';
   const proj = planProj();
   drawIsoRoom(svg, proj, ROOM.W, ROOM.D, ROOM.WALL);
-  const slots = SLOTS[4];
+  const slots = SLOTS[ZONES.length];
   ZONES.forEach((z, i) => {
     const [gx, gy] = slots[i];
     drawRack(svg, proj, gx, gy, z.color, 2.8);
-    drawHotspot(svg, proj, gx+1.47, gy+0.42, 3.5, z.color, z.label.split(' — ')[0],
+    drawHotspot(svg, proj, gx+1.47, gy+0.42, 3.5, z.color, z.label.split(' · ')[0],
       () => openHostPanel(z));
   });
 }
