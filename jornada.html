@@ -619,21 +619,23 @@ const PARADAS = [
     notas:'EICAR é um arquivo de teste inofensivo que todo antivírus reconhece: serve para provar que a detecção funciona. Guardem esta VLAN: é aqui que o incidente vai começar.'
   },
   {
-    quem:P3, cor:COR.soc, titulo:'OpenVAS: as varreduras', sub:'Procurar a porta aberta antes do atacante',
+    quem:P3, cor:COR.soc, titulo:'OpenVAS: as regras de varredura', sub:'Como o SOC procura a porta aberta antes do atacante',
     cam:[0, 330, 1600, 570], foco:['vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
     anim(){
       const ov = hostCentro(4, 2);
       emLoop(() => [0,1,2,3,5].forEach((i, k) => setTimeout(() => pacote(viaBus(ov, { x:COL_CX(i), y:420 }), '#FB923C', 1600, 5), k * 300)), 3400);
     },
-    html:`<p>Varreduras de rede sobre <b>todos os servidores</b>, com a regra de varrer as VLANs internas.</p>
-      <table><tr><th>Porta</th><th>Serviço verificado</th></tr>
-        <tr><td class="mono">443 · 8900 · 9080</td><td>HTTPS e interfaces web</td></tr>
-        <tr class="perigo"><td class="mono">3389</td><td>RDP (área de trabalho remota)</td></tr>
-        <tr class="perigo"><td class="mono">5985</td><td>WinRM</td></tr>
-        <tr class="perigo"><td class="mono">22</td><td>SSH</td></tr>
-        <tr><td class="mono">445 · 139</td><td>SMB / NetBIOS</td></tr></table>
-      <p>Principais riscos apontados: <b>administração remota acessível pela rede interna</b> e <b>TLS antigo</b> em serviços web.</p>`,
-    notas:'Falar das varreduras de forma geral, sem quantidades. Em vermelho, as portas de administração remota, que são o principal risco.'
+    html:`<h3>Regra 1 · Varredura por VLAN</h3>
+      <p>Uma tarefa por sub-rede: o alvo é a <b>VLAN inteira (/24)</b>, para descobrir qualquer máquina ou serviço que apareça.</p>
+      <div class="chips"><span class="chip">VLAN 10</span><span class="chip">VLAN 20</span><span class="chip">VLAN 30</span><span class="chip">VLAN 40</span><span class="chip">VLAN 50</span><span class="chip">VLAN 60</span></div>
+      <h3>Regra 2 · Baseline por servidor</h3>
+      <p>Uma tarefa por ativo crítico, para comparar o mesmo servidor ao longo do tempo.</p>
+      <div class="chips"><span class="chip">NT-001</span><span class="chip">NT-002</span><span class="chip">NT-003</span><span class="chip">Wazuh</span><span class="chip">Zabbix + Grafana</span><span class="chip">OpenVAS</span><span class="chip">Reverse Proxy</span></div>
+      <h3>Como a varredura é feita</h3>
+      <ul><li style="--cor:${COR.soc}"><b>Sem credenciais:</b> enxerga a rede como um visitante enxergaria</li>
+      <li style="--cor:${COR.soc}">Verifica portas abertas, serviços e versões, criptografia TLS e cabeçalhos web</li>
+      <li style="--cor:${COR.soc}">Atenção especial às portas de administração remota: <b>3389</b> (RDP), <b>5985</b> (WinRM) e <b>22</b> (SSH)</li></ul>`,
+    notas:'Mostrar como o OpenVAS está configurado, não os resultados. São dois tipos de tarefa: uma por VLAN, que pega qualquer coisa nova na rede, e uma por servidor, que serve de linha de base para comparar depois. Tudo sem credenciais. Se pedirem para ver, abrir o OpenVAS e mostrar as tarefas e os targets.'
   },
   {
     quem:P3, cor:COR.danger, titulo:'VLAN 30: DMZ', sub:'A única parte exposta para fora',
