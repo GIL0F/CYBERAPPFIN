@@ -4,6 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cyberappfin: a jornada do pacote</title>
+<meta name="description" content="Apresentação interativa do ambiente de segurança da Cyberappfin (Defesa Cibernética, Impacta).">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B1520'/%3E%3Crect x='12' y='40' width='40' height='6' rx='3' fill='%2314B8A6'/%3E%3Crect x='12' y='29' width='40' height='6' rx='3' fill='%238B5CF6'/%3E%3Crect x='12' y='18' width='40' height='6' rx='3' fill='%23F59E0B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
@@ -16,6 +18,12 @@
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans', system-ui, sans-serif; overflow:hidden; }
+  body{ -webkit-user-select:none; user-select:none; }
+  /* cursor some depois de 2,5 s parado; volta ao mexer o mouse */
+  body.sem-cursor, body.sem-cursor *{ cursor:none !important; }
+  /* tela preta (tecla B ou ponto, como nos passadores de slide) */
+  #preto{ position:fixed; inset:0; background:#000; z-index:50; opacity:0; pointer-events:none; transition:opacity .3s ease; }
+  body.tela-preta #preto{ opacity:1; pointer-events:auto; }
   .mono{ font-family:'JetBrains Mono', ui-monospace, monospace; }
 
   /* ---------- palco ---------- */
@@ -35,6 +43,11 @@
   .host.alerta rect{ stroke:var(--danger) !important; fill:#3A1C21 !important; }
   .pulso{ animation:pulso 1.4s ease-in-out infinite; }
   @keyframes pulso{ 0%,100%{ opacity:1 } 50%{ opacity:.35 } }
+
+  /* ---------- marca d'água da faculdade (canto superior direito) ---------- */
+  #marca{ position:fixed; top:16px; right:22px; height:34px; width:auto; z-index:30; pointer-events:none;
+          filter:brightness(0) invert(1); opacity:.42; }
+  body.modo-sala #marca{ height:40px; top:22px; right:30px; }
 
   /* ---------- painel lateral ---------- */
   #painel{
@@ -204,6 +217,16 @@
   #contador{ font-size:15px; color:var(--muted); min-width:64px; text-align:right; }
   #dica{ font-size:13px; color:#5F7790; }
 
+  @media (max-height:820px){
+    #painel .topo{ padding-top:20px; gap:6px; }
+    #painel h1{ font-size:27px; }
+    #conteudo{ padding:14px 32px 20px; gap:11px; }
+    #conteudo p{ font-size:15.5px; line-height:1.45; }
+    #conteudo li{ font-size:15px; line-height:1.4; }
+    #conteudo ul{ gap:6px; }
+    #conteudo h3{ margin-top:2px; }
+    .chip{ font-size:13px; padding:4px 10px; }
+  }
   @media (max-width:1100px){
     :root{ --panel-w:420px; }
     #painel h1{ font-size:26px; }
@@ -240,19 +263,21 @@
   <div id="conteudo"></div>
 </aside>
 <div id="notas" aria-label="Notas de fala"></div>
+<img id="marca" src="midia/impacta.png" alt="" aria-hidden="true" onerror="this.remove()">
+<div id="preto" aria-hidden="true"></div>
 
 <nav id="rodape" aria-label="Navegação da apresentação">
   <button id="ant" aria-label="Parada anterior">← Anterior</button>
   <div id="pontos"></div>
   <span id="contador"></span>
   <button id="prox" aria-label="Próxima parada">Próxima →</button>
-  <span id="dica">← → navega · N notas · F tela cheia</span>
+  <span id="dica">← → navega · N notas · F tela cheia · B tela preta</span>
 </nav>
 
 <script>
 /* =====================================================================
    Cyberappfin: a jornada do pacote
-   Fonte dos dados: ambiente-bpo (inventário), plano V2 de provisionamento,
+   Fonte dos dados: inventário do grupo, plano V2 de provisionamento,
    relatório OpenVAS de 11/09/2026 e as políticas POL-GI-001 / POL-CN-001.
    ===================================================================== */
 
@@ -471,14 +496,14 @@ function resetIncidente(){
 }
 
 /* ---------- conteúdo das paradas ---------- */
-const P1 = 'Apresentador 1 · Abertura', P2N = 'Apresentador 2 · Network', P2I = 'Apresentador 2 · IAM',
-      P3 = 'Apresentador 3 · SOC', P3E = 'Apresentador 3 · Endpoint', P34 = 'Apresentadores 3 e 4 · Incidente',
-      P4 = 'Apresentador 4 · GRC e fechamento';
+const P1 = 'Cyberappfin', P2N = 'Network', P2I = 'IAM',
+      P3 = 'SOC', P3E = 'Endpoint', P34 = 'Simulação · SOC',
+      P4 = 'GRC e continuidade';
 
 const PARADAS = [
   /* =================== ABERTURA (sala) =================== */
   {
-    quem:P1, cor:COR.brand, titulo:'Cyberappfin', foto:true,
+    quem:'', cor:COR.brand, titulo:'Cyberappfin', foto:true,
     sala:`<div class="s-corpo" style="justify-content:center">
         <p class="s-rot" style="color:#8DB6F9">Defesa Cibernética · Impacta</p>
         <h2 class="gigante">Cyberappfin</h2>
@@ -495,10 +520,10 @@ const PARADAS = [
     notas:'Apresentar o grupo e a empresa. Ela guarda dados financeiros de vários clientes e acessa bancos e meios de pagamento: alvo valioso. Regulada pelo Banco Central, precisa provar que é segura. Explicar o formato: primeiro vamos seguir o caminho que um pacote faz dentro da rede; depois, em telas como esta, mostramos os processos e a gestão.'
   },
   {
-    quem:P1, cor:COR.brand, titulo:'Como organizamos', foto:'fundo', sub:'Cinco times, um inventário único, seis fases de subida (21/08 a 14/09/2026)',
+    quem:'Organização', cor:COR.brand, titulo:'Como organizamos', foto:'fundo', sub:'Cinco times, seis fases de subida (21/08 a 14/09/2026)',
     sala:`<div class="s-corpo">
         <div class="linha" style="grid-template-columns:repeat(5, 1fr)">
-          <div class="bloco" style="--cor:${COR.net}"><h4>Network</h4><p>Rede, perímetro e virtualização</p></div>
+          <div class="bloco" style="--cor:${COR.net}"><h4>Network</h4><p>Rede e perímetro</p></div>
           <div class="bloco" style="--cor:${COR.iam}"><h4>IAM</h4><p>Identidades e acessos</p></div>
           <div class="bloco" style="--cor:${COR.soc}"><h4>SOC</h4><p>Monitoramento e resposta</p></div>
           <div class="bloco" style="--cor:${COR.end}"><h4>Endpoint</h4><p>Estações e correções</p></div>
@@ -507,13 +532,12 @@ const PARADAS = [
         <p class="s-rot">Plano de subida do ambiente</p>
         <div class="tempo" style="--n:6">
           <div class="etapa" style="--cor:${COR.net}"><span class="bola">1</span><h4>Infraestrutura e conectividade</h4><p>Network</p></div>
-          <div class="etapa" style="--cor:${COR.net}"><span class="bola">2</span><h4>Virtualização</h4><p>Network</p></div>
+          <div class="etapa" style="--cor:${COR.net}"><span class="bola">2</span><h4>Virtualização</h4><p>Ambiente externo (VLAN 200)</p></div>
           <div class="etapa" style="--cor:${COR.iam}"><span class="bola">3</span><h4>Identidade</h4><p>IAM</p></div>
           <div class="etapa" style="--cor:${COR.soc}"><span class="bola">4</span><h4>SOC e observabilidade</h4><p>SOC + Endpoint</p></div>
           <div class="etapa" style="--cor:${COR.brand}"><span class="bola">5</span><h4>Aplicação e segurança</h4><p>Todos os times</p></div>
           <div class="etapa" style="--cor:${COR.grc}"><span class="bola">6</span><h4>Backup, DR e documentação</h4><p>GRC e todos</p></div>
         </div>
-        <p class="s-txt">Tudo registrado no <b>ambiente-bpo</b> em três níveis: <b>sistema</b> (o que existe) → <b>configuração</b> (como está ajustado) → <b>regra</b> (o que passa a valer).</p>
       </div>`,
     notas:'Cada time cuidou de uma área. O plano seguiu a ordem de dependência: sem rede não há servidor, sem servidor não há identidade, sem identidade o SOC não tem o que monitorar. Na próxima tela entramos no mapa.'
   },
@@ -558,7 +582,7 @@ const PARADAS = [
     cam:[680, 30, 910, 300], foco:['externo', 'cisco', 'ligacoes'],
     html:`<p>Hosts ESXi, vCenter, Jump Server e Storage/TrueNAS ficam na <b>VLAN 200</b>, num ambiente <b>administrado externamente</b>.</p>
       <ul><li style="--cor:#9FB1C3">O grupo usa essa infraestrutura, mas não a administra</li>
-      <li style="--cor:#9FB1C3">Por isso ela não entra no escopo nem no inventário do projeto</li></ul>`,
+      <li style="--cor:#9FB1C3">Por isso ela não entra no escopo do projeto</li></ul>`,
     notas:'Deixar claro o limite do escopo. Não citar versões nem capacidades desse ambiente: não são administrados pelo grupo.'
   },
 
@@ -613,9 +637,11 @@ const PARADAS = [
     quem:P3E, cor:COR.end, titulo:'VLAN 40: as workstations', sub:'Endpoint: onde a maioria dos ataques começa',
     cam:[700, 330, 520, 570], foco:['vlan40', 'barramento'],
     html:`<p>Estações de trabalho dos colaboradores, separadas das máquinas de gerência (VLAN 10).</p>
-      <ul><li style="--cor:${COR.end}">Antivírus ClamAV integrado ao Wazuh nos servidores, validado com o arquivo de teste <b>EICAR</b></li>
-      <li style="--cor:${COR.end}">Hardening com UFW nos servidores Linux: entrada bloqueada por padrão, SSH restrito</li>
-      <li style="--cor:${COR.end}">Regras de senha e bloqueio vêm das GPOs do AD</li></ul>`,
+      <h3>Nas workstations</h3>
+      <ul><li style="--cor:${COR.end}">Ingressadas no domínio: senha mínima, bloqueio de conta e demais regras vêm das GPOs do AD</li></ul>
+      <h3>Nos servidores</h3>
+      <ul><li style="--cor:${COR.end}">Antivírus ClamAV integrado ao Wazuh, validado com o arquivo de teste <b>EICAR</b></li>
+      <li style="--cor:${COR.end}">Hardening com UFW nos Linux: entrada bloqueada por padrão, SSH restrito</li></ul>`,
     notas:'EICAR é um arquivo de teste inofensivo que todo antivírus reconhece: serve para provar que a detecção funciona. Guardem esta VLAN: é aqui que o incidente vai começar.'
   },
   {
@@ -655,7 +681,7 @@ const PARADAS = [
         : passo === 2 ? ['vlan50']
         : ['vlan50', 'unifi', 'vlan20', 'vlan40', 'barramento', 'ligacoes', 'cisco'],
     html:`<div class="passos">
-        <div class="passo ${passo >= 0 ? 'ativo' : ''}"><span><b>Entrada:</b> um e-mail de phishing chega a uma workstation da VLAN 40 e o colaborador clica no link.</span></div>
+        <div class="passo ${passo >= 0 ? 'ativo' : ''}"><span><b>Entrada:</b> um e-mail de phishing chega à workstation de um colaborador de Contas a Pagar (VLAN 40), que clica no link.</span></div>
         <div class="passo ${passo >= 1 ? 'ativo' : ''}"><span><b>Detecção:</b> o Wazuh detecta a conexão a um domínio suspeito logo após o e-mail. A CyberFin IA classifica o alerta e avisa o SOC.</span></div>
         <div class="passo ${passo >= 2 ? 'ativo' : ''}"><span><b>Registro:</b> o analista confirma e abre o ticket no <b>ITSM</b>. O SOC conduz a investigação pelo playbook PB-010.</span></div>
         <div class="passo ${passo >= 3 ? 'ativo' : ''}"><span><b>Contenção:</b> Network bloqueia o domínio no UniFi, IAM reseta a senha e revoga as sessões, Endpoint verifica a estação.</span></div></div>`,
@@ -717,7 +743,7 @@ const PARADAS = [
         </div>
         <p class="s-txt">Apoio contínuo: <b>CyberFin IA</b> classificando os alertas 24/7, com a decisão final sempre do <b>analista</b>.</p>
       </div>`,
-    notas:'Metas dão objetividade ao SOC. Falsos positivos importam porque um SOC que alerta demais é ignorado. Fechar o bloco do SOC aqui.'
+    notas:'Metas dão objetividade ao SOC. Falsos positivos importam porque um SOC que alerta demais é ignorado. Se perguntarem se as metas já são cumpridas: são metas da política, e o registro dos tickets no ITSM é o que permite medir os tempos. Fechar o bloco do SOC aqui.'
   },
 
   /* =================== MAPA: backup =================== */
@@ -751,8 +777,7 @@ const PARADAS = [
             <p><b>Em validação:</b> cópia offsite da estratégia 3-2-1, que depende da VPN, e o primeiro teste de restauração.</p></div>
           <div class="bloco" style="--cor:${COR.brand}"><h4>Plano de testes</h4>
             <p><b>Mensal:</b> restauração de backup (SOC e Endpoint)</p>
-            <p><b>Semestral:</b> simulado de failover (SOC e Network)</p>
-            <p><b>Anual:</b> exercício de mesa (SOC, GRC e Diretoria)</p></div>
+                        <p><b>Anual:</b> exercício de mesa (SOC, GRC e Diretoria)</p></div>
         </div>
         <p class="s-aviso">Os tempos são metas da política. Só o teste de restauração vai dizer se são cumpridos.</p>
       </div>`,
@@ -762,7 +787,7 @@ const PARADAS = [
     quem:P4, cor:COR.grc, titulo:'GRC: políticas e conformidade', sub:'Uma financeira regulada precisa provar que é segura',
     sala:`<div class="s-corpo">
         <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
-          <div class="doc"><span class="cod">POL-GDI-001 · POL-CA-001</span><h4>Identidades e Controle de Acesso</h4><p>Ciclo de vida de identidades, MFA, contas privilegiadas via Jump Server e trilhas de auditoria.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.3 · vigente</span></div>
+          <div class="doc"><span class="cod">POL-GDI-001 · POL-CA-001</span><h4>Identidades e Controle de Acesso</h4><p>Ciclo de vida de identidades, MFA, controle de contas privilegiadas e trilhas de auditoria.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.3 · vigente</span></div>
           <div class="doc"><span class="cod">POL-CR-001</span><h4>Criptografia</h4><p>Algoritmos, gestão de chaves e proteção de dados em trânsito e em repouso.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.2 · vigente</span></div>
           <div class="doc"><span class="cod">POL-GI-001</span><h4>Gestão de Incidentes</h4><p>Matriz de severidade, ciclo de resposta, CSIRT, notificação e KPIs.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.0 · SOC</span></div>
           <div class="doc"><span class="cod">POL-CN-001</span><h4>Continuidade do Negócio</h4><p>BIA, RTO/RPO, backup 3-2-1, DRP e plano de testes.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.0 · SOC</span></div>
@@ -778,7 +803,7 @@ const PARADAS = [
     notas:'Banco Central e LGPD exigem política escrita, não só prática. GRC coordena e cada time contribui com a política da sua área: o SOC escreveu as de incidentes e continuidade. São 11 playbooks: o PB-000 é o mestre e o PB-010, de phishing, é o usado na simulação.'
   },
   {
-    quem:P4, cor:COR.danger, titulo:'Onde estão os riscos', sub:'O que o OpenVAS e o inventário mostram',
+    quem:P4, cor:COR.danger, titulo:'Onde estão os riscos', sub:'O que as varreduras e os testes mostram',
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="linha" style="grid-template-columns:repeat(2, 1fr)">
           <div class="bloco" style="--cor:#F87171"><span class="rot" style="color:#F87171">Crítico · risco calculado</span><h4>Administração remota acessível pela rede</h4>
@@ -793,7 +818,7 @@ const PARADAS = [
     notas:'Apresentar o crítico com a ressalva: é um ambiente simulado, o acesso remoto existe para administrar e testar, e o grupo sabe que em produção ele seria restrito à VLAN de gerência. As lacunas mostram maturidade: o grupo sabe o que falta validar.'
   },
   {
-    quem:P4, cor:COR.brand, titulo:'Encerramento', foto:true,
+    quem:'', cor:COR.brand, titulo:'Encerramento', foto:true,
     sala:`<div class="s-corpo" style="justify-content:center; gap:3vh">
         <p class="s-rot" style="color:#8DB6F9">Cyberappfin · Defesa Cibernética · Impacta</p>
         <h2 class="gigante">Obrigado!</h2>
@@ -864,6 +889,7 @@ function ir(i){
   resetIncidente();
 
   $('quem').textContent = p.quem;
+  $('quem').hidden = !p.quem;
   $('quem').style.color = p.cor;
   $('titulo').textContent = p.titulo;
   $('subtitulo').textContent = p.sub || '';
@@ -891,7 +917,7 @@ function ir(i){
   document.body.classList.toggle('modo-sala', sala);
   if(sala){
     $('sala').innerHTML = `<div class="s-head">
-        <span class="s-quem" style="color:${p.cor}">${p.quem}</span>
+        ${p.quem ? `<span class="s-quem" style="color:${p.cor}">${p.quem}</span>` : ''}
         ${p.titulo !== 'Cyberappfin' && p.titulo !== 'Encerramento' ? `<h2 class="s-titulo">${p.titulo}</h2>` : ''}
         ${p.sub ? `<p class="s-sub">${p.sub}</p>` : ''}
       </div>${p.sala}`;
@@ -925,10 +951,19 @@ document.addEventListener('keydown', e => {
   else if(e.key === 'Home') ir(0);
   else if(e.key === 'End') ir(PARADAS.length - 1);
   else if(e.key === 'n' || e.key === 'N') document.body.classList.toggle('com-notas');
+  else if(e.key === 'b' || e.key === 'B' || e.key === '.') document.body.classList.toggle('tela-preta');
   else if(e.key === 'f' || e.key === 'F'){
     if(document.fullscreenElement) document.exitFullscreen();
     else document.documentElement.requestFullscreen?.();
   }
+});
+
+// cursor escondido quando o mouse fica parado (não aparece no projetor)
+let timerCursor = null;
+document.addEventListener('mousemove', () => {
+  document.body.classList.remove('sem-cursor');
+  clearTimeout(timerCursor);
+  timerCursor = setTimeout(() => document.body.classList.add('sem-cursor'), 2500);
 });
 
 // o endereço #N abre direto na parada N (útil para ensaiar uma parte)
