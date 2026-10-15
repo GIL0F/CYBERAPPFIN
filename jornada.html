@@ -633,7 +633,7 @@ const PARADAS = [
       <div class="chips"><span class="chip">NT-001</span><span class="chip">NT-002</span><span class="chip">NT-003</span><span class="chip">Wazuh</span><span class="chip">Zabbix + Grafana</span><span class="chip">OpenVAS</span><span class="chip">Reverse Proxy</span></div>
       <h3>Como a varredura é feita</h3>
       <ul><li style="--cor:${COR.soc}"><b>Sem credenciais:</b> enxerga a rede como um visitante enxergaria</li>
-      <li style="--cor:${COR.soc}">Verifica portas abertas, serviços e versões, criptografia TLS e cabeçalhos web</li>
+      <li style="--cor:${COR.soc}">Verifica portas abertas, serviços e versões e a configuração dos serviços web</li>
       <li style="--cor:${COR.soc}">Atenção especial às portas de administração remota: <b>3389</b> (RDP), <b>5985</b> (WinRM) e <b>22</b> (SSH)</li></ul>`,
     notas:'Mostrar como o OpenVAS está configurado, não os resultados. São dois tipos de tarefa: uma por VLAN, que pega qualquer coisa nova na rede, e uma por servidor, que serve de linha de base para comparar depois. Tudo sem credenciais. Se pedirem para ver, abrir o OpenVAS e mostrar as tarefas e os targets.'
   },
@@ -778,66 +778,30 @@ const PARADAS = [
     notas:'Banco Central e LGPD exigem política escrita, não só prática. GRC coordena e cada time contribui com a política da sua área: o SOC escreveu as de incidentes e continuidade. São 11 playbooks: o PB-000 é o mestre e o PB-010, de phishing, é o usado na simulação.'
   },
   {
-    quem:P4, cor:COR.danger, titulo:'Onde estão os riscos', sub:'O que o scan e o inventário mostram',
-    sala:`<div class="s-corpo">
-        <div class="linha" style="grid-template-columns:repeat(3, 1fr); flex:1">
-          <div class="bloco" style="--cor:#F87171"><span class="rot" style="color:#F87171">Crítico</span><h4>Administração remota exposta</h4><p>RDP 3389, WinRM 5985 e SSH 22 alcançáveis de toda a rede interna.</p><p>Abre caminho para força bruta e movimento lateral.</p><div class="rodape">Principal risco apontado pelo OpenVAS</div></div>
-          <div class="bloco" style="--cor:#FB923C"><span class="rot" style="color:#FB923C">Alto</span><h4>Criptografia antiga</h4><p>TLS 1.0/1.1 e cifras fracas em 443, 8900 e 9080. Sem HSTS, X-Frame-Options e CSP.</p><p>Permite interceptar ou rebaixar a conexão.</p><div class="rodape">Apontado nos serviços web</div></div>
-          <div class="bloco" style="--cor:${COR.brand}"><span class="rot" style="color:#8DB6F9">Lacunas</span><h4>Cobertura incompleta</h4><p>Teste de restauração ainda não realizado. Cópia offsite do backup depende da VPN. Varredura autenticada ainda não feita.</p><div class="rodape">O que está dentro das máquinas ainda não foi medido</div></div>
-        </div>
-      </div>`,
-    notas:'Dois problemas concentram os riscos: administração remota acessível pela rede e criptografia antiga. Além disso, lacunas que já estão no plano. Não citar quantidades de achados.'
-  },
-  {
-    quem:P4, cor:COR.brand, titulo:'Plano de ação', sub:'O que fazer primeiro, depois e por último',
-    sala:`<div class="s-corpo">
-        <div class="linha" style="grid-template-columns:repeat(3, 1fr); flex:1">
-          <div class="bloco" style="--cor:#F87171"><span class="rot" style="color:#F87171">Agora</span>
-            <h4>1. Acesso remoto</h4><p>3389, 5985 e 22 só a partir da VLAN 10. NLA no RDP. SMBv1 desligado e assinatura SMB.</p>
-            <h4>2. Criptografia</h4><p>Só TLS 1.2+ com PFS e AES-GCM. HSTS, X-Frame-Options e X-Content-Type-Options.</p></div>
-          <div class="bloco" style="--cor:#FB923C"><span class="rot" style="color:#FB923C">Em seguida</span>
-            <h4>3. Ocultar informações</h4><p>server_tokens off, versões escondidas, páginas de erro genéricas.</p>
-            <h4>4. Nova varredura</h4><p>Scan autenticado nos servidores, para medir o que está dentro das máquinas.</p></div>
-          <div class="bloco" style="--cor:${COR.brand}"><span class="rot" style="color:#8DB6F9">Depois</span>
-            <h4>5. Cobertura do SOC</h4><p>Logs do switch via syslog e painéis de alta severidade e escalada de privilégio.</p>
-            <h4>6. Continuidade</h4><p>Validar a cópia offsite (3-2-1) e fazer o primeiro teste de restauração.</p></div>
-        </div>
-      </div>`,
-    notas:'As frentes 1 a 4 vêm direto do plano do OpenVAS. A 1 fecha a maior parte dos críticos. Depois de aplicar, repetir o scan com credenciais.'
-  },
-  {
-    quem:P4, cor:COR.brand, titulo:'A aplicação do inventário', sub:'ambiente-bpo.vercel.app · onde tudo isto está registrado',
-    sala:`<div class="s-corpo">
-        <div class="pilha">
-          <div class="bloco" style="--cor:${COR.brand}"><span class="rot">Navegador</span><h4>React + TypeScript</h4><p>A tela só esconde o que o perfil não pode usar.</p><p>CSP, HSTS, X-Frame-Options DENY, nosniff.</p></div>
-          <span class="seta">→</span>
-          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">API · Vercel</span><h4>Quem decide é a API</h4><p>Sessão JWT em cookie HttpOnly, Secure, SameSite=Lax, 8 h.</p><p>RBAC: outra área retorna <b>403</b>. Upload conferido por tipo, tamanho e assinatura.</p></div>
-          <span class="seta">→</span>
-          <div class="bloco" style="--cor:${COR.end}"><span class="rot">Banco · Neon</span><h4>Postgres</h4><p>Senhas com bcrypt. Triggers garantem a hierarquia sistema → configuração → regra.</p><p>O navegador nunca fala com o banco.</p></div>
-        </div>
-        <div class="linha" style="grid-template-columns:repeat(3, 1fr)">
-          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Perfis</span><p><b>Admin</b>, <b>Visualizador</b> e <b>Coordenador</b> preso à própria área. Sem cadastro público.</p></div>
-          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Árvore geral</span><p>Busca qualquer item do ambiente, útil para responder perguntas na hora.</p></div>
-          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Custo</span><p>Zero: Vercel e Neon em planos gratuitos.</p></div>
-        </div>
-      </div>`,
-    notas:'O portal do inventário também segue boas práticas, o que combina com a disciplina. A regra de acesso está na API, não só na tela: um coordenador que chamar a API de outra área recebe 403 (testado em produção).'
-  },
-  {
-    quem:P4, cor:COR.brand, titulo:'Encerramento',
+    quem:P4, cor:COR.danger, titulo:'Onde estão os riscos', sub:'O que o OpenVAS e o inventário mostram',
     sala:`<div class="s-corpo" style="justify-content:center">
-        <p class="s-rot" style="color:#8DB6F9">Cyberappfin</p>
-        <h2 class="gigante" style="font-size:clamp(44px, 5.4vw, 100px)">Segmentado, monitorado e com plano para o que falta.</h2>
-        <div class="linha" style="grid-template-columns:repeat(4, 1fr); max-width:1200px">
-          <div class="bloco" style="--cor:${COR.net}"><span class="grande">6</span><p>VLANs internas</p></div>
-          <div class="bloco" style="--cor:${COR.soc}"><span class="grande">5</span><p>agentes Wazuh ativos</p></div>
-          <div class="bloco" style="--cor:#F87171"><span class="grande">11</span><p>playbooks de resposta</p></div>
-          <div class="bloco" style="--cor:${COR.brand}"><span class="grande">6</span><p>frentes de ação</p></div>
+        <div class="linha" style="grid-template-columns:repeat(2, 1fr)">
+          <div class="bloco" style="--cor:#F87171"><span class="rot" style="color:#F87171">Crítico · risco calculado</span><h4>Administração remota acessível pela rede</h4>
+            <p>RDP 3389, WinRM 5985 e SSH 22 alcançáveis a partir da rede interna, o que abriria caminho para força bruta e movimento lateral.</p>
+            <p><b>Ressalva:</b> em um ambiente simulado, esse acesso é mantido para viabilizar a administração e os testes. É um risco conhecido e calculado; em produção, seria restrito à VLAN de gerência.</p></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="rot" style="color:#8DB6F9">Lacunas</span><h4>O que ainda está em validação</h4>
+            <p>Teste de restauração do backup ainda não realizado.</p>
+            <p>Cópia offsite (3-2-1) depende da VPN.</p>
+            <p>Varredura autenticada, que mede o que está dentro das máquinas, ainda não feita.</p></div>
         </div>
-        <div class="lema2"><span>Segurança</span><span>·</span><span>Resiliência</span><span>·</span><span>Controle</span></div>
-        <p class="s-txt" style="font-size:clamp(22px, 2vw, 36px)">Perguntas?</p>
       </div>`,
-    notas:'Retomar o lema e abrir para perguntas. O ambiente-bpo tem a Árvore geral com busca para achar qualquer item rapidamente.'
+    notas:'Apresentar o crítico com a ressalva: é um ambiente simulado, o acesso remoto existe para administrar e testar, e o grupo sabe que em produção ele seria restrito à VLAN de gerência. As lacunas mostram maturidade: o grupo sabe o que falta validar.'
+  },
+  {
+    quem:P4, cor:COR.brand, titulo:'Encerramento', foto:true,
+    sala:`<div class="s-corpo" style="justify-content:center; gap:3vh">
+        <p class="s-rot" style="color:#8DB6F9">Cyberappfin · Defesa Cibernética · Impacta</p>
+        <h2 class="gigante">Obrigado!</h2>
+        <p class="s-txt" style="font-size:clamp(26px, 2.6vw, 48px); color:var(--text); font-family:'Sora', system-ui, sans-serif; font-weight:700">Perguntas?</p>
+        <div class="faixa"></div>
+        <div class="lema2"><span>Segurança</span><span>·</span><span>Resiliência</span><span>·</span><span>Controle</span></div>
+      </div>`,
+    notas:'Agradecer em nome do grupo e abrir para perguntas. Se pedirem para ver algo do ambiente, voltar à parada correspondente (o endereço #número abre direto).'
   }
 ];
 
