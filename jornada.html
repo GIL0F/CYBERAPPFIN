@@ -232,6 +232,20 @@
   .check{ list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; }
   .check li{ font-size:clamp(13px, .95vw, 17px); color:var(--soft); padding-left:24px; position:relative; }
   .check li::before{ content:""; position:absolute; left:2px; top:.25em; width:12px; height:12px; border-radius:3px; border:2px solid var(--cor, #22C55E); }
+  /* prancheta com folha pautada */
+  .prancheta{ position:relative; background:linear-gradient(160deg, #7A5232, #5C3B22); border-radius:16px;
+              padding:30px 14px 14px; box-shadow:0 14px 30px rgba(0,0,0,.45), inset 0 0 0 1px rgba(255,255,255,.06); }
+  .prancheta .clip{ position:absolute; top:-12px; left:50%; transform:translateX(-50%); width:120px; height:34px; border-radius:8px 8px 12px 12px;
+                    background:linear-gradient(180deg, #E8EDF2, #9AA6B2 55%, #C9D1D9); box-shadow:0 4px 8px rgba(0,0,0,.4); }
+  .prancheta .clip::after{ content:""; position:absolute; top:7px; left:50%; transform:translateX(-50%); width:44px; height:10px;
+                           border-radius:6px; background:#5C3B22; box-shadow:inset 0 2px 3px rgba(0,0,0,.5); }
+  .prancheta .papel{ background-color:#FBF8EF; border-radius:4px; padding:16px 18px 14px 46px; position:relative;
+                     background-image:linear-gradient(90deg, transparent 33px, #F2A8A8 33px, #F2A8A8 35px, transparent 35px);
+                     box-shadow:0 2px 0 #E9E3D2, 0 4px 0 #DCD5C2; }
+  .prancheta .papel .rot{ display:block; color:#7C5A3A; padding-bottom:6px; border-bottom:1px solid #BFD3EC; }
+  .prancheta .check{ gap:0 18px; }
+  .prancheta .check li{ color:#2B3440; line-height:1.9em; font-size:clamp(13px, .95vw, 17px); border-bottom:1px solid #BFD3EC; }
+  .prancheta .check li::before{ border-color:#3B7D52; background:#FFFFFF; top:.55em; }
   .gigante{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(56px, 7.5vw, 140px); font-weight:800; line-height:.95; letter-spacing:-.03em; }
 
   /* ---------- rodapé de navegação ---------- */
@@ -909,8 +923,7 @@ const PARADAS = [
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="fluxo"><div class="passo2"><b>1. Restore point</b><span>Confirmar o ponto de backup que será usado</span></div><span class="seta2">→</span><div class="passo2"><b>2. Máquina de destino</b><span>Preparar a VM que vai receber o servidor</span></div><span class="seta2">→</span><div class="passo2"><b>3. Recovery Media</b><span>Iniciar a máquina pela mídia de recuperação do Veeam</span></div><span class="seta2">→</span><div class="passo2"><b>4. Entire Machine Restore</b><span>Restaurar o servidor inteiro a partir do NT-003</span></div><span class="seta2">→</span><div class="passo2"><b>5. Boot e validação</b><span>Ligar e passar pelo checklist abaixo</span></div></div>
         <div class="linha" style="grid-template-columns:1.35fr 1fr">
-          <div class="bloco" style="--cor:#22C55E"><span class="rot">Checklist depois da restauração</span>
-            <ul class="check"><li>Sistema operacional inicializa</li><li>Discos e partições corretos</li><li>IP, gateway e VLAN corretos</li><li>DNS e NTP funcionam</li><li>Autenticação no AD funciona</li><li>Banco de dados íntegro</li><li>Aplicação responde</li><li>Dados críticos conferidos</li><li>Wazuh recebe eventos</li><li>Zabbix monitora o host</li><li>Firewall e hardening preservados</li><li>Novo backup pós-DR executado</li></ul></div>
+          <div class="prancheta"><div class="clip"></div><div class="papel"><span class="rot">Checklist depois da restauração</span><ul class="check"><li>Sistema operacional inicializa</li><li>Discos e partições corretos</li><li>IP, gateway e VLAN corretos</li><li>DNS e NTP funcionam</li><li>Autenticação no AD funciona</li><li>Banco de dados íntegro</li><li>Aplicação responde</li><li>Dados críticos conferidos</li><li>Wazuh recebe eventos</li><li>Zabbix monitora o host</li><li>Firewall e hardening preservados</li><li>Novo backup pós-DR executado</li></ul></div></div>
           <div class="bloco" style="--cor:${COR.grc}"><span class="rot">O que se registra ao final</span>
             <p><b>Restore point</b> usado (data e hora do backup restaurado)</p>
             <p><b>RPO real</b>: do último dado recuperado até a falha</p>
