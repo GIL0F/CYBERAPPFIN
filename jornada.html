@@ -262,23 +262,22 @@ const MUNDO = [0, 0, 1600, 920];
 
 const COR = { net:'#14B8A6', iam:'#8B5CF6', soc:'#F59E0B', end:'#22C55E', grc:'#EAB308', brand:'#4C8DF6', danger:'#F87171', cinza:'#64809B' };
 
-/* ---------- VLANs e hosts ---------- */
+/* ---------- VLANs e hosts (revisão do grupo, 14/10/2026) ---------- */
 const VLANS = [
-  { n:10, uso:'Gerência',   rede:'10.10.10.0/24', cor:COR.brand, hosts:[['UniFi (gestão)','10.10.10.x'],['vCenter 8.x','10.10.10.x'],['Notebook Admin','10.10.10.x']] },
-  { n:20, uso:'Servidores', rede:'10.10.20.0/24', cor:COR.iam,   hosts:[['AD-01','10.10.20.10'],['AD-02','10.10.20.11']] },
+  { n:10, uso:'Gerência',   rede:'10.10.10.0/24', cor:COR.brand, hosts:[['Workstation 01','gerência · 10.10.10.x'],['Workstation 02','gerência · 10.10.10.x'],['Workstation 03','gerência · 10.10.10.x']] },
+  { n:20, uso:'Servidores', rede:'10.10.20.0/24', cor:COR.iam,   hosts:[['NT-001 · AD-01','10.10.20.10'],['NT-002 · AD-02','10.10.20.11']] },
   { n:30, uso:'DMZ',        rede:'10.10.30.0/24', cor:COR.danger, hosts:[['Reverse Proxy','10.10.30.3']] },
-  { n:40, uso:'Usuários',   rede:'10.10.40.0/24', cor:COR.end,   hosts:[['W10','10.10.40.x'],['W10-2','10.10.40.x'],['WIN-10','10.10.40.x']] },
-  { n:50, uso:'Segurança / SOC', rede:'10.10.50.0/24', cor:COR.soc, hosts:[['Wazuh Manager','10.10.50.21'],['Zabbix + Grafana','10.10.50.15'],['OpenVAS','10.10.50.7'],['Jump Server','PAM · 10.10.50.x']] },
-  { n:60, uso:'Backup',     rede:'10.10.60.0/24', cor:COR.grc,   hosts:[['Backup Server','10.10.60.x']] },
-  { n:70, uso:'PCI / CDE',  rede:'10.10.70.0/24', cor:'#F472B6', hosts:[['PCI-APP-01','10.10.70.x']] },
-  { n:80, uso:'vSphere DR', rede:'10.10.80.0/24', cor:'#60A5FA', hosts:[['vSphere DR','10.10.80.x']] },
-  { n:99, uso:'Quarentena', rede:'10.10.99.0/24', cor:'#C084FC', hosts:[] }
+  { n:40, uso:'Usuários',   rede:'10.10.40.0/24', cor:COR.end,   hosts:[['Workstation','10.10.40.x'],['Workstation','10.10.40.x'],['Workstation','10.10.40.x']] },
+  { n:50, uso:'Segurança / SOC', rede:'10.10.50.0/24', cor:COR.soc, hosts:[['Wazuh Manager','10.10.50.21'],['Zabbix + Grafana','10.10.50.15'],['OpenVAS','10.10.50.7'],['CyberFin IA','10.10.50.19'],['ITSM','10.10.50.x']] },
+  { n:60, uso:'Backup',     rede:'10.10.60.0/24', cor:COR.grc,   hosts:[['NT-003 · Backup','10.10.60.143']] }
 ];
-const COL_X = i => 20 + i * 174;          // canto esquerdo da coluna
-const COL_CX = i => COL_X(i) + 80;        // centro da coluna
-const HOST_Y = j => 500 + j * 70;         // topo do host
+const COL_W = 236;
+const COL_X = i => 30 + i * 258;            // canto esquerdo da coluna
+const COL_CX = i => COL_X(i) + COL_W / 2;   // centro da coluna
+const HOST_Y = j => 500 + j * 70;           // topo do host
 const hostCentro = (i, j) => ({ x: COL_CX(i), y: HOST_Y(j) + 29 });
 const BUS_Y = 360;
+const ULT = VLANS.length - 1;
 
 /* ---------- desenho ---------- */
 function el(tag, attrs = {}, pai = svg){
@@ -308,33 +307,36 @@ defs.innerHTML = `
 el('rect', { x:-2000, y:-2000, width:5600, height:4920, fill:'url(#grade)' });
 
 // rótulos de camada
-texto(svg, 30, 30, 'PERÍMETRO E VIRTUALIZAÇÃO', { class:'t-mono', 'font-size':13, 'letter-spacing':2 });
+texto(svg, 30, 30, 'PERÍMETRO', { class:'t-mono', 'font-size':13, 'letter-spacing':2 });
 texto(svg, 30, 395, 'VLANs · TRUNK 802.1Q', { class:'t-mono', 'font-size':13, 'letter-spacing':2 });
 
 // ligações do perímetro (desenhadas antes das caixas)
 const gLig = grupo('ligacoes');
-el('path', { d:'M200 100 C250 100 250 140 300 140', class:'lig trac' }, gLig);
-el('path', { d:'M200 230 C250 230 250 200 300 200', class:'lig trac' }, gLig);
-el('path', { d:'M600 170 H700', class:'lig' }, gLig);
-el('path', { d:'M940 170 H1040', class:'lig' }, gLig);
+el('path', { d:'M210 170 H300', class:'lig trac' }, gLig);
+el('path', { d:'M620 170 H700', class:'lig' }, gLig);
+el('path', { d:'M940 170 H1030', class:'lig trac' }, gLig);
 el('path', { d:`M820 225 V${BUS_Y}`, class:'lig' }, gLig);
 
-// WAN1 / WAN2
-[['wan1', 60, 'WAN1', 'Link principal'], ['wan2', 190, 'WAN2', 'Link de backup']].forEach(([id, y, nome, sub]) => {
-  const g = grupo(id);
-  el('rect', { x:30, y, width:170, height:80, rx:40, fill:'#12263A', stroke:COR.net, 'stroke-width':2 }, g);
-  texto(g, 115, y + 36, nome, { 'text-anchor':'middle', class:'t-title', 'font-size':20 });
-  texto(g, 115, y + 58, sub, { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
-});
+// Entrada: SD-WAN
+(() => {
+  const g = grupo('sdwan');
+  el('rect', { x:30, y:120, width:180, height:100, rx:50, fill:'#12263A', stroke:COR.net, 'stroke-width':2 }, g);
+  texto(g, 120, 164, 'SD-WAN', { 'text-anchor':'middle', class:'t-title', 'font-size':22 });
+  texto(g, 120, 188, 'entrada da internet', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
+})();
 
-// UniFi
+// UniFi: dois gateways formando o SD-WAN
 (() => {
   const g = grupo('unifi');
-  el('rect', { x:300, y:95, width:300, height:150, rx:16, fill:'#10283A', stroke:COR.net, 'stroke-width':2.5 }, g);
-  texto(g, 324, 135, 'UniFi Controller', { class:'t-title', 'font-size':24 });
-  texto(g, 324, 165, 'Firewall · NAT · VLANs · APs', { class:'t-muted', 'font-size':15 });
-  texto(g, 324, 189, 'Gestão de switches e Wi-Fi', { class:'t-muted', 'font-size':15 });
-  texto(g, 324, 222, 'VM Ubuntu 22.04 · VLAN 10', { class:'t-mono', 'font-size':13 });
+  el('rect', { x:300, y:85, width:320, height:170, rx:16, fill:'#10283A', stroke:COR.net, 'stroke-width':2.5 }, g);
+  texto(g, 324, 124, 'UniFi Controller', { class:'t-title', 'font-size':24 });
+  [344, 486].forEach(x => {
+    el('rect', { x, y:146, width:90, height:52, rx:10, fill:'#16354C', stroke:'#2BD4C0', 'stroke-width':1.5 }, g);
+    texto(g, x + 45, 170, 'U', { 'text-anchor':'middle', class:'t-title', 'font-size':20, fill:'#5EEAD4' });
+    texto(g, x + 45, 189, 'gateway', { 'text-anchor':'middle', class:'t-mono', 'font-size':11 });
+  });
+  el('path', { d:'M434 172 H486', fill:'none', stroke:'#2BD4C0', 'stroke-width':2, 'stroke-dasharray':'5 5' }, g);
+  texto(g, 460, 228, 'SD-WAN · firewall · VLANs', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
 })();
 
 // Cisco 2960
@@ -346,49 +348,40 @@ el('path', { d:`M820 225 V${BUS_Y}`, class:'lig' }, gLig);
   texto(g, 722, 204, 'Trunks 802.1Q', { class:'t-muted', 'font-size':15 });
 })();
 
-// Cluster vSphere
+// Ambiente externo (VLAN 200): fora do escopo do projeto
 (() => {
-  const g = grupo('cluster');
-  el('rect', { x:1040, y:60, width:530, height:240, rx:18, fill:'#0F2133', stroke:COR.brand, 'stroke-width':2.5 }, g);
-  texto(g, 1062, 92, 'Cluster vSphere HA', { class:'t-title', 'font-size':20 });
-  texto(g, 1548, 92, 'vCenter 8.x', { class:'t-mono', 'font-size':13, 'text-anchor':'end' });
-  [['ESX-01', 1060, 'Serviços internos', 'AD · Backup · PCI-APP'], ['ESX-02', 1310, 'SOC · DMZ · OpenVAS', 'EDR · Laboratório']].forEach(([n, x, a, b]) => {
-    el('rect', { x, y:110, width:240, height:170, rx:12, fill:'#132A40', stroke:'#2E4E70', 'stroke-width':1.5 }, g);
-    texto(g, x + 18, 142, n, { class:'t-title', 'font-size':20 });
-    texto(g, x + 18, 170, a, { class:'t-muted', 'font-size':14 });
-    texto(g, x + 18, 191, b, { class:'t-muted', 'font-size':14 });
-    texto(g, x + 18, 226, '16 cores · 128 GB ECC', { class:'t-mono', 'font-size':12 });
-    texto(g, x + 18, 246, '2x480 GB cache + 4x2 TB', { class:'t-mono', 'font-size':12 });
-    texto(g, x + 18, 266, '2x10GbE + 2x10GbE vMotion', { class:'t-mono', 'font-size':12 });
+  const g = grupo('externo');
+  el('rect', { x:1030, y:60, width:540, height:240, rx:18, fill:'#101B27', stroke:'#5B7389', 'stroke-width':2, 'stroke-dasharray':'8 6' }, g);
+  texto(g, 1052, 94, 'Ambiente externo · VLAN 200', { class:'t-title', 'font-size':20 });
+  texto(g, 1052, 118, 'fora do escopo do projeto, administrado externamente', { class:'t-muted', 'font-size':13 });
+  [['Hosts ESXi', 1052, 140], ['vCenter', 1306, 140], ['Jump Server', 1052, 214], ['Storage / TrueNAS', 1306, 214]].forEach(([n, x, y]) => {
+    el('rect', { x, y, width:242, height:60, rx:10, fill:'#15222F', stroke:'#33475A', 'stroke-width':1.5 }, g);
+    texto(g, x + 18, y + 37, n, { 'font-size':16, 'font-weight':700, fill:'#AFC1D2' });
   });
 })();
 
 // Barramento (trunk) e colunas de VLAN
 const gBus = grupo('barramento');
-el('path', { d:`M${COL_CX(0)} ${BUS_Y} H${COL_CX(8)}`, class:'barramento' }, gBus);
+el('path', { d:`M${COL_CX(0)} ${BUS_Y} H${COL_CX(ULT)}`, class:'barramento' }, gBus);
 VLANS.forEach((v, i) => el('path', { d:`M${COL_CX(i)} ${BUS_Y} V400`, class:'lig' }, gBus));
 
 const hostEls = {};   // "col-indice" -> <g>
 VLANS.forEach((v, i) => {
   const g = grupo('vlan' + v.n);
   const x = COL_X(i);
-  el('rect', { x, y:400, width:160, height:500, rx:14, fill:'#0F1D2B', stroke:v.cor, 'stroke-width':2, 'stroke-opacity':.75 }, g);
-  el('rect', { x, y:400, width:160, height:6, rx:3, fill:v.cor }, g);
-  texto(g, x + 14, 444, String(v.n), { class:'t-title', 'font-size':30, fill:v.cor });
-  texto(g, x + 14, 466, v.uso, { 'font-size':14, 'font-weight':700 });
-  texto(g, x + 14, 485, v.rede, { class:'t-mono', 'font-size':11 });
+  el('rect', { x, y:400, width:COL_W, height:500, rx:14, fill:'#0F1D2B', stroke:v.cor, 'stroke-width':2, 'stroke-opacity':.75 }, g);
+  el('rect', { x, y:400, width:COL_W, height:6, rx:3, fill:v.cor }, g);
+  texto(g, x + 16, 444, String(v.n), { class:'t-title', 'font-size':30, fill:v.cor });
+  texto(g, x + 16, 466, v.uso, { 'font-size':15, 'font-weight':700 });
+  texto(g, x + 16, 485, v.rede, { class:'t-mono', 'font-size':12 });
   v.hosts.forEach(([nome, ip], j) => {
     const h = el('g', { class:'host', 'data-host': `${i}-${j}` }, g);
-    el('rect', { x:x + 10, y:HOST_Y(j), width:140, height:58, rx:9, fill:'#16283A', stroke:'#2C4560', 'stroke-width':1.5 }, h);
-    texto(h, x + 20, HOST_Y(j) + 25, nome, { 'font-size':14, 'font-weight':700 });
-    texto(h, x + 20, HOST_Y(j) + 45, ip, { class:'t-mono', 'font-size':11 });
+    el('rect', { x:x + 10, y:HOST_Y(j), width:COL_W - 20, height:58, rx:9, fill:'#16283A', stroke:'#2C4560', 'stroke-width':1.5 }, h);
+    texto(h, x + 22, HOST_Y(j) + 25, nome, { 'font-size':15, 'font-weight':700 });
+    texto(h, x + 22, HOST_Y(j) + 45, ip, { class:'t-mono', 'font-size':12 });
     hostEls[`${i}-${j}`] = h;
   });
 });
-// vazio da quarentena
-const gQ = svg.querySelector('[data-id="vlan99"]');
-texto(gQ, COL_CX(8), 640, 'isolamento', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
-texto(gQ, COL_CX(8), 660, 'de host suspeito', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
 
 // camada de animações (pacotes) por cima de tudo
 const camada = el('g', { id:'camada' });
@@ -463,35 +456,18 @@ function focar(ids){
   ids.forEach(id => svg.querySelector(`[data-id="${id}"]`)?.classList.add('foco'));
 }
 
-/* ---------- incidente: estação W10 indo para a quarentena ---------- */
-const W10 = hostEls['3-0'];
-function resetW10(){
-  W10.classList.remove('alerta');
-  W10.removeAttribute('transform');
-  W10.querySelector('.selo')?.remove();
+/* ---------- incidente: a workstation da VLAN 40 que recebe o phishing ---------- */
+const WS = hostEls['3-0'];
+const ITSM = hostEls['4-4'];
+function selo(host, txt, cor){
+  host.querySelector('.selo')?.remove();
+  const r = host.querySelector('rect');
+  const x = +r.getAttribute('x') + (+r.getAttribute('width')) - 12, y = +r.getAttribute('y') + 22;
+  const s = el('text', { x, y, 'text-anchor':'end', class:'selo pulso', 'font-size':12, 'font-weight':700, 'letter-spacing':1.5, fill:cor }, host);
+  s.textContent = txt;
 }
-function moverW10ParaQuarentena(){
-  const dx = COL_X(8) - COL_X(3), dur = 1400, t0 = performance.now();
-  const minha = geracao;
-  // a estação precisa ficar acima da coluna da quarentena enquanto se move
-  svg.insertBefore(W10, camada);
-  function quadro(t){
-    if(minha !== geracao) return;
-    const k = Math.min(1, (t - t0) / dur);
-    const e = k < .5 ? 2*k*k : 1 - Math.pow(-2*k + 2, 2) / 2;
-    W10.setAttribute('transform', `translate(${dx * e} 0)`);
-    if(k < 1) requestAnimationFrame(quadro);
-    else {
-      // selo logo abaixo da estação, longe do cabeçalho da VLAN 99
-      const s = el('text', { x:COL_X(3) + 80, y:HOST_Y(0) + 82, 'text-anchor':'middle', class:'selo pulso', 'font-size':14, 'font-weight':700, 'letter-spacing':2, fill:COR.danger }, W10);
-      s.textContent = 'ISOLADO';
-    }
-  }
-  requestAnimationFrame(quadro);
-}
-function devolverW10(){
-  resetW10();
-  svg.querySelector('[data-id="vlan40"]').appendChild(W10);
+function resetIncidente(){
+  [WS, ITSM].forEach(h => { h.classList.remove('alerta'); h.querySelector('.selo')?.remove(); });
 }
 
 /* ---------- conteúdo das paradas ---------- */
@@ -542,108 +518,81 @@ const PARADAS = [
     notas:'Cada time cuidou de uma área. O plano seguiu a ordem de dependência: sem rede não há servidor, sem servidor não há identidade, sem identidade o SOC não tem o que monitorar. Na próxima tela entramos no mapa.'
   },
 
-  /* =================== MAPA: perímetro e virtualização =================== */
+  /* =================== MAPA: perímetro =================== */
   {
-    quem:P2N, cor:COR.net, titulo:'Entrada: WAN1 e WAN2', sub:'Dois links de internet com SD-WAN',
-    cam:[0, 20, 680, 320], foco:['wan1', 'wan2', 'unifi', 'ligacoes'],
-    anim(){ emLoop(() => { pacote([{x:200,y:100},{x:250,y:110},{x:300,y:140}], COR.net, 1100); setTimeout(() => pacote([{x:200,y:230},{x:300,y:200}], '#5EEAD4', 1100, 5), 550); }, 2000); },
-    html:`<p>Todo tráfego da Cyberappfin entra por dois links: <b>WAN1</b> (principal) e <b>WAN2</b> (backup).</p>
-      <ul><li style="--cor:${COR.net}">SD-WAN entre os links: se a WAN1 cair, o tráfego segue pela WAN2</li>
-      <li style="--cor:${COR.net}">Failover de rotas é papel do Network no DRP</li></ul>
-      <div class="cards"><div class="card" style="--cor:${COR.net}"><span class="n">50%</span><span class="l">Links WAN1/WAN2</span></div>
-      <div class="card" style="--cor:${COR.net}"><span class="n">35%</span><span class="l">SD-WAN</span></div></div>
-      <p class="aviso">Percentuais de 11/09. Confirmar com o Network.</p>`,
-    notas:'Redundância começa na borda. Um único link de internet seria um ponto único de falha: para uma financeira, ficar offline é parar operações de crédito.'
+    quem:P2N, cor:COR.net, titulo:'Entrada: SD-WAN', sub:'Por onde a internet chega à Cyberappfin',
+    cam:[0, 40, 720, 300], foco:['sdwan', 'unifi', 'ligacoes'],
+    anim(){ emLoop(() => pacote([{x:210,y:170},{x:344,y:172}], COR.net, 1100), 1700); },
+    html:`<p>Todo o tráfego da Cyberappfin entra por um <b>SD-WAN</b>, formado por dois gateways UniFi.</p>
+      <ul><li style="--cor:${COR.net}">O SD-WAN escolhe sozinho o melhor caminho de saída e mantém a conexão se um caminho falhar</li>
+      <li style="--cor:${COR.net}">É o primeiro ponto de controle antes de qualquer VLAN</li></ul>`,
+    notas:'Redundância começa na borda. Ficar offline significa parar o BPO e as operações de crédito.'
   },
   {
-    quem:P2N, cor:COR.net, titulo:'UniFi Controller', sub:'Firewall, NAT e separação das VLANs',
+    quem:P2N, cor:COR.net, titulo:'UniFi Controller', sub:'Firewall e separação das VLANs',
     cam:[170, 50, 820, 260], foco:['unifi', 'cisco', 'ligacoes'],
-    anim(){ emLoop(() => pacote([{x:300,y:140},{x:450,y:170},{x:700,y:170}], COR.net, 1400), 2000); },
-    html:`<p>Primeiro ponto de controle: <b>todo pacote passa pelo firewall</b> antes de chegar a qualquer VLAN.</p>
-      <ul><li style="--cor:${COR.net}">Firewall e NAT na borda</li>
-      <li style="--cor:${COR.net}">Gestão das 9 VLANs, switches e APs</li>
-      <li style="--cor:${COR.net}">VM Ubuntu 22.04 · 2 vCPU · 4 GB · 30 GB · VLAN 10</li></ul>
-      <p>Firewall e regras de segmentação em <b>80%</b>. pfSense e Suricata foram descontinuados na V2.</p>`,
-    notas:'O UniFi é o porteiro da rede: decide o que pode passar de uma VLAN para outra. Na resposta a incidentes, é aqui que o Network bloqueia tráfego e isola segmentos.'
+    anim(){ emLoop(() => pacote([{x:434,y:172},{x:486,y:172},{x:620,y:170},{x:700,y:170}], COR.net, 1400), 2000); },
+    html:`<p><b>Todo pacote passa pelo firewall</b> antes de chegar a qualquer VLAN.</p>
+      <ul><li style="--cor:${COR.net}">SD-WAN com dois gateways UniFi</li>
+      <li style="--cor:${COR.net}">Firewall e regras de segmentação entre as VLANs</li>
+      <li style="--cor:${COR.net}">Gestão dos switches e do Wi-Fi</li></ul>`,
+    notas:'O UniFi é o porteiro da rede: decide o que pode passar de uma VLAN para outra. Na resposta a incidentes, é aqui que o Network bloqueia domínios e URLs maliciosos.'
   },
   {
-    quem:P2N, cor:COR.net, titulo:'Cisco 2960 e as 9 VLANs', sub:'Trunks 802.1Q · rede 10.10.X.0/24',
+    quem:P2N, cor:COR.net, titulo:'Cisco 2960 e as VLANs', sub:'Trunks 802.1Q · rede 10.10.X.0/24',
     cam:[0, 100, 1600, 560], foco:['cisco', 'barramento', 'ligacoes', ...VLANS.map(v => 'vlan' + v.n)],
-    anim(){ emLoop(() => VLANS.forEach((v, i) => setTimeout(() => pacote([{x:820,y:225},{x:820,y:BUS_Y},{x:COL_CX(i),y:BUS_Y},{x:COL_CX(i),y:400}], v.cor, 1600, 6), i * 140)), 3000); },
+    anim(){ emLoop(() => VLANS.forEach((v, i) => setTimeout(() => pacote([{x:820,y:225},{x:820,y:BUS_Y},{x:COL_CX(i),y:BUS_Y},{x:COL_CX(i),y:400}], v.cor, 1600, 6), i * 160)), 3000); },
     html:`<table><tr><th>VLAN</th><th>Uso</th><th>Sub-rede</th></tr>
       <tr><td>10</td><td>Gerência</td><td class="mono">10.10.10.0/24</td></tr>
       <tr><td>20</td><td>Servidores</td><td class="mono">10.10.20.0/24</td></tr>
       <tr><td>30</td><td>DMZ</td><td class="mono">10.10.30.0/24</td></tr>
       <tr><td>40</td><td>Usuários</td><td class="mono">10.10.40.0/24</td></tr>
       <tr class="dest"><td>50</td><td>Segurança / SOC</td><td class="mono">10.10.50.0/24</td></tr>
-      <tr><td>60</td><td>Backup</td><td class="mono">10.10.60.0/24</td></tr>
-      <tr><td>70</td><td>PCI / CDE</td><td class="mono">10.10.70.0/24</td></tr>
-      <tr><td>80</td><td>vSphere DR</td><td class="mono">10.10.80.0/24</td></tr>
-      <tr><td>99</td><td>Quarentena</td><td class="mono">10.10.99.0/24</td></tr></table>
-      <p>Gateway de cada VLAN no <b>.1</b>. VLANs e trunks em <b>95%</b>, DMZ e PCI em <b>90%</b>, DHCP e DNS em <b>85%</b>.</p>`,
-    notas:'O Cisco 2960 leva todas as VLANs aos servidores por um único cabo (trunk 802.1Q), marcando cada pacote com o número da VLAN. Segmentar limita o movimento lateral: quem invade uma estação da VLAN 40 não chega direto aos controladores de domínio nem aos dados de cartão.'
+      <tr><td>60</td><td>Backup</td><td class="mono">10.10.60.0/24</td></tr></table>
+      <p>Gateway de cada VLAN no <b>.1</b>. VLANs e trunks em <b>95%</b>, DMZ em <b>100%</b>.</p>
+      <p>A infraestrutura de virtualização fica na <b>VLAN 200</b>, em ambiente externo (próxima parada).</p>`,
+    notas:'O Cisco 2960 leva todas as VLANs por um único cabo (trunk 802.1Q), marcando cada pacote com o número da VLAN. Segmentar limita o movimento lateral: quem compromete uma workstation da VLAN 40 não chega direto aos controladores de domínio.'
   },
   {
-    quem:P2N, cor:COR.brand, titulo:'Cluster vSphere HA', sub:'Onde rodam as máquinas virtuais',
-    cam:[690, 30, 900, 300], foco:['cluster', 'cisco', 'ligacoes'],
-    anim(){ emLoop(() => pacote([{x:940,y:170},{x:1040,y:170},{x:1180,y:170}], COR.brand, 1100), 1800); },
-    html:`<table><tr><th>Host</th><th>Função</th></tr>
-      <tr><td>ESX-01</td><td>Serviços internos, AD, Backup, PCI-APP</td></tr>
-      <tr><td>ESX-02</td><td>SOC, DMZ, OpenVAS, EDR, laboratório</td></tr>
-      <tr><td>vSphere DR</td><td>Réplica do cluster na VLAN 80</td></tr></table>
-      <ul><li style="--cor:${COR.brand}">16 cores Xeon · 128 GB ECC por host</li>
-      <li style="--cor:${COR.brand}">2x 480 GB SSD cache + 4x 2 TB SSD/NVMe</li>
-      <li style="--cor:${COR.brand}">2x 10GbE gestão + 2x 10GbE vMotion</li></ul>
-      <p>Gerenciado pelo <b>vCenter 8.x</b> (4 vCPU · 12 GB · 100 GB). Virtualização e cluster HA em <b>55%</b>.</p>`,
-    notas:'Se um host físico falha, o vSphere HA religa as VMs no outro. ESXi não aceita agente Wazuh: é monitorado sem agente, pela API do vCenter.'
+    quem:P2N, cor:'#9FB1C3', titulo:'Ambiente externo · VLAN 200', sub:'Fora do escopo do projeto',
+    cam:[680, 30, 910, 300], foco:['externo', 'cisco', 'ligacoes'],
+    html:`<p>Hosts ESXi, vCenter, Jump Server e Storage/TrueNAS ficam na <b>VLAN 200</b>, num ambiente <b>administrado externamente</b>.</p>
+      <ul><li style="--cor:#9FB1C3">O grupo usa essa infraestrutura, mas não a administra</li>
+      <li style="--cor:#9FB1C3">Por isso ela não entra no escopo nem no inventário do projeto</li></ul>`,
+    notas:'Deixar claro o limite do escopo. Não citar versões nem capacidades desse ambiente: não são administrados pelo grupo.'
   },
 
   /* =================== MAPA: identidade =================== */
   {
     quem:P2I, cor:COR.iam, titulo:'VLAN 20: Active Directory', sub:'Domínio cyberappfin.local',
-    cam:[100, 330, 460, 420], foco:['vlan20', 'barramento'],
-    anim(){ emLoop(() => { pacote([{x:COL_CX(1),y:BUS_Y},hostCentro(1,0)], COR.iam, 900, 6); setTimeout(() => pacote(viaBus(hostCentro(1,0), hostCentro(1,1)), '#C4B5FD', 900, 5), 1100); }, 2600); },
-    html:`<div class="cards"><div class="card" style="--cor:${COR.iam}"><span class="n">AD-01</span><span class="l mono">10.10.20.10 · AD, DNS, DHCP</span></div>
-      <div class="card" style="--cor:${COR.iam}"><span class="n">AD-02</span><span class="l mono">10.10.20.11 · redundante</span></div></div>
-      <ul><li style="--cor:${COR.iam}">Windows Server 2022 · 4 vCPU · 8 GB · 80 GB</li>
-      <li style="--cor:${COR.iam}">Replicação confirmada entre os dois DCs</li>
+    cam:[230, 330, 520, 420], foco:['vlan20', 'barramento'],
+    anim(){ emLoop(() => pacote([hostCentro(1,0), hostCentro(1,1)], '#C4B5FD', 900, 5), 2000); },
+    html:`<div class="cards"><div class="card" style="--cor:${COR.iam}"><span class="n">NT-001</span><span class="l mono">AD-01 · 10.10.20.10</span></div>
+      <div class="card" style="--cor:${COR.iam}"><span class="n">NT-002</span><span class="l mono">AD-02 · 10.10.20.11</span></div></div>
+      <ul><li style="--cor:${COR.iam}">Dois controladores de domínio com replicação confirmada</li>
       <li style="--cor:${COR.iam}"><b>GPO:</b> senha mínima de 10 caracteres, bloqueio após 5 tentativas</li>
-      <li style="--cor:${COR.iam}"><b>11 OUs e 18 grupos</b> de segurança, um por perfil RBAC</li></ul>`,
-    notas:'Dois controladores evitam que a queda de um derrube o login de todos (a bolinha lilás clara é a replicação entre eles). A permissão vai para o grupo, nunca direto para a pessoa: menor privilégio. Os dois DCs são o alvo número 1 de monitoramento do SOC.'
-  },
-  {
-    quem:P2I, cor:COR.iam, titulo:'Jump Server / PAM', sub:'O único caminho para administrar',
-    cam:[0, 330, 940, 560], foco:['vlan10', 'vlan50', 'vlan20', 'barramento'],
-    anim(){
-      const nb = hostCentro(0, 2), js = hostCentro(4, 3), ad = hostCentro(1, 0);
-      emLoop(async () => { if(await pacote(viaBus(nb, js), COR.iam, 1800)) pacote(viaBus(js, ad), COR.iam, 1800); }, 4400);
-    },
-    html:`<p>Administrador nunca acessa servidor direto. O caminho é sempre <b>Notebook Admin (VLAN 10) → Jump Server (VLAN 50) → servidor</b>.</p>
-      <ul><li style="--cor:${COR.iam}">Acesso privilegiado sob demanda (PAM)</li>
-      <li style="--cor:${COR.iam}">Toda sessão administrativa é gravada</li>
-      <li style="--cor:${COR.iam}">Fonte oficial do inventário de ativos</li>
-      <li style="--cor:${COR.iam}">Ubuntu 22.04 · 2 vCPU · 4 GB · 60 GB</li></ul>
-      <p class="aviso">Status de 11/09: 75%. Confirmar com o IAM.</p>`,
-    notas:'Acesso direto a servidor crítico é risco duplo: credencial que vaza e ação que ninguém viu. O Jump Server força um funil auditável: quem entrou, quando e o que fez.'
+      <li style="--cor:${COR.iam}"><b>11 OUs e 18 grupos</b> de segurança, um por perfil RBAC</li></ul>
+      <p>Política vigente: <b>POL-GDI-001 / POL-CA-001 v1.3</b>.</p>`,
+    notas:'Dois controladores evitam que a queda de um derrube o login de todos (a bolinha lilás é a replicação). A permissão vai para o grupo, nunca direto para a pessoa: menor privilégio.'
   },
 
   /* =================== MAPA: SOC e endpoint =================== */
   {
-    quem:P3, cor:COR.soc, titulo:'VLAN 50: o SOC', sub:'Wazuh, Zabbix, Grafana e OpenVAS',
-    cam:[540, 330, 480, 570], foco:['vlan50', 'barramento'],
-    html:`<table><tr><th>Ferramenta</th><th>IP</th><th>Recursos</th></tr>
-      <tr class="dest"><td>Wazuh 4.14.6 (SIEM/EDR)</td><td class="mono">.50.21</td><td>4 vCPU · 8 GB · 80+200 GB</td></tr>
-      <tr><td>Zabbix + Grafana</td><td class="mono">.50.15</td><td>4 vCPU · 8 GB · 60+200 GB</td></tr>
-      <tr><td>OpenVAS (GVM)</td><td class="mono">.50.7</td><td>4 vCPU · 8 GB · 60+200 GB</td></tr>
-      <tr><td>JumpServer</td><td class="mono">.50.x</td><td>2 vCPU · 4 GB · 60 GB</td></tr></table>
-      <ul><li style="--cor:${COR.soc}">Wazuh em Docker single-node, painéis no OpenSearch</li>
-      <li style="--cor:${COR.soc}">Agentes: porta <b>1514</b> (eventos) e <b>1515</b> (registro)</li>
-      <li style="--cor:${COR.soc}">Zabbix server na porta <b>10051</b>, Grafana consolida tudo</li></ul>`,
-    notas:'Toda a stack do SOC é open source e fica isolada na VLAN 50. Wazuh é o centro: cada servidor manda os logs para ele. Zabbix cobre o que não é ataque (disco cheio, serviço parado). OpenVAS procura vulnerabilidades.'
+    quem:P3, cor:COR.soc, titulo:'VLAN 50: o SOC', sub:'Monitoramento, varredura e registro de incidentes',
+    cam:[960, 330, 520, 570], foco:['vlan50', 'barramento'],
+    html:`<table><tr><th>Ferramenta</th><th>IP</th><th>Função</th></tr>
+      <tr class="dest"><td>Wazuh 4.14.6</td><td class="mono">.50.21</td><td>SIEM: recebe e correlaciona os logs</td></tr>
+      <tr><td>Zabbix + Grafana</td><td class="mono">.50.15</td><td>Disponibilidade e painéis</td></tr>
+      <tr><td>OpenVAS</td><td class="mono">.50.7</td><td>Varredura de vulnerabilidades</td></tr>
+      <tr><td>CyberFin IA</td><td class="mono">.50.19</td><td>Classifica os alertas; o analista decide</td></tr>
+      <tr><td>ITSM</td><td class="mono">.50.x</td><td>Registro e acompanhamento dos incidentes</td></tr></table>
+      <ul><li style="--cor:${COR.soc}">Wazuh instalado direto em servidor Linux (standalone)</li>
+      <li style="--cor:${COR.soc}">Agentes reportam pelas portas 1514 e 1515</li></ul>`,
+    notas:'Toda a stack do SOC é open source e fica isolada na VLAN 50. A IA ajuda na triagem dos logs, mas não executa nenhuma ação: a decisão é sempre do analista. O ITSM registra cada incidente com um ticket.'
   },
   {
-    quem:P3, cor:COR.soc, titulo:'Os agentes falando com o Wazuh', sub:'5 agentes ativos, coleta e detecção',
-    cam:[150, 330, 940, 570], foco:['vlan20', 'vlan30', 'vlan40', 'vlan50', 'barramento'],
+    quem:P3, cor:COR.soc, titulo:'Os agentes falando com o Wazuh', sub:'Coleta e detecção',
+    cam:[260, 330, 1100, 570], foco:['vlan20', 'vlan30', 'vlan40', 'vlan50', 'barramento'],
     anim(){
       const wz = hostCentro(4, 0);
       const fontes = [hostCentro(1,0), hostCentro(1,1), hostCentro(2,0), hostCentro(4,1), hostCentro(4,2)];
@@ -654,80 +603,65 @@ const PARADAS = [
       <tr><td>NT-002</td><td class="mono">10.10.20.11</td><td>AD-02</td></tr>
       <tr><td>FIREFLY</td><td class="mono">10.10.30.3</td><td>Reverse Proxy</td></tr>
       <tr><td>zabbixgrafana</td><td class="mono">10.10.50.15</td><td>Zabbix + Grafana</td></tr>
-      <tr><td>openvaz</td><td class="mono">10.10.50.7</td><td>OpenVAS</td></tr>
-      <tr class="dest"><td>W10, W10-2, WIN-10</td><td class="mono">10.10.40.x</td><td>pendente</td></tr></table>
-      <ul><li style="--cor:${COR.soc}"><b>agent.conf</b> do grupo Servidores coleta o /var/log/auth.log</li>
-      <li style="--cor:${COR.soc}"><b>Regra 31533</b> ajustada: auto-refresh do Zabbix não é bot</li>
-      <li style="--cor:${COR.soc}">Dashboard "Cyber": eventos por agente, rule.level, logons <b>4624/4625</b></li>
-      <li style="--cor:${COR.soc}">IA do SOC em treinamento, decisão final do analista N2</li></ul>`,
-    notas:'Os pacotes laranja são logs indo para o Wazuh. Exemplo de trabalho real: o Zabbix atualiza a tela sozinho e o Wazuh achava que era um robô; ajustamos a regra 31533. 4624 é logon com sucesso, 4625 é falha. Pendentes: painel de alta severidade, contador de escalada de privilégio e o switch SW-001 via syslog.'
+      <tr><td>openvaz</td><td class="mono">10.10.50.7</td><td>OpenVAS</td></tr></table>
+      <ul><li style="--cor:${COR.soc}">Coleta do auth.log de todos os servidores Linux</li>
+      <li style="--cor:${COR.soc}">Regras ajustadas para reduzir falsos positivos</li>
+      <li style="--cor:${COR.soc}">Dashboard "Cyber": eventos por agente, severidade e logons</li></ul>`,
+    notas:'Os pacotes laranja são logs indo para o Wazuh. Falar das regras de forma geral: cada ajuste foi feito para diminuir alertas que não eram incidente.'
   },
   {
-    quem:P3E, cor:COR.end, titulo:'VLAN 40: as estações', sub:'Endpoint: onde a maioria dos ataques começa',
-    cam:[370, 330, 480, 570], foco:['vlan40', 'barramento'],
-    html:`<div class="cards">
-      <div class="card" style="--cor:${COR.end}"><span class="n">55%</span><span class="l">EDR e antivírus</span></div>
-      <div class="card" style="--cor:${COR.end}"><span class="n">50%</span><span class="l">Hardening e baseline</span></div>
-      <div class="card" style="--cor:${COR.soc}"><span class="n">0%</span><span class="l">Gestão de patches</span></div>
-      <div class="card" style="--cor:${COR.soc}"><span class="n">0%</span><span class="l">Inventário de dispositivos</span></div></div>
-      <ul><li style="--cor:${COR.end}">ClamAV integrado ao Wazuh nos servidores, validado com <b>EICAR</b></li>
-      <li style="--cor:${COR.end}">UFW nos Linux: deny inbound, allow outbound, SSH restrito</li>
-      <li style="--cor:${COR.end}">W10, W10-2 e WIN-10 ainda <b>sem agente Wazuh</b></li></ul>
-      <p class="aviso">Percentuais de 11/09. Confirmar com o Endpoint.</p>`,
-    notas:'EICAR é um arquivo de teste inofensivo que todo antivírus reconhece: prova que a detecção funciona. A maior lacuna: o SOC ainda não enxerga as estações, por onde entram phishing e pendrive infectado. Guardem esta VLAN: é aqui que o incidente vai começar.'
+    quem:P3E, cor:COR.end, titulo:'VLAN 40: as workstations', sub:'Endpoint: onde a maioria dos ataques começa',
+    cam:[700, 330, 520, 570], foco:['vlan40', 'barramento'],
+    html:`<p>Estações de trabalho dos colaboradores, separadas das máquinas de gerência (VLAN 10).</p>
+      <ul><li style="--cor:${COR.end}">Antivírus ClamAV integrado ao Wazuh nos servidores, validado com o arquivo de teste <b>EICAR</b></li>
+      <li style="--cor:${COR.end}">Hardening com UFW nos servidores Linux: entrada bloqueada por padrão, SSH restrito</li>
+      <li style="--cor:${COR.end}">Regras de senha e bloqueio vêm das GPOs do AD</li></ul>`,
+    notas:'EICAR é um arquivo de teste inofensivo que todo antivírus reconhece: serve para provar que a detecção funciona. Guardem esta VLAN: é aqui que o incidente vai começar.'
   },
   {
-    quem:P3, cor:COR.soc, titulo:'OpenVAS: a varredura', sub:'30/08 a 10/09/2026 · 20 hosts · 19 tasks',
-    cam:[0, 330, 1080, 570], foco:['vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
+    quem:P3, cor:COR.soc, titulo:'OpenVAS: as varreduras', sub:'Procurar a porta aberta antes do atacante',
+    cam:[0, 330, 1600, 570], foco:['vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
     anim(){
       const ov = hostCentro(4, 2);
       emLoop(() => [0,1,2,3,5].forEach((i, k) => setTimeout(() => pacote(viaBus(ov, { x:COL_CX(i), y:420 }), '#FB923C', 1600, 5), k * 300)), 3400);
     },
-    html:`<p>Scan <b>sem credenciais</b>: o GVM marcou as 744 ocorrências como Log (CVSS 0.0). O SOC reclassificou cada uma pelo vetor de ataque.</p>
-      <div class="barras">
-        <div class="barra"><span>Crítico</span><i style="width:76%;background:#EF4444"></i><b>167</b></div>
-        <div class="barra"><span>Alto</span><i style="width:100%;background:#F59E0B"></i><b>221</b></div>
-        <div class="barra"><span>Médio</span><i style="width:41%;background:#EAB308"></i><b>90</b></div>
-        <div class="barra"><span>Baixo</span><i style="width:52%;background:#64809B"></i><b>116</b></div>
-        <div class="barra"><span>Informativo</span><i style="width:68%;background:#3D5468"></i><b>150</b></div></div>
-      <table><tr><th>Porta</th><th>Serviço</th><th>Ocorr.</th></tr>
-        <tr><td class="mono">443</td><td>HTTPS / ESXi</td><td>83</td></tr>
-        <tr class="perigo"><td class="mono">3389</td><td>RDP</td><td>70</td></tr>
-        <tr><td class="mono">8900</td><td>Gerência web</td><td>66</td></tr>
-        <tr><td class="mono">9080</td><td>Aplicações web</td><td>60</td></tr>
-        <tr class="perigo"><td class="mono">5985</td><td>WinRM</td><td>42</td></tr>
-        <tr class="perigo"><td class="mono">22</td><td>SSH</td><td>32</td></tr></table>`,
-    notas:'Sem credenciais o OpenVAS só vê portas e serviços, por isso classificou tudo como informativo. O SOC refez a classificação perguntando: o que um atacante dentro da rede faria com isso? As portas em vermelho são de administração remota e explicam a maior parte dos críticos.'
+    html:`<p>Varreduras de rede sobre <b>todos os servidores</b>, com a regra de varrer as VLANs internas.</p>
+      <table><tr><th>Porta</th><th>Serviço verificado</th></tr>
+        <tr><td class="mono">443 · 8900 · 9080</td><td>HTTPS e interfaces web</td></tr>
+        <tr class="perigo"><td class="mono">3389</td><td>RDP (área de trabalho remota)</td></tr>
+        <tr class="perigo"><td class="mono">5985</td><td>WinRM</td></tr>
+        <tr class="perigo"><td class="mono">22</td><td>SSH</td></tr>
+        <tr><td class="mono">445 · 139</td><td>SMB / NetBIOS</td></tr></table>
+      <p>Principais riscos apontados: <b>administração remota acessível pela rede interna</b> e <b>TLS antigo</b> em serviços web.</p>`,
+    notas:'Falar das varreduras de forma geral, sem quantidades. Em vermelho, as portas de administração remota, que são o principal risco.'
   },
   {
-    quem:P3, cor:COR.danger, titulo:'VLANs 30 e 70: DMZ e PCI', sub:'O que é exposto e o que é mais protegido',
-    cam:[330, 330, 960, 570], foco:['vlan30', 'vlan70', 'barramento'],
-    html:`<h3>VLAN 30 · DMZ</h3>
-      <p><b>Reverse Proxy</b> (Apache, 10.10.30.3, agente FIREFLY): publica serviços sem abrir acesso direto à rede interna. Ubuntu 22.04 · 2 vCPU · 4 GB · 40 GB.</p>
-      <h3>VLAN 70 · PCI / CDE</h3>
-      <p><b>PCI-APP-01</b>: aplicação em escopo PCI (dados de cartão), classificação <b>Restrito</b>. Ubuntu 22.04 · 4 vCPU · 8 GB · 80+200 GB.</p>
-      <p class="aviso">A VLAN 70 ainda não entrou nas varreduras do OpenVAS.</p>`,
-    notas:'A DMZ é a única parte que conversa com a internet, por isso fica separada. O PCI é o oposto: o segmento mais fechado, porque guarda dados de cartão. Lacuna honesta: a VLAN 70 ainda não foi escaneada.'
+    quem:P3, cor:COR.danger, titulo:'VLAN 30: DMZ', sub:'A única parte exposta para fora',
+    cam:[440, 330, 520, 570], foco:['vlan30', 'barramento'],
+    html:`<p><b>Reverse Proxy</b> (10.10.30.3, agente FIREFLY): publica a aplicação sem abrir acesso direto à rede interna.</p>
+      <ul><li style="--cor:${COR.danger}">DMZ em <b>100%</b></li>
+      <li style="--cor:${COR.danger}">Monitorada pelo Wazuh como qualquer servidor interno</li></ul>`,
+    notas:'A DMZ é a única parte que conversa com a internet, por isso fica separada das demais VLANs.'
   },
 
-  /* =================== MAPA: simulação de incidente (4 passos) =================== */
+  /* =================== MAPA: simulação de incidente (PB-010, 4 passos) =================== */
   ...[0, 1, 2, 3].map(passo => ({
-    quem:P34, cor:COR.danger, titulo:'Simulação de incidente', sub:'Phishing em Contas a Pagar',
+    quem:P34, cor:COR.danger, titulo:'Simulação de incidente', sub:'Phishing · playbook PB-010',
     cam:[0, 20, 1600, 900], incidente:passo,
-    foco: passo === 0 ? ['wan1', 'unifi', 'cisco', 'barramento', 'ligacoes', 'vlan40']
+    foco: passo === 0 ? ['sdwan', 'unifi', 'cisco', 'barramento', 'ligacoes', 'vlan40']
         : passo === 1 ? ['vlan40', 'vlan50', 'barramento']
-        : passo === 2 ? ['vlan40', 'vlan99', 'barramento', 'unifi']
-        : [],
+        : passo === 2 ? ['vlan50']
+        : ['vlan50', 'unifi', 'vlan20', 'vlan40', 'barramento', 'ligacoes', 'cisco'],
     html:`<div class="passos">
-        <div class="passo ${passo >= 0 ? 'ativo' : ''}"><span><b>Entrada:</b> e-mail de phishing passa pela WAN1 e chega à estação W10 de Contas a Pagar.</span></div>
-        <div class="passo ${passo >= 1 ? 'ativo' : ''}"><span><b>Detecção:</b> falhas de logon (4625) seguidas de sucesso (4624) chegam ao Wazuh. O analista confirma o incidente.</span></div>
-        <div class="passo ${passo >= 2 ? 'ativo' : ''}"><span><b>Contenção:</b> Network move a W10 para a <b>VLAN 99</b>. IAM revoga a credencial. Endpoint isola via EDR.</span></div>
-        <div class="passo ${passo >= 3 ? 'ativo' : ''}"><span><b>Resposta:</b> o CSIRT é acionado. A seguir, o processo por trás de cada passo.</span></div></div>`,
+        <div class="passo ${passo >= 0 ? 'ativo' : ''}"><span><b>Entrada:</b> um e-mail de phishing chega a uma workstation da VLAN 40 e o colaborador clica no link.</span></div>
+        <div class="passo ${passo >= 1 ? 'ativo' : ''}"><span><b>Detecção:</b> o Wazuh detecta a conexão a um domínio suspeito logo após o e-mail. A CyberFin IA classifica o alerta e avisa o SOC.</span></div>
+        <div class="passo ${passo >= 2 ? 'ativo' : ''}"><span><b>Registro:</b> o analista confirma e abre o ticket no <b>ITSM</b>. O SOC conduz a investigação pelo playbook PB-010.</span></div>
+        <div class="passo ${passo >= 3 ? 'ativo' : ''}"><span><b>Contenção:</b> Network bloqueia o domínio no UniFi, IAM reseta a senha e revoga as sessões, Endpoint verifica a estação.</span></div></div>`,
     notas: [
-      'Cenário fictício para mostrar o processo. O pacote vermelho é o e-mail malicioso: entra pela WAN1, passa pelo firewall e pelo switch e chega à estação W10. Lembrar que a W10 ainda não tem agente: no cenário, consideramos a meta com o agente instalado.',
-      'O Wazuh recebe a sequência de falhas de logon seguidas de um sucesso: padrão de credencial roubada. O analista faz a triagem (próximas telas mostram como ele classifica).',
-      'Contenção: a estação é movida para a VLAN 99 de quarentena e perde acesso ao resto da rede. Cada time tem um papel: Network isola, IAM revoga a senha, Endpoint isola e coleta memória para a forense.',
-      'Agora saímos do mapa e mostramos o processo: como o incidente é classificado, quem é acionado e como medimos o desempenho do SOC.'
+      'Cenário fictício baseado no playbook PB-010 (Phishing e Engenharia Social). O pacote vermelho é o e-mail: entra pelo SD-WAN, passa pelo firewall e pelo switch e chega a uma workstation da VLAN de usuários.',
+      'O gatilho é um dos previstos no PB-010: conexão a domínio recém-registrado logo após abrir um e-mail. A IA classifica, mas o analista é quem confirma. Alerta não é sinônimo de incidente confirmado.',
+      'Confirmado, o incidente vira um ticket no ITSM. A partir daí cada ação fica registrada na linha do tempo do incidente.',
+      'Contenção proporcional e autorizada pelo coordenador do SOC: bloqueio do domínio no UniFi, reset da credencial no AD e verificação da estação. A seguir, o processo por trás de cada passo.'
     ][passo]
   })),
 
@@ -736,7 +670,7 @@ const PARADAS = [
     quem:P3, cor:COR.soc, titulo:'Matriz de severidade', sub:'POL-GI-001 · cada incidente confirmado recebe um nível',
     sala:`<div class="s-corpo">
         <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
-          <div class="bloco" style="--cor:#4ADE80"><span class="rot">Nível 1</span><h4>Baixa</h4><p>Evento isolado, sem impacto.</p><p><b>Ex.:</b> malware bloqueado pelo EDR.</p><div class="rodape">Resposta em até <b>2 h</b></div></div>
+          <div class="bloco" style="--cor:#4ADE80"><span class="rot">Nível 1</span><h4>Baixa</h4><p>Evento isolado, sem impacto.</p><p><b>Ex.:</b> malware bloqueado pelo antivírus.</p><div class="rodape">Resposta em até <b>2 h</b></div></div>
           <div class="bloco" style="--cor:#FACC15"><span class="rot">Nível 2</span><h4>Média</h4><p>Área pontual, sem parar serviço crítico.</p><p><b>Ex.:</b> credencial comum comprometida.</p><div class="rodape">Resposta em até <b>1 h</b></div></div>
           <div class="bloco" style="--cor:#FB923C; box-shadow:0 0 0 2px #FB923C"><span class="rot">Nível 3 · nosso cenário</span><h4>Alta</h4><p>Parada parcial de BPO/Folha ou suspeita de vazamento.</p><p><b>Ex.:</b> phishing bem-sucedido em Contas a Pagar.</p><div class="rodape">Resposta em até <b>30 min</b></div></div>
           <div class="bloco" style="--cor:#F87171"><span class="rot">Nível 4</span><h4>Crítica</h4><p>Parada total, vazamento massivo ou ransomware.</p><p><b>Ex.:</b> criptografia de servidores.</p><div class="rodape">Resposta em até <b>15 min</b></div></div>
@@ -750,25 +684,25 @@ const PARADAS = [
     sala:`<div class="s-corpo">
         <div class="tempo" style="--n:5">
           <div class="etapa" style="--cor:${COR.brand}"><span class="bola">1</span><h4>Preparação</h4><p>Ferramentas, playbooks e equipe prontos</p></div>
-          <div class="etapa" style="--cor:${COR.soc}"><span class="bola">2</span><h4>Detecção e análise</h4><p>Alerta do Wazuh, triagem e nível</p></div>
-          <div class="etapa" style="--cor:#F87171"><span class="bola">3</span><h4>Contenção</h4><p>Host para a VLAN 99</p></div>
+          <div class="etapa" style="--cor:${COR.soc}"><span class="bola">2</span><h4>Detecção e análise</h4><p>Alerta do Wazuh, triagem com a IA, ticket no ITSM</p></div>
+          <div class="etapa" style="--cor:#F87171"><span class="bola">3</span><h4>Contenção</h4><p>Bloqueio no UniFi e reset de credenciais</p></div>
           <div class="etapa" style="--cor:${COR.end}"><span class="bola">4</span><h4>Erradicação e recuperação</h4><p>Remove a causa e restaura</p></div>
           <div class="etapa" style="--cor:${COR.grc}"><span class="bola">5</span><h4>Pós-incidente</h4><p>RCI em 5 dias úteis e lições aprendidas</p></div>
         </div>
         <div class="org">
-          <div class="chefe"><h4>Líder do SOC</h4><p>Coordena o CSIRT (níveis 3 e 4)</p></div>
+          <div class="chefe"><h4>Coordenador do SOC</h4><p>Autoriza a contenção e coordena o CSIRT (níveis 3 e 4)</p></div>
           <div class="tronco"></div>
           <div class="ramos">
-            <div class="membro" style="--cor:${COR.iam}"><h4>IAM</h4><p>Revoga credenciais</p></div>
-            <div class="membro" style="--cor:${COR.net}"><h4>Network</h4><p>Isola segmentos e bloqueia tráfego</p></div>
-            <div class="membro" style="--cor:${COR.end}"><h4>Endpoint</h4><p>Isola via EDR e coleta memória</p></div>
+            <div class="membro" style="--cor:${COR.iam}"><h4>IAM</h4><p>Reseta senhas e revoga sessões</p></div>
+            <div class="membro" style="--cor:${COR.net}"><h4>Network</h4><p>Bloqueia domínios e tráfego no UniFi</p></div>
+            <div class="membro" style="--cor:${COR.end}"><h4>Endpoint</h4><p>Verifica a estação e faz reimagem se preciso</p></div>
             <div class="membro" style="--cor:${COR.grc}"><h4>GRC e DPO</h4><p>Notificam ANPD e BACEN</p></div>
             <div class="membro" style="--cor:#94A3B8"><h4>Jurídico</h4><p>Obrigações legais</p></div>
             <div class="membro" style="--cor:${COR.brand}"><h4>Diretoria</h4><p>CEO e CFO, comunicação externa</p></div>
           </div>
         </div>
       </div>`,
-    notas:'No nosso phishing: detecção pelo Wazuh, contenção na VLAN 99, e como é nível 3 o CSIRT é acionado. Cada time tem um papel. Ninguém fala publicamente sobre o incidente sem a Diretoria. As lições aprendidas viram ajuste de regra no Wazuh.'
+    notas:'No nosso phishing: detecção pelo Wazuh, triagem com a IA, ticket no ITSM e contenção pelos times. Como é nível 3, o CSIRT é acionado. Cada time tem um papel. Ninguém fala publicamente sobre o incidente sem a Diretoria. As lições aprendidas viram ajuste de regra no Wazuh.'
   },
   {
     quem:P3, cor:COR.soc, titulo:'Como medimos o SOC', sub:'Metas de desempenho da POL-GI-001',
@@ -776,32 +710,33 @@ const PARADAS = [
         <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
           <div class="bloco" style="--cor:${COR.soc}"><span class="rot">MTTD</span><span class="grande">&lt; 15 min</span><p>Tempo médio para <b>detectar</b>, na infraestrutura crítica.</p></div>
           <div class="bloco" style="--cor:${COR.soc}"><span class="rot">MTTR</span><span class="grande">&lt; 30 min</span><p>Tempo médio para <b>responder</b> a incidentes alta e crítica.</p></div>
-          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">Falsos positivos</span><span class="grande">&lt; 10%</span><p>Alertas que não eram incidente. A regra 31533 foi um ajuste disso.</p></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">Falsos positivos</span><span class="grande">&lt; 10%</span><p>Alertas que não eram incidente. Ajustar as regras do Wazuh reduz esse número.</p></div>
           <div class="bloco" style="--cor:${COR.soc}"><span class="rot">RCIs no prazo</span><span class="grande">100%</span><p>Relatórios dos níveis 3 e 4 entregues em até 5 dias úteis.</p></div>
         </div>
-        <p class="s-txt">Apoio contínuo: <b>IA do SOC</b> analisando logs 24/7 (em treinamento), com a decisão final sempre do <b>analista N2</b>.</p>
+        <p class="s-txt">Apoio contínuo: <b>CyberFin IA</b> classificando os alertas 24/7, com a decisão final sempre do <b>analista</b>.</p>
       </div>`,
     notas:'Metas dão objetividade ao SOC. Falsos positivos importam porque um SOC que alerta demais é ignorado. Fechar o bloco do SOC aqui.'
   },
 
-  /* =================== MAPA: backup e DR =================== */
+  /* =================== MAPA: backup =================== */
   {
-    quem:P4, cor:COR.grc, titulo:'VLANs 60 e 80: Backup e DR', sub:'Onde a empresa se recupera de um desastre',
-    cam:[820, 330, 640, 570], foco:['vlan60', 'vlan80', 'barramento'],
-    anim(){ emLoop(() => pacote(viaBus(hostCentro(5, 0), hostCentro(7, 0)), COR.grc, 1800), 2600); },
-    html:`<ul><li style="--cor:${COR.grc}"><b>Backup Server</b> na VLAN 60: Windows Server 2022, 4 vCPU, 8 GB, 80 GB + 2 TB</li>
-      <li style="--cor:${COR.grc}">Software de backup: Veeam ou Bacula</li>
-      <li style="--cor:${COR.grc}">Backup por agente (Windows e Linux) com cópia em repositório externo</li>
-      <li style="--cor:${COR.grc}"><b>vSphere DR</b> na VLAN 80: réplica do cluster para failover</li></ul>
-      <p>As duas VLANs ficam isoladas: um ataque à produção não alcança as cópias.</p>`,
-    notas:'A bolinha amarela é a replicação do backup para o ambiente de DR. Na próxima tela, quanto tempo cada serviço pode ficar parado.'
+    quem:P4, cor:COR.grc, titulo:'VLAN 60: Backup', sub:'Onde ficam as cópias dos dados',
+    cam:[300, 330, 1290, 570], foco:['vlan60', 'vlan20', 'barramento'],
+    anim(){ emLoop(() => { pacote(viaBus(hostCentro(1, 0), hostCentro(5, 0)), COR.grc, 2000); setTimeout(() => pacote(viaBus(hostCentro(1, 1), hostCentro(5, 0)), COR.grc, 2000), 500); }, 3000); },
+    html:`<div class="cards"><div class="card" style="--cor:${COR.grc}"><span class="n">NT-003</span><span class="l mono">Backup Server · 10.10.60.143</span></div>
+      <div class="card" style="--cor:${COR.grc}"><span class="n">Veeam</span><span class="l">software de backup</span></div></div>
+      <ul><li style="--cor:${COR.grc}">Backup por agente nos servidores Windows e Linux, com cópia em repositório</li>
+      <li style="--cor:${COR.grc}">Backups <b>criptografados</b></li>
+      <li style="--cor:${COR.grc}">VLAN isolada: um ataque à produção não alcança as cópias</li></ul>
+      <p class="aviso">Cópia offsite (3-2-1) e teste de restauração ainda em validação.</p>`,
+    notas:'As bolinhas amarelas são as cópias saindo dos servidores para o NT-003. Ser honesto: o backup roda e é criptografado, mas a cópia fora do ambiente e o teste de restauração ainda estão sendo validados.'
   },
 
   /* =================== SALA: continuidade, GRC, riscos, plano, aplicação =================== */
   {
     quem:P4, cor:COR.grc, titulo:'Continuidade do negócio', sub:'POL-CN-001 · BIA e DRP',
     sala:`<div class="s-corpo">
-        <p class="s-rot">Tempo máximo de parada (RTO) e perda de dados aceitável (RPO), escala de 24 h</p>
+        <p class="s-rot">Metas da BIA: tempo máximo de parada (RTO) e perda de dados aceitável (RPO), escala de 24 h</p>
         <div class="rto">
           <div class="item"><span class="nome">Operações de Crédito</span><div class="trilho"><i style="width:8.3%;background:#F87171"></i><span style="left:10%">RTO 2 h · RPO 15 min · MTPD 6 h</span></div></div>
           <div class="item"><span class="nome">BPO Financeiro</span><div class="trilho"><i style="width:16.7%;background:#FB923C"></i><span style="left:18.5%">RTO 4 h · RPO 1 h · MTPD 12 h</span></div></div>
@@ -809,19 +744,17 @@ const PARADAS = [
           <div class="item"><span class="nome">Valuation e M&amp;A</span><div class="trilho"><i style="width:100%;background:#3D5F82"></i><span style="left:2%">RTO 24 h · RPO 12 h · MTPD 72 h</span></div></div>
         </div>
         <div class="linha" style="grid-template-columns:1.2fr 1fr">
-          <div class="bloco" style="--cor:${COR.grc}"><h4>Backup 3-2-1 imutável</h4>
-            <div class="linha" style="grid-template-columns:repeat(3, 1fr)">
-              <div><span class="grande" style="--cor:${COR.grc}">3</span><p>cópias dos dados</p></div>
-              <div><span class="grande" style="--cor:${COR.grc}">2</span><p>tipos de mídia</p></div>
-              <div><span class="grande" style="--cor:${COR.grc}">1</span><p>offsite WORM, contra ransomware</p></div></div></div>
-          <div class="bloco" style="--cor:${COR.brand}"><h4>Testes</h4>
+          <div class="bloco" style="--cor:${COR.grc}"><h4>Backup hoje</h4>
+            <p><b>Em operação:</b> Veeam no NT-003 (VLAN 60), backup por agente Windows e Linux, cópias criptografadas.</p>
+            <p><b>Em validação:</b> cópia offsite da estratégia 3-2-1, que depende da VPN, e o primeiro teste de restauração.</p></div>
+          <div class="bloco" style="--cor:${COR.brand}"><h4>Plano de testes</h4>
             <p><b>Mensal:</b> restauração de backup (SOC e Endpoint)</p>
             <p><b>Semestral:</b> simulado de failover (SOC e Network)</p>
             <p><b>Anual:</b> exercício de mesa (SOC, GRC e Diretoria)</p></div>
         </div>
-        <p class="s-aviso">Conferir com a BIA e o DRP oficiais do grupo.</p>
+        <p class="s-aviso">Os tempos são metas da política. Só o teste de restauração vai dizer se são cumpridos.</p>
       </div>`,
-    notas:'RTO é o tempo máximo para voltar, RPO quanto dado pode ser perdido, MTPD o limite do dano aceitável. Crédito é o mais sensível: 2 horas para voltar e no máximo 15 minutos de dados perdidos. O backup imutável é a defesa contra ransomware. Planos complementares: PCO, Comunicação em Crise e Trabalho Remoto por VPN.'
+    notas:'RTO é o tempo máximo para voltar, RPO quanto dado pode ser perdido, MTPD o limite do dano aceitável. São metas definidas na BIA pela criticidade de cada serviço: crédito é o mais sensível. Se perguntarem como chegamos nos números: são metas da política, e o teste de restauração, ainda em validação, é o que vai comprovar. Planos complementares: PCO, Comunicação em Crise e Trabalho Remoto por VPN.'
   },
   {
     quem:P4, cor:COR.grc, titulo:'GRC: políticas e conformidade', sub:'Uma financeira regulada precisa provar que é segura',
@@ -835,23 +768,23 @@ const PARADAS = [
         <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
           <div class="bloco" style="--cor:${COR.grc}"><span class="grande">100%</span><p>Inventário de ativos</p></div>
           <div class="bloco" style="--cor:${COR.grc}"><span class="grande">45%</span><p>PSI e políticas complementares</p></div>
-          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">25%</span><p>Playbooks (PB-000 pronto)</p></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">11</span><p>Playbooks de resposta (PB-000 a PB-010)</p></div>
           <div class="bloco" style="--cor:${COR.grc}"><span class="grande">40%</span><p>Documentação do projeto</p></div>
         </div>
         <p class="s-aviso">Percentuais de 11/09. Confirmar com o GRC.</p>
       </div>`,
-    notas:'Banco Central e LGPD exigem política escrita, não só prática. GRC coordena e cada time contribui com a política da sua área: o SOC escreveu as de incidentes e continuidade. O playbook mestre PB-000 serve de modelo para os demais.'
+    notas:'Banco Central e LGPD exigem política escrita, não só prática. GRC coordena e cada time contribui com a política da sua área: o SOC escreveu as de incidentes e continuidade. São 11 playbooks: o PB-000 é o mestre e o PB-010, de phishing, é o usado na simulação.'
   },
   {
     quem:P4, cor:COR.danger, titulo:'Onde estão os riscos', sub:'O que o scan e o inventário mostram',
     sala:`<div class="s-corpo">
         <div class="linha" style="grid-template-columns:repeat(3, 1fr); flex:1">
-          <div class="bloco" style="--cor:#F87171"><span class="rot" style="color:#F87171">Crítico</span><h4>Administração remota exposta</h4><p>RDP 3389, WinRM 5985 e SSH 22 alcançáveis de toda a rede interna.</p><p>Abre caminho para força bruta e movimento lateral.</p><div class="rodape"><b>167</b> ocorrências críticas no scan</div></div>
-          <div class="bloco" style="--cor:#FB923C"><span class="rot" style="color:#FB923C">Alto</span><h4>Criptografia antiga</h4><p>TLS 1.0/1.1 e cifras fracas em 443, 8900 e 9080. Sem HSTS, X-Frame-Options e CSP.</p><p>Permite interceptar ou rebaixar a conexão.</p><div class="rodape"><b>221</b> ocorrências altas no scan</div></div>
-          <div class="bloco" style="--cor:${COR.brand}"><span class="rot" style="color:#8DB6F9">Lacunas</span><h4>Cobertura incompleta</h4><p>Estações sem agente Wazuh. VLAN 70 (PCI) não escaneada. Nenhum teste de restauração. ITSM sem dados.</p><div class="rodape">Scan sem credenciais: patches ainda não medidos</div></div>
+          <div class="bloco" style="--cor:#F87171"><span class="rot" style="color:#F87171">Crítico</span><h4>Administração remota exposta</h4><p>RDP 3389, WinRM 5985 e SSH 22 alcançáveis de toda a rede interna.</p><p>Abre caminho para força bruta e movimento lateral.</p><div class="rodape">Principal risco apontado pelo OpenVAS</div></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="rot" style="color:#FB923C">Alto</span><h4>Criptografia antiga</h4><p>TLS 1.0/1.1 e cifras fracas em 443, 8900 e 9080. Sem HSTS, X-Frame-Options e CSP.</p><p>Permite interceptar ou rebaixar a conexão.</p><div class="rodape">Apontado nos serviços web</div></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="rot" style="color:#8DB6F9">Lacunas</span><h4>Cobertura incompleta</h4><p>Teste de restauração ainda não realizado. Cópia offsite do backup depende da VPN. Varredura autenticada ainda não feita.</p><div class="rodape">O que está dentro das máquinas ainda não foi medido</div></div>
         </div>
       </div>`,
-    notas:'Dois problemas explicam a maior parte dos 388 achados críticos e altos. Além disso, lacunas de cobertura. O scan foi sem credenciais: o que está dentro das máquinas ainda não foi medido.'
+    notas:'Dois problemas concentram os riscos: administração remota acessível pela rede e criptografia antiga. Além disso, lacunas que já estão no plano. Não citar quantidades de achados.'
   },
   {
     quem:P4, cor:COR.brand, titulo:'Plano de ação', sub:'O que fazer primeiro, depois e por último',
@@ -862,10 +795,10 @@ const PARADAS = [
             <h4>2. Criptografia</h4><p>Só TLS 1.2+ com PFS e AES-GCM. HSTS, X-Frame-Options e X-Content-Type-Options.</p></div>
           <div class="bloco" style="--cor:#FB923C"><span class="rot" style="color:#FB923C">Em seguida</span>
             <h4>3. Ocultar informações</h4><p>server_tokens off, versões escondidas, páginas de erro genéricas.</p>
-            <h4>4. Nova varredura</h4><p>Scan autenticado, incluindo a VLAN 70.</p></div>
+            <h4>4. Nova varredura</h4><p>Scan autenticado nos servidores, para medir o que está dentro das máquinas.</p></div>
           <div class="bloco" style="--cor:${COR.brand}"><span class="rot" style="color:#8DB6F9">Depois</span>
-            <h4>5. Cobertura do SOC</h4><p>Agentes nas estações, syslog do SW-001, painéis de alta severidade e escalada de privilégio.</p>
-            <h4>6. Continuidade</h4><p>Primeiro teste de restauração e cadastro do ITSM.</p></div>
+            <h4>5. Cobertura do SOC</h4><p>Logs do switch via syslog e painéis de alta severidade e escalada de privilégio.</p>
+            <h4>6. Continuidade</h4><p>Validar a cópia offsite (3-2-1) e fazer o primeiro teste de restauração.</p></div>
         </div>
       </div>`,
     notas:'As frentes 1 a 4 vêm direto do plano do OpenVAS. A 1 fecha a maior parte dos críticos. Depois de aplicar, repetir o scan com credenciais.'
@@ -894,9 +827,9 @@ const PARADAS = [
         <p class="s-rot" style="color:#8DB6F9">Cyberappfin</p>
         <h2 class="gigante" style="font-size:clamp(44px, 5.4vw, 100px)">Segmentado, monitorado e com plano para o que falta.</h2>
         <div class="linha" style="grid-template-columns:repeat(4, 1fr); max-width:1200px">
-          <div class="bloco" style="--cor:${COR.net}"><span class="grande">9</span><p>VLANs</p></div>
+          <div class="bloco" style="--cor:${COR.net}"><span class="grande">6</span><p>VLANs internas</p></div>
           <div class="bloco" style="--cor:${COR.soc}"><span class="grande">5</span><p>agentes Wazuh ativos</p></div>
-          <div class="bloco" style="--cor:#F87171"><span class="grande">744</span><p>achados reclassificados</p></div>
+          <div class="bloco" style="--cor:#F87171"><span class="grande">11</span><p>playbooks de resposta</p></div>
           <div class="bloco" style="--cor:${COR.brand}"><span class="grande">6</span><p>frentes de ação</p></div>
         </div>
         <div class="lema2"><span>Segurança</span><span>·</span><span>Resiliência</span><span>·</span><span>Controle</span></div>
@@ -923,19 +856,33 @@ function montarPontos(){
 
 async function rodarIncidente(passo){
   const minha = geracao;
-  const w10 = hostCentro(3, 0), wz = hostCentro(4, 0);
+  const ws = hostCentro(3, 0), wz = hostCentro(4, 0), ia = hostCentro(4, 3), it = hostCentro(4, 4), ad = hostCentro(1, 0);
+  resetIncidente();
   if(passo === 0){
-    resetW10();
-    await pacote([{x:115,y:100},{x:200,y:100},{x:300,y:140},{x:450,y:170},{x:700,y:170},{x:820,y:170},{x:820,y:BUS_Y},{x:w10.x,y:BUS_Y},w10], COR.danger, 3200, 9);
-    if(minha === geracao) W10.classList.add('alerta');
+    // e-mail de phishing: SD-WAN -> UniFi -> Cisco -> workstation da VLAN 40
+    await pacote([{x:120,y:170},{x:300,y:170},{x:460,y:172},{x:700,y:170},{x:820,y:170},{x:820,y:BUS_Y},{x:ws.x,y:BUS_Y},ws], COR.danger, 3200, 9);
+    if(minha === geracao){ WS.classList.add('alerta'); selo(WS, 'CLICOU', COR.danger); }
+    return;
   }
+  WS.classList.add('alerta');
+  selo(WS, 'SUSPEITA', COR.danger);
   if(passo === 1){
-    W10.classList.add('alerta');
-    emLoop(() => pacote(viaBus(w10, wz), COR.danger, 1400, 7), 1700);
+    // detecção no Wazuh e classificação pela CyberFin IA
+    emLoop(async () => { if(await pacote(viaBus(ws, wz), COR.danger, 1500, 7)) pacote([wz, ia], '#FCA5A5', 900, 6); }, 3000);
   }
   if(passo === 2){
-    W10.classList.add('alerta');
-    moverW10ParaQuarentena();
+    // analista confirma: ticket no ITSM
+    emLoop(async () => { if(await pacote([ia, it], '#FCD34D', 900, 7) && minha === geracao) selo(ITSM, 'INC ABERTO', '#FCD34D'); }, 2400);
+  }
+  if(passo === 3){
+    // contenção: Network bloqueia no UniFi, IAM reseta a credencial, Endpoint verifica a estação
+    selo(ITSM, 'INC ABERTO', '#FCD34D');
+    emLoop(() => {
+      pacote([it, {x:it.x,y:BUS_Y}, {x:820,y:BUS_Y}, {x:820,y:170}, {x:620,y:170}, {x:460,y:172}], COR.net, 2000, 7);
+      setTimeout(() => pacote(viaBus(it, ad), COR.iam, 1800, 7), 400);
+      setTimeout(() => pacote(viaBus(it, ws), COR.end, 1600, 7), 800);
+    }, 3400);
+    setTimeout(() => { if(minha === geracao){ WS.classList.remove('alerta'); selo(WS, 'CONTIDA', COR.end); } }, 2600);
   }
 }
 
@@ -947,9 +894,8 @@ function ir(i){
   atual = i;
   limparAnimacoes();
 
-  // estação W10 volta ao lugar; os passos 2 e 3 do incidente a movem de novo
-  devolverW10();
-  if(p.incidente === 3){ W10.classList.add('alerta'); moverW10ParaQuarentena(); }
+  // o estado da simulação só existe nas paradas do incidente
+  resetIncidente();
 
   $('quem').textContent = p.quem;
   $('quem').style.color = p.cor;
