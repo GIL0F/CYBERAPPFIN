@@ -222,6 +222,16 @@
   .escada .bloco:nth-child(4){ margin-bottom:6.6vh; } .escada .bloco:nth-child(5){ margin-bottom:8.8vh; }
   .escada .rodape{ font-size:clamp(13px, .92vw, 16px); color:var(--soft); }
   .escada .rodape b{ color:var(--cor); }
+  /* DRP: fluxo da restauração e checklist */
+  .fluxo{ display:flex; align-items:stretch; gap:8px; }
+  .fluxo .passo2{ flex:1; background:#132233; border:1px solid var(--line); border-top:4px solid var(--cor, #EAB308); border-radius:12px;
+                  padding:clamp(10px, .9vw, 16px); display:flex; flex-direction:column; gap:4px; }
+  .fluxo .passo2 b{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(14px, 1.05vw, 19px); line-height:1.2; }
+  .fluxo .passo2 span{ font-size:clamp(12px, .85vw, 15px); color:var(--muted); line-height:1.35; }
+  .fluxo .seta2{ align-self:center; color:var(--line-2); font-size:22px; }
+  .check{ list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; }
+  .check li{ font-size:clamp(13px, .95vw, 17px); color:var(--soft); padding-left:24px; position:relative; }
+  .check li::before{ content:""; position:absolute; left:2px; top:.25em; width:12px; height:12px; border-radius:3px; border:2px solid var(--cor, #22C55E); }
   .gigante{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(56px, 7.5vw, 140px); font-weight:800; line-height:.95; letter-spacing:-.03em; }
 
   /* ---------- rodapé de navegação ---------- */
@@ -893,6 +903,24 @@ const PARADAS = [
         <p class="s-aviso">Restauração ainda não testada: o runbook exige um teste real para validar o backup e medir os tempos.</p>
       </div>`,
     notas:'A ordem vem do runbook de recuperação: primeiro o que sustenta tudo (infraestrutura, rede e identidade), depois o backup, os serviços do SOC e por último as aplicações, seguindo a criticidade da BIA. Sem AD e DNS de pé, nada mais autentica; por isso a identidade vem antes do backup.'
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:'DRP: como restauramos um servidor', sub:'Runbook de DR · rota Veeam para a perda total de uma máquina',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="fluxo"><div class="passo2"><b>1. Restore point</b><span>Confirmar o ponto de backup que será usado</span></div><span class="seta2">→</span><div class="passo2"><b>2. Máquina de destino</b><span>Preparar a VM que vai receber o servidor</span></div><span class="seta2">→</span><div class="passo2"><b>3. Recovery Media</b><span>Iniciar a máquina pela mídia de recuperação do Veeam</span></div><span class="seta2">→</span><div class="passo2"><b>4. Entire Machine Restore</b><span>Restaurar o servidor inteiro a partir do NT-003</span></div><span class="seta2">→</span><div class="passo2"><b>5. Boot e validação</b><span>Ligar e passar pelo checklist abaixo</span></div></div>
+        <div class="linha" style="grid-template-columns:1.35fr 1fr">
+          <div class="bloco" style="--cor:#22C55E"><span class="rot">Checklist depois da restauração</span>
+            <ul class="check"><li>Sistema operacional inicializa</li><li>Discos e partições corretos</li><li>IP, gateway e VLAN corretos</li><li>DNS e NTP funcionam</li><li>Autenticação no AD funciona</li><li>Banco de dados íntegro</li><li>Aplicação responde</li><li>Dados críticos conferidos</li><li>Wazuh recebe eventos</li><li>Zabbix monitora o host</li><li>Firewall e hardening preservados</li><li>Novo backup pós-DR executado</li></ul></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="rot">O que se registra ao final</span>
+            <p><b>Restore point</b> usado (data e hora do backup restaurado)</p>
+            <p><b>RPO real</b>: do último dado recuperado até a falha</p>
+            <p><b>RTO real</b>: da declaração da falha até o serviço validado</p>
+            <p><b>Integridade</b>: arquivos, hash, banco e configurações</p>
+            <p>Os tempos medidos são comparados com as metas da BIA.</p></div>
+        </div>
+        <p class="s-aviso">Teste obrigatório ainda não realizado: primeiro em rede isolada, depois um teste destrutivo controlado.</p>
+      </div>`,
+    notas:'Esta é a parte prática do DRP: como se recupera um servidor perdido usando o Veeam no NT-003. Depois de restaurar, nada é liberado sem passar pelo checklist, que inclui voltar a mandar logs para o Wazuh e a ser monitorado pelo Zabbix. Ao final se registram o RPO e o RTO reais, que são comparados com as metas da BIA. A documentação e os scripts ficam numa pasta de emergência fora dos servidores. Ser honesto: o teste real ainda vai ser feito, primeiro em rede isolada.'
   },
   {
     quem:P4, cor:COR.grc, titulo:'GRC: políticas e conformidade', sub:'Uma financeira regulada precisa provar que é segura',
