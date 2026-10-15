@@ -1,0 +1,529 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GRC-DRP-001 · Plano de Recuperação de Desastres</title>
+<meta name="description" content="Plano de Recuperação de Desastres (DRP) da Cyberappfin: cenário, papéis, sequência de restauração do ambiente, checklists e registro.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B1520'/%3E%3Crect x='12' y='40' width='40' height='6' rx='3' fill='%2314B8A6'/%3E%3Crect x='12' y='29' width='40' height='6' rx='3' fill='%238B5CF6'/%3E%3Crect x='12' y='18' width='40' height='6' rx='3' fill='%23F59E0B'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F4F2EC; --papel:#FFFFFF; --tinta:#14202C; --soft:#3A4756; --muted:#66727F; --linha:#DDD8CC; --linha-2:#C9C2B2;
+    --net:#0E9F8E; --iam:#7C4DEB; --soc:#D98606; --end:#16A34A; --grc:#B98A04; --brand:#2F6FDB; --danger:#D64545;
+    --faixa:#FBF6E6;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; scroll-padding-top:20px; }
+  body{ background:var(--bg); color:var(--tinta); font-family:'DM Sans', system-ui, sans-serif; font-size:17px; line-height:1.6; }
+  .mono, code{ font-family:'JetBrains Mono', ui-monospace, monospace; font-size:.88em; }
+  code{ background:#EFEBE1; padding:1px 6px; border-radius:5px; white-space:nowrap; }
+  a{ color:var(--brand); }
+
+  .topo{ background:#0B1520; color:#EEF3F8; padding:14px 24px; display:flex; gap:16px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+  .topo a{ color:#C7D4E1; text-decoration:none; font-weight:700; font-size:15px; }
+  .topo a:hover{ color:#fff; }
+  .topo .marca{ font-family:'Sora', system-ui, sans-serif; font-weight:800; letter-spacing:.02em; }
+  .topo button{ background:#1A2B3C; color:#EEF3F8; border:1px solid #344B61; border-radius:8px; font:700 14px 'DM Sans', system-ui, sans-serif; padding:7px 14px; cursor:pointer; }
+
+  .grade{ max-width:1240px; margin:0 auto; padding:32px 24px 80px; display:grid; grid-template-columns:250px 1fr; gap:36px; align-items:start; }
+  nav.indice{ position:sticky; top:20px; font-size:14.5px; }
+  nav.indice h2{ font-family:'Sora', system-ui, sans-serif; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); margin-bottom:10px; }
+  nav.indice ol{ list-style:none; display:flex; flex-direction:column; gap:2px; counter-reset:i; }
+  nav.indice a{ display:block; padding:5px 10px; border-radius:7px; color:var(--soft); text-decoration:none; border-left:3px solid transparent; }
+  nav.indice a:hover{ background:#EAE5D8; color:var(--tinta); }
+
+  main{ background:var(--papel); border:1px solid var(--linha); border-radius:14px; padding:48px 56px; box-shadow:0 10px 30px rgba(20,32,44,.06); min-width:0; }
+  .cabeca{ display:flex; flex-direction:column; gap:10px; padding-bottom:28px; border-bottom:2px solid var(--tinta); margin-bottom:28px; }
+  .cabeca .cod{ font-family:'JetBrains Mono', monospace; color:var(--muted); font-size:14px; letter-spacing:.04em; }
+  .cabeca h1{ font-family:'Sora', system-ui, sans-serif; font-size:40px; line-height:1.1; font-weight:800; letter-spacing:-.01em; }
+  .cabeca .sub{ font-size:19px; color:var(--soft); }
+  .meta{ display:grid; grid-template-columns:repeat(4, 1fr); gap:0; border:1px solid var(--linha); border-radius:10px; overflow:hidden; margin-top:10px; }
+  .meta div{ padding:10px 14px; border-right:1px solid var(--linha); }
+  .meta div:last-child{ border-right:none; }
+  .meta span{ display:block; font-size:12px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); font-weight:700; }
+  .meta b{ font-size:15.5px; }
+  .status{ display:inline-flex; gap:8px; align-items:center; align-self:flex-start; background:#FDF1D6; color:#7A4B00; border:1px solid #F2D597; padding:6px 12px; border-radius:999px; font-size:14.5px; font-weight:700; }
+
+  section{ padding-top:14px; margin-bottom:34px; }
+  h2{ font-family:'Sora', system-ui, sans-serif; font-size:26px; line-height:1.2; margin-bottom:14px; display:flex; gap:12px; align-items:baseline; }
+  h2 .n{ color:var(--grc); font-size:22px; min-width:1.6em; }
+  h3{ font-family:'Sora', system-ui, sans-serif; font-size:19px; margin:20px 0 8px; }
+  p{ margin-bottom:10px; color:var(--soft); }
+  p b, li b, td b{ color:var(--tinta); }
+  ul.lista, ol.lista{ padding-left:22px; display:flex; flex-direction:column; gap:5px; margin-bottom:12px; color:var(--soft); }
+
+  table{ width:100%; border-collapse:collapse; font-size:15.5px; margin:8px 0 14px; }
+  th{ text-align:left; font-size:12.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:8px 10px; border-bottom:2px solid var(--linha-2); background:#FAF8F3; }
+  td{ padding:8px 10px; border-bottom:1px solid var(--linha); vertical-align:top; color:var(--soft); }
+  tr.forte td{ background:var(--faixa); }
+  .tabela-rola{ overflow-x:auto; }
+
+  .caixa{ border:1px solid var(--linha); border-left:5px solid var(--cor, var(--grc)); border-radius:10px; padding:14px 18px; margin:12px 0; background:#FCFBF8; }
+  .caixa p:last-child{ margin-bottom:0; }
+  .caixa .rot{ font-size:12.5px; letter-spacing:.1em; text-transform:uppercase; font-weight:800; color:var(--cor, var(--grc)); display:block; margin-bottom:4px; }
+  .alerta{ --cor:var(--danger); background:#FDF3F3; }
+  .aviso{ --cor:#C77700; background:#FFF8EA; }
+
+  /* linha de restauração */
+  .linha-rest{ display:grid; grid-template-columns:repeat(8, 1fr); gap:6px; margin:14px 0 6px; }
+  .linha-rest a{ text-decoration:none; color:var(--tinta); border-radius:10px; padding:10px 8px; background:#FAF8F3; border:1px solid var(--linha); border-top:5px solid var(--cor); display:flex; flex-direction:column; gap:2px; }
+  .linha-rest a:hover{ background:#F2EEE3; }
+  .linha-rest b{ font-family:'Sora', system-ui, sans-serif; font-size:22px; color:var(--cor); line-height:1; }
+  .linha-rest span{ font-size:13.5px; font-weight:700; line-height:1.25; }
+  .linha-rest small{ font-size:12px; color:var(--muted); line-height:1.3; }
+
+  /* fases */
+  .fase{ border:1px solid var(--linha); border-radius:12px; margin:16px 0 22px; overflow:hidden; }
+  .fase > header{ display:flex; gap:16px; align-items:center; padding:14px 18px; background:#FAF8F3; border-bottom:1px solid var(--linha); border-left:6px solid var(--cor); }
+  .fase > header .num{ font-family:'Sora', system-ui, sans-serif; font-size:34px; font-weight:800; color:var(--cor); line-height:1; min-width:1.1em; }
+  .fase > header h3{ margin:0; font-size:21px; }
+  .fase > header p{ margin:0; font-size:15px; color:var(--muted); }
+  .fase .corpo{ padding:14px 22px 6px; }
+  .fase .quem{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:10px; }
+  .tag{ font-size:13px; font-weight:700; padding:3px 10px; border-radius:999px; background:#EFEBE1; color:var(--soft); }
+  .tag.net{ background:#D9F3EF; color:#0B5F55; } .tag.iam{ background:#ECE4FD; color:#4B2A9E; } .tag.soc{ background:#FDEBCB; color:#7A4B00; }
+  .tag.end{ background:#DDF5E4; color:#14532D; } .tag.grc{ background:#F8EDC4; color:#6B5000; } .tag.dir{ background:#DDE8FB; color:#1E4A9A; }
+  .fase ol.passos{ padding-left:22px; display:flex; flex-direction:column; gap:6px; margin-bottom:12px; color:var(--soft); }
+  .fase ol.passos li::marker{ font-weight:800; color:var(--cor); }
+  .portao{ display:flex; gap:12px; align-items:flex-start; background:#F1F8F3; border:1px solid #CBE6D3; border-radius:10px; padding:10px 14px; margin:6px 0 14px; }
+  .portao::before{ content:"✓"; flex-shrink:0; width:24px; height:24px; border-radius:50%; background:var(--end); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:14px; margin-top:2px; }
+  .portao p{ margin:0; color:#1F3B2A; }
+
+  /* checklist e ficha para imprimir */
+  .ficha td{ height:34px; }
+  .ficha td.cx{ width:46px; text-align:center; }
+  .ficha td.cx::before{ content:""; display:inline-block; width:16px; height:16px; border:2px solid var(--soft); border-radius:3px; vertical-align:middle; }
+
+  .rodape{ text-align:center; color:var(--muted); font-size:14px; margin-top:30px; }
+
+  @media (max-width:980px){
+    .grade{ grid-template-columns:1fr; }
+    nav.indice{ position:static; }
+    main{ padding:28px 22px; }
+    .meta{ grid-template-columns:1fr 1fr; }
+    .linha-rest{ grid-template-columns:repeat(4, 1fr); }
+  }
+  @media (max-width:560px){
+    .cabeca h1{ font-size:30px; }
+    .linha-rest{ grid-template-columns:repeat(2, 1fr); }
+    .meta{ grid-template-columns:1fr; }
+  }
+  @media print{
+    body{ background:#fff; font-size:12pt; }
+    .topo, nav.indice{ display:none; }
+    .grade{ display:block; padding:0; max-width:none; }
+    main{ border:none; box-shadow:none; padding:0; }
+    .fase, .caixa, table, .linha-rest{ break-inside:avoid; }
+    section{ break-inside:auto; }
+    a{ color:inherit; text-decoration:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="topo">
+  <span class="marca">Cyberappfin · GRC</span>
+  <div style="display:flex; gap:18px; align-items:center">
+    <a href="jornada.html">← Voltar à apresentação</a>
+    <button onclick="window.print()">Imprimir / PDF</button>
+  </div>
+</div>
+
+<div class="grade">
+  <nav class="indice" aria-label="Índice">
+    <h2>Índice</h2>
+    <ol>
+      <li><a href="#s1">1. Objetivo e escopo</a></li>
+      <li><a href="#s2">2. Cenário de desastre</a></li>
+      <li><a href="#s3">3. Metas da BIA</a></li>
+      <li><a href="#s4">4. Quando o DRP é acionado</a></li>
+      <li><a href="#s5">5. Papéis e responsáveis</a></li>
+      <li><a href="#s6">6. Pré-requisitos (kit de emergência)</a></li>
+      <li><a href="#s7">7. Linha de restauração</a></li>
+      <li><a href="#s8">8. Fases, passo a passo</a></li>
+      <li><a href="#s9">9. Restaurar um servidor com o Veeam</a></li>
+      <li><a href="#s10">10. Checklist pós-restauração</a></li>
+      <li><a href="#s11">11. Registro da recuperação</a></li>
+      <li><a href="#s12">12. Comunicação durante o DR</a></li>
+      <li><a href="#s13">13. Encerramento e lições aprendidas</a></li>
+      <li><a href="#s14">14. Testes do plano</a></li>
+      <li><a href="#s15">15. Lacunas conhecidas</a></li>
+      <li><a href="#s16">Anexo: inventário de restauração</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <div class="cabeca">
+      <span class="cod">GRC-DRP-001 · baseado em POL-CN-001, GRC-BIA-001, POL-GI-001 e no runbook de DR</span>
+      <h1>Plano de Recuperação de Desastres</h1>
+      <p class="sub">Como a Cyberappfin restaura o ambiente inteiro a partir do backup, em que ordem e com que validação entre uma etapa e outra.</p>
+      <div class="meta">
+        <div><span>Versão</span><b>1.0</b></div>
+        <div><span>Data</span><b>15/10/2026</b></div>
+        <div><span>Dono</span><b>GRC</b></div>
+        <div><span>Classificação</span><b>Uso interno</b></div>
+      </div>
+      <span class="status">● Versão para validação: o teste real de restauração ainda não foi feito</span>
+    </div>
+
+    <!-- 1 -->
+    <section id="s1">
+      <h2><span class="n">1</span>Objetivo e escopo</h2>
+      <p>Este plano descreve como recuperar o ambiente da Cyberappfin depois de um desastre que deixe os servidores inutilizáveis. Ele define <b>a ordem de restauração</b>, <b>quem executa cada etapa</b>, <b>o critério para passar à etapa seguinte</b> e <b>o que se registra</b> para comparar com as metas da BIA.</p>
+      <table>
+        <tr><th>Dentro do escopo</th><th>Fora do escopo</th></tr>
+        <tr><td>Servidores das VLANs 20 (AD), 30 (DMZ), 50 (SOC) e 60 (Backup); configuração de rede (UniFi e Cisco 2960); estações das VLANs 10 e 40.</td>
+            <td>Ambiente externo da VLAN 200 (hosts ESXi, vCenter, Jump Server e Storage/TrueNAS). O grupo usa essa infraestrutura, mas não a administra: aqui só se descreve <b>o que pedir</b> a quem a administra.</td></tr>
+      </table>
+    </section>
+
+    <!-- 2 -->
+    <section id="s2">
+      <h2><span class="n">2</span>Cenário de desastre</h2>
+      <div class="caixa alerta">
+        <span class="rot">Cenário de referência</span>
+        <p><b>Ransomware criptografa os servidores das VLANs 20, 30 e 50.</b> Os dois controladores de domínio (NT-001 e NT-002), o Reverse Proxy da DMZ e toda a stack do SOC ficam inacessíveis. O SOC classifica como <b>nível 4 (crítico)</b> pela matriz da POL-GI-001, o CSIRT é acionado e recomenda à Diretoria declarar o desastre.</p>
+      </div>
+      <p>O que sobrevive e por quê:</p>
+      <ul class="lista">
+        <li><b>NT-003 (Backup, 10.10.60.143)</b>: está na VLAN 60, isolada das demais pelo firewall, e os backups do Veeam são criptografados. É a partir dele que o ambiente volta.</li>
+        <li><b>Rede (UniFi e Cisco 2960)</b>: não é afetada pelo ransomware, mas suas regras são revistas antes de reabrir o tráfego.</li>
+        <li><b>Ambiente externo (VLAN 200)</b>: fornece as máquinas virtuais novas onde os servidores serão restaurados.</li>
+      </ul>
+      <p>O mesmo plano serve para outros desastres que levam à perda dos servidores (falha do storage, erro humano em massa, perda do ambiente de virtualização). Nesses casos, a <a href="#f0">fase 0</a> muda (não há perícia de malware) e o resto da sequência é igual.</p>
+    </section>
+
+    <!-- 3 -->
+    <section id="s3">
+      <h2><span class="n">3</span>Metas da BIA</h2>
+      <p>A ordem em que os serviços de negócio voltam segue o MTPD de cada um (GRC-BIA-001 e POL-CN-001).</p>
+      <div class="tabela-rola"><table>
+        <tr><th>Serviço</th><th>Criticidade</th><th>RTO</th><th>RPO</th><th>MTPD</th><th>Ordem de retorno</th></tr>
+        <tr class="forte"><td><b>Operações de Crédito</b></td><td>Crítico · S1</td><td>2 h</td><td>15 min</td><td>6 h</td><td>1º</td></tr>
+        <tr><td><b>BPO Financeiro</b></td><td>Alto · S2</td><td>4 h</td><td>1 h</td><td>12 h</td><td>2º</td></tr>
+        <tr><td><b>Folha de Pagamento</b></td><td>Alto · S2</td><td>4 h</td><td>1 h</td><td>24 h</td><td>3º</td></tr>
+        <tr><td><b>Valuation e M&amp;A</b></td><td>Médio-Baixo · S3-S4</td><td>24 h</td><td>12 h</td><td>72 h</td><td>4º</td></tr>
+      </table></div>
+      <p><b>RTO</b>: tempo máximo para o serviço voltar. <b>RPO</b>: perda máxima de dados aceitável. <b>MTPD</b>: a partir daqui o dano é inaceitável.</p>
+    </section>
+
+    <!-- 4 -->
+    <section id="s4">
+      <h2><span class="n">4</span>Quando o DRP é acionado</h2>
+      <p>O DRP começa com a <b>declaração do desastre pela Diretoria Executiva</b>, por recomendação do CSIRT (degrau 5 do escalonamento da POL-GI-001). A recomendação acontece quando ao menos uma condição é verdadeira:</p>
+      <ul class="lista">
+        <li>Incidente nível 4 com perda de servidores que não se resolve com contenção e correção pontual;</li>
+        <li>Algum serviço de negócio com risco de passar do MTPD (Crédito: 6 h);</li>
+        <li>Perda da infraestrutura que hospeda os servidores (ambiente externo indisponível).</li>
+      </ul>
+      <p>Da declaração em diante, o relógio do <b>RTO real</b> está correndo e o Coordenador do DR registra a hora (<a href="#s11">seção 11</a>).</p>
+    </section>
+
+    <!-- 5 -->
+    <section id="s5">
+      <h2><span class="n">5</span>Papéis e responsáveis</h2>
+      <div class="tabela-rola"><table>
+        <tr><th>Papel</th><th>Quem</th><th>O que faz no DR</th></tr>
+        <tr><td><b>Declara o desastre</b></td><td><span class="tag dir">Diretoria</span></td><td>Declara, aprova a comunicação externa e é a única que fala com o público.</td></tr>
+        <tr><td><b>Coordenador do DR</b></td><td><span class="tag grc">GRC</span></td><td>Conduz o plano, libera cada fase pelo critério de saída, mantém o registro e os tempos.</td></tr>
+        <tr><td><b>Coordenador do SOC</b></td><td><span class="tag soc">SOC</span></td><td>Lidera a parte de incidente (perícia, contenção) e decide quando é seguro reconectar.</td></tr>
+        <tr><td><b>Rede</b></td><td><span class="tag net">Network</span></td><td>Isola as VLANs, valida SD-WAN, firewall, VLANs e trunks; restaura o Reverse Proxy na DMZ.</td></tr>
+        <tr><td><b>Identidade</b></td><td><span class="tag iam">IAM</span></td><td>Restaura o NT-001, reconstrói o NT-002, troca as senhas privilegiadas e valida o AD.</td></tr>
+        <tr><td><b>Backup</b></td><td><span class="tag grc">GRC</span></td><td>Opera o Veeam no NT-003: integridade do repositório, escolha do ponto limpo e restaurações.</td></tr>
+        <tr><td><b>Serviços do SOC</b></td><td><span class="tag soc">SOC</span></td><td>Restaura e valida Wazuh, Zabbix + Grafana, OpenVAS, CyberFin IA e ITSM.</td></tr>
+        <tr><td><b>Estações e hardening</b></td><td><span class="tag end">Endpoint</span></td><td>Varre os pontos de restauração com antivírus, confere o hardening e faz a reimagem das estações.</td></tr>
+        <tr><td><b>Notificações</b></td><td><span class="tag grc">GRC</span> <span class="tag">DPO</span> <span class="tag">Jurídico</span></td><td>Avaliam e fazem a notificação à ANPD (LGPD) e ao BACEN (SCD).</td></tr>
+      </table></div>
+    </section>
+
+    <!-- 6 -->
+    <section id="s6">
+      <h2><span class="n">6</span>Pré-requisitos: o kit de emergência</h2>
+      <p>Tudo o que é preciso para começar fica <b>fora dos servidores</b>, porque eles podem estar perdidos. O kit de emergência contém:</p>
+      <ul class="lista">
+        <li>Este plano e o runbook de DR, impressos e em mídia offline;</li>
+        <li>Credenciais de emergência guardadas em cofre: <b>conta local</b> do NT-003 e do Veeam (fora do domínio), senha de DSRM do AD, administradores do UniFi e do Cisco;</li>
+        <li>Mídias de recuperação do Veeam (Recovery Media para Windows e Linux), em ISO;</li>
+        <li>Backup da configuração do UniFi e do Cisco 2960 (<code>running-config</code>);</li>
+        <li>Inventário de IPs e de servidores (o <a href="#s16">anexo</a> deste plano);</li>
+        <li>Contatos: times, ambiente externo (VLAN 200), Diretoria, DPO e Jurídico, por telefone e WhatsApp, porque o e-mail e o AD podem estar fora.</li>
+      </ul>
+      <div class="caixa aviso"><span class="rot">Por que conta local</span>
+        <p>O backup precisa voltar <b>antes</b> do AD, porque é dele que sai o AD. Se o login do NT-003 dependesse do domínio, ninguém conseguiria entrar para restaurar. Por isso o NT-003 e o Veeam têm uma conta local de emergência.</p></div>
+    </section>
+
+    <!-- 7 -->
+    <section id="s7">
+      <h2><span class="n">7</span>Linha de restauração</h2>
+      <p>O ambiente volta <b>em camadas</b>, de baixo para cima: cada camada depende da anterior. <b>Nenhuma fase começa antes de a anterior passar pelo critério de saída.</b></p>
+      <div class="linha-rest">
+        <a href="#f0" style="--cor:#66727F"><b>0</b><span>Declarar e conter</span><small>Diretoria, CSIRT</small></a>
+        <a href="#f1" style="--cor:#66727F"><b>1</b><span>Infraestrutura</span><small>VMs limpas</small></a>
+        <a href="#f2" style="--cor:var(--net)"><b>2</b><span>Rede</span><small>UniFi, Cisco</small></a>
+        <a href="#f3" style="--cor:var(--grc)"><b>3</b><span>Backup</span><small>NT-003, Veeam</small></a>
+        <a href="#f4" style="--cor:var(--iam)"><b>4</b><span>Identidade</span><small>NT-001, NT-002</small></a>
+        <a href="#f5" style="--cor:var(--soc)"><b>5</b><span>SOC</span><small>Wazuh primeiro</small></a>
+        <a href="#f6" style="--cor:var(--danger)"><b>6</b><span>Aplicação</span><small>DMZ, por MTPD</small></a>
+        <a href="#f7" style="--cor:var(--brand)"><b>7</b><span>Volta à operação</span><small>Agentes, novo backup</small></a>
+      </div>
+      <p>A regra do runbook: <b>não iniciar restaurações em massa antes de confirmar infraestrutura, rede, backup íntegro e AD/DNS.</b> Restaurar uma aplicação sem AD e DNS no ar gera um servidor que não autentica nem resolve nomes.</p>
+    </section>
+
+    <!-- 8 -->
+    <section id="s8">
+      <h2><span class="n">8</span>Fases, passo a passo</h2>
+
+      <div class="fase" id="f0" style="--cor:#66727F">
+        <header><span class="num">0</span><div><h3>Declarar o desastre e conter</h3><p>Parar a propagação, preservar as evidências e definir de que ponto restaurar</p></div></header>
+        <div class="corpo">
+          <div class="quem"><span class="tag dir">Diretoria</span><span class="tag soc">SOC (CSIRT)</span><span class="tag net">Network</span><span class="tag grc">GRC</span></div>
+          <ol class="passos">
+            <li>Diretoria declara o desastre por recomendação do CSIRT; o Coordenador do DR registra a <b>hora da declaração</b> (início do RTO real).</li>
+            <li>Network <b>isola as VLANs no UniFi</b>: bloqueia o tráfego entre VLANs e a saída para a internet, mantendo só o acesso administrativo necessário. A VLAN 60 (backup) fica fechada para tudo que não seja o próprio DR.</li>
+            <li>SOC <b>preserva as evidências</b>: as máquinas criptografadas não são apagadas nem reaproveitadas; ficam desligadas para perícia. Coletar a nota de resgate e os últimos alertas do Wazuh que ainda estiverem acessíveis.</li>
+            <li>SOC identifica <b>quando a infecção começou</b> (primeiro alerta, primeiro arquivo criptografado). Isso define o <b>último ponto de restauração limpo</b>: o mais recente que seja anterior ao comprometimento.</li>
+            <li>Inventariar o que sobreviveu (NT-003, rede, estações) e abrir o ticket do desastre no ITSM, ou em papel se o ITSM estiver perdido.</li>
+            <li>GRC, DPO e Jurídico avaliam as notificações (ANPD e BACEN). Diretoria aprova a comunicação externa.</li>
+          </ol>
+          <div class="portao"><p><b>Critério de saída:</b> ambiente isolado, evidências preservadas, ponto de restauração limpo definido e responsáveis acionados.</p></div>
+        </div>
+      </div>
+
+      <div class="fase" id="f1" style="--cor:#66727F">
+        <header><span class="num">1</span><div><h3>Infraestrutura (ambiente externo, VLAN 200)</h3><p>Onde os servidores vão ser restaurados</p></div></header>
+        <div class="corpo">
+          <div class="quem"><span class="tag grc">GRC (solicita)</span><span class="tag">Administrador do ambiente externo</span></div>
+          <ol class="passos">
+            <li>Solicitar ao administrador do ambiente externo a confirmação de que hosts, storage e rede de gerência estão íntegros.</li>
+            <li>Pedir <b>máquinas virtuais novas e vazias</b> para cada servidor perdido, com os mesmos recursos das originais (inventário no <a href="#s16">anexo</a>). Não restaurar sobre as VMs criptografadas: elas são evidência.</li>
+            <li>Confirmar o acesso administrativo às VMs e às suas consoles.</li>
+          </ol>
+          <div class="portao"><p><b>Critério de saída:</b> VMs novas criadas, conectadas às VLANs corretas e com console acessível.</p></div>
+        </div>
+      </div>
+
+      <div class="fase" id="f2" style="--cor:var(--net)">
+        <header><span class="num">2</span><div><h3>Rede</h3><p>SD-WAN, firewall e VLANs no UniFi e no Cisco 2960</p></div></header>
+        <div class="corpo">
+          <div class="quem"><span class="tag net">Network</span></div>
+          <ol class="passos">
+            <li>Conferir o <b>UniFi Controller</b> e os dois gateways do SD-WAN. Se a configuração tiver sido alterada, restaurar o backup de configuração do kit.</li>
+            <li>Conferir o <b>Cisco 2960</b>: VLANs 10 a 60 e trunks 802.1Q (<code>show vlan brief</code>, <code>show interfaces trunk</code>). Se preciso, aplicar o <code>running-config</code> do kit.</li>
+            <li>Conferir os <b>gateways .1</b> de cada VLAN e as <b>regras de firewall</b> entre as VLANs.</li>
+            <li>Manter a <b>saída para a internet fechada</b> até a <a href="#f7">fase 7</a>, exceto o que o DR precisar.</li>
+          </ol>
+          <div class="portao"><p><b>Critério de saída:</b> de uma máquina de teste, <code>ping</code> responde no gateway de cada VLAN (10.10.X.1) e as regras de firewall estão como na documentação do Network.</p></div>
+        </div>
+      </div>
+
+      <div class="fase" id="f3" style="--cor:var(--grc)">
+        <header><span class="num">3</span><div><h3>Backup: NT-003 com Veeam</h3><p>10.10.60.143 · a fonte de tudo o que vem depois</p></div></header>
+        <div class="corpo">
+          <div class="quem"><span class="tag grc">GRC</span><span class="tag end">Endpoint</span><span class="tag soc">SOC</span></div>
+          <ol class="passos">
+            <li>Entrar no NT-003 com a <b>conta local de emergência</b> (o AD ainda não existe).</li>
+            <li>Verificar se o próprio NT-003 não foi atingido: serviços do Veeam no ar, sem arquivos criptografados, sem nota de resgate.</li>
+            <li>No Veeam, conferir a <b>integridade do repositório</b> e listar os pontos de restauração de cada servidor.</li>
+            <li>Para cada servidor, escolher o <b>ponto limpo</b> definido na fase 0 e registrar data e hora (será o <b>RPO real</b>).</li>
+            <li>Endpoint <b>monta o ponto escolhido e varre com antivírus</b> antes de restaurá-lo. Se o ponto estiver contaminado, voltar para um ponto anterior.</li>
+          </ol>
+          <div class="caixa alerta"><span class="rot">Se o NT-003 também estiver perdido</span>
+            <p>A recuperação depende da cópia fora do ambiente (regra 3-2-1), que ainda está em validação e depende da VPN. Enquanto ela não estiver pronta, o NT-003 é um ponto único de falha (<a href="#s15">lacunas</a>).</p></div>
+          <div class="portao"><p><b>Critério de saída:</b> repositório íntegro e, para cada servidor, um ponto de restauração limpo escolhido, verificado e registrado.</p></div>
+        </div>
+      </div>
+
+      <div class="fase" id="f4" style="--cor:var(--iam)">
+        <header><span class="num">4</span><div><h3>Identidade: Active Directory</h3><p>NT-001 (10.10.20.10) e NT-002 (10.10.20.11) · domínio cyberappfin.local</p></div></header>
+        <div class="corpo">
+          <div class="quem"><span class="tag iam">IAM</span><span class="tag grc">GRC (Veeam)</span></div>
+          <ol class="passos">
+            <li>Restaurar o <b>NT-001</b> com a restauração completa da máquina pelo Veeam (<a href="#s9">seção 9</a>) na VM nova, com o IP 10.10.20.10.</li>
+            <li>Ligar o NT-001 <b>sem o NT-002 na rede</b> e verificar AD, DNS e SYSVOL. Ele é, por enquanto, o único controlador de domínio.</li>
+            <li>Não restaurar o NT-002 do backup ao mesmo tempo: dois controladores voltando de pontos diferentes podem ficar inconsistentes. O <b>NT-002 é reconstruído</b>: Windows Server novo, IP 10.10.20.11, promovido a controlador de domínio e <b>replicado a partir do NT-001</b>. Antes, remover do AD os metadados do NT-002 antigo.</li>
+            <li>Como o ataque pode ter roubado credenciais: <b>trocar as senhas</b> dos administradores e contas de serviço e <b>trocar duas vezes a senha da conta krbtgt</b>, com intervalo para replicar, o que invalida tickets Kerberos forjados.</li>
+            <li>Conferir as GPOs (senha mínima de 10 caracteres, bloqueio após 5 tentativas) e os 18 grupos de segurança.</li>
+          </ol>
+          <div class="portao"><p><b>Critério de saída:</b> <code>dcdiag</code> sem erros, <code>repadmin /replsummary</code> sem falhas entre NT-001 e NT-002, <code>nslookup cyberappfin.local</code> responde e um usuário de teste consegue fazer login.</p></div>
+        </div>
+      </div>
+
+      <div class="fase" id="f5" style="--cor:var(--soc)">
+        <header><span class="num">5</span><div><h3>Serviços do SOC</h3><p>VLAN 50 · visibilidade antes de reabrir o ambiente</p></div></header>
+        <div class="corpo">
+          <div class="quem"><span class="tag soc">SOC</span><span class="tag grc">GRC (Veeam)</span></div>
+          <p>O <b>Wazuh vem primeiro</b>: é ele que deixa o SOC enxergar o ambiente enquanto ele volta e perceber se a ameaça reaparece.</p>
+          <ol class="passos">
+            <li><b>Wazuh Manager</b> (10.10.50.21): restaurar e conferir <code>systemctl status wazuh-manager</code>, o dashboard e as regras customizadas.</li>
+            <li><b>Zabbix + Grafana</b> (10.10.50.15): restaurar e conferir os hosts monitorados e os painéis.</li>
+            <li><b>OpenVAS</b> (10.10.50.7): restaurar e conferir as tarefas por VLAN e por servidor (será usado na fase 7).</li>
+            <li><b>CyberFin IA</b> (10.10.50.19): restaurar e testar a classificação de um alerta.</li>
+            <li><b>ITSM</b> (VLAN 50): restaurar e passar para ele o registro do desastre feito até aqui.</li>
+          </ol>
+          <div class="portao"><p><b>Critério de saída:</b> Wazuh recebendo eventos dos agentes já restaurados (portas 1514 e 1515), Zabbix monitorando, OpenVAS com as tarefas e ITSM aberto.</p></div>
+        </div>
+      </div>
+
+      <div class="fase" id="f6" style="--cor:var(--danger)">
+        <header><span class="num">6</span><div><h3>Aplicação</h3><p>Reverse Proxy na DMZ e serviços de negócio, na ordem do MTPD</p></div></header>
+        <div class="corpo">
+          <div class="quem"><span class="tag net">Network (DMZ)</span><span class="tag grc">GRC (Veeam)</span><span class="tag">Áreas de negócio</span></div>
+          <ol class="passos">
+            <li>Restaurar o <b>Reverse Proxy</b> (10.10.30.3) na DMZ e conferir que ele só alcança o que a regra de firewall permite.</li>
+            <li>Religar os serviços de negócio na ordem do <a href="#s3">MTPD</a>: <b>Crédito → BPO Financeiro → Folha → Valuation e M&amp;A</b>.</li>
+            <li>Cada servidor passa pelo <a href="#s10">checklist pós-restauração</a> antes de ser liberado.</li>
+            <li>Uma pessoa da área de negócio confere os dados críticos (por exemplo, os últimos lançamentos antes do ponto restaurado).</li>
+          </ol>
+          <div class="portao"><p><b>Critério de saída:</b> checklist completo em cada servidor e cada serviço validado pela área responsável.</p></div>
+        </div>
+      </div>
+
+      <div class="fase" id="f7" style="--cor:var(--brand)">
+        <header><span class="num">7</span><div><h3>Segurança, observação e volta à operação</h3><p>Só se reabre o ambiente quando ele está monitorado e com backup novo</p></div></header>
+        <div class="corpo">
+          <div class="quem"><span class="tag soc">SOC</span><span class="tag end">Endpoint</span><span class="tag net">Network</span><span class="tag grc">GRC</span></div>
+          <ol class="passos">
+            <li>Conferir que <b>todos os agentes</b> reportam ao Wazuh e que o Zabbix monitora todos os hosts.</li>
+            <li>Rodar o <b>OpenVAS</b> em cada servidor restaurado e <b>comparar com o baseline</b>: nenhuma porta ou serviço novo.</li>
+            <li>Endpoint confere ClamAV e UFW nos servidores e faz a <b>reimagem das estações</b> das VLANs 10 e 40 atingidas, que voltam ao domínio.</li>
+            <li>Executar um <b>backup completo novo</b> de todos os servidores no NT-003.</li>
+            <li>Network reabre as regras normais entre VLANs e a <b>saída para a internet</b>.</li>
+            <li>Coordenador do DR registra a hora do serviço validado (fim do <b>RTO real</b>) e encerra o DR.</li>
+          </ol>
+          <div class="portao"><p><b>Critério de saída:</b> ambiente monitorado, varredura sem diferenças em relação ao baseline, backup novo concluído e Diretoria informada do encerramento.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 9 -->
+    <section id="s9">
+      <h2><span class="n">9</span>Restaurar um servidor com o Veeam</h2>
+      <p>Rota do runbook para a perda total de uma máquina. É a mesma para cada servidor das fases 4 a 6.</p>
+      <table>
+        <tr><th>#</th><th>Etapa</th><th>O que fazer</th></tr>
+        <tr><td><b>1</b></td><td><b>Restore point</b></td><td>Confirmar no Veeam o ponto limpo escolhido na fase 3 e anotar data e hora.</td></tr>
+        <tr><td><b>2</b></td><td><b>Máquina de destino</b></td><td>Preparar a VM nova na VLAN e com o IP do servidor original, com disco igual ou maior.</td></tr>
+        <tr><td><b>3</b></td><td><b>Recovery Media</b></td><td>Iniciar a VM pela mídia de recuperação do Veeam (Windows ou Linux, conforme o servidor).</td></tr>
+        <tr><td><b>4</b></td><td><b>Entire Machine Restore</b></td><td>Conectar ao repositório do NT-003 (10.10.60.143) e restaurar a máquina inteira a partir do ponto escolhido.</td></tr>
+        <tr><td><b>5</b></td><td><b>Boot e validação</b></td><td>Retirar a mídia, ligar o servidor e passar pelo <a href="#s10">checklist</a>.</td></tr>
+      </table>
+    </section>
+
+    <!-- 10 -->
+    <section id="s10">
+      <h2><span class="n">10</span>Checklist pós-restauração</h2>
+      <p>Um por servidor. Nenhum servidor é liberado com item pendente.</p>
+      <table class="ficha">
+        <tr><th>Item</th><th>Como conferir</th><th>OK</th></tr>
+        <tr><td>Sistema operacional inicializa</td><td>Boot sem erro, serviços principais no ar</td><td class="cx"></td></tr>
+        <tr><td>Discos e partições corretos</td><td>Tamanho e pontos de montagem iguais ao original</td><td class="cx"></td></tr>
+        <tr><td>IP, gateway e VLAN corretos</td><td><code>ipconfig</code> / <code>ip a</code>, ping no gateway 10.10.X.1</td><td class="cx"></td></tr>
+        <tr><td>DNS e NTP funcionam</td><td><code>nslookup cyberappfin.local</code>, hora sincronizada</td><td class="cx"></td></tr>
+        <tr><td>Autenticação no AD funciona</td><td>Login com usuário de teste do domínio</td><td class="cx"></td></tr>
+        <tr><td>Banco de dados íntegro</td><td>Serviço do banco no ar, sem erro de consistência</td><td class="cx"></td></tr>
+        <tr><td>Aplicação responde</td><td>Acesso pelo caminho normal (pelo Reverse Proxy, se for o caso)</td><td class="cx"></td></tr>
+        <tr><td>Dados críticos conferidos</td><td>Área de negócio confere os últimos registros</td><td class="cx"></td></tr>
+        <tr><td>Wazuh recebe eventos</td><td>Agente ativo no Wazuh</td><td class="cx"></td></tr>
+        <tr><td>Zabbix monitora o host</td><td>Host disponível no Zabbix</td><td class="cx"></td></tr>
+        <tr><td>Firewall e hardening preservados</td><td>UFW ou Windows Firewall ativos, SSH restrito, ClamAV no ar</td><td class="cx"></td></tr>
+        <tr><td>Novo backup pós-DR executado</td><td>Job do Veeam concluído com sucesso</td><td class="cx"></td></tr>
+      </table>
+    </section>
+
+    <!-- 11 -->
+    <section id="s11">
+      <h2><span class="n">11</span>Registro da recuperação</h2>
+      <p>Preenchido pelo Coordenador do DR durante a execução. Os tempos medidos são comparados com as metas da BIA.</p>
+      <ul class="lista">
+        <li><b>RPO real</b>: do último dado recuperado (data e hora do ponto restaurado) até a falha.</li>
+        <li><b>RTO real</b>: da declaração do desastre até o serviço validado.</li>
+        <li><b>Integridade</b>: arquivos, hash, banco e configurações conferidos.</li>
+      </ul>
+      <div class="tabela-rola"><table class="ficha">
+        <tr><th>Servidor</th><th>Restore point</th><th>Início</th><th>Fim</th><th>RPO real</th><th>RTO real</th><th>Integridade</th><th>Responsável</th></tr>
+        <tr><td>NT-001 · AD-01</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>NT-002 · AD-02</td><td>reconstruído</td><td></td><td></td><td>—</td><td></td><td></td><td></td></tr>
+        <tr><td>Wazuh Manager</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Zabbix + Grafana</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>OpenVAS</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>CyberFin IA</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>ITSM</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Reverse Proxy</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+      </table></div>
+    </section>
+
+    <!-- 12 -->
+    <section id="s12">
+      <h2><span class="n">12</span>Comunicação durante o DR</h2>
+      <table>
+        <tr><th>Público</th><th>Quem fala</th><th>Canal e frequência</th></tr>
+        <tr><td>Times técnicos</td><td>Coordenador do DR</td><td>WhatsApp e canal técnico; atualização a cada 15 min enquanto durar a crise</td></tr>
+        <tr><td>GRC e Diretoria</td><td>Coordenador do DR e Coordenador do SOC</td><td>E-mail e WhatsApp, a cada mudança de fase</td></tr>
+        <tr><td>Regulador (BACEN) e ANPD</td><td>GRC, DPO e Jurídico</td><td>Rito formal de notificação, aprovado pela Diretoria</td></tr>
+        <tr><td>Clientes</td><td>Coordenador do SOC e GRC</td><td>Comunicado aprovado pela Diretoria</td></tr>
+        <tr><td>Público e imprensa</td><td>Somente a Diretoria</td><td>Nota oficial</td></tr>
+      </table>
+      <p>Se o e-mail ou o AD estiverem comprometidos, toda a comunicação passa para <b>telefone e WhatsApp</b>, com os contatos do kit de emergência.</p>
+    </section>
+
+    <!-- 13 -->
+    <section id="s13">
+      <h2><span class="n">13</span>Encerramento e lições aprendidas</h2>
+      <ul class="lista">
+        <li>O DR termina quando a fase 7 passa pelo critério de saída e a Diretoria é informada.</li>
+        <li>Monitoramento reforçado no Wazuh por pelo menos 7 dias, procurando sinais da mesma ameaça.</li>
+        <li>Relatório de Causa do Incidente (RCI) em até <b>5 dias úteis</b> (POL-GI-001).</li>
+        <li>Reunião de lições aprendidas: tempos reais contra as metas da BIA, o que travou, o que mudar neste plano. As mudanças geram a próxima versão deste documento.</li>
+      </ul>
+    </section>
+
+    <!-- 14 -->
+    <section id="s14">
+      <h2><span class="n">14</span>Testes do plano</h2>
+      <p>Um plano de recuperação só vale se for testado. A POL-CN-001 prevê testes periódicos, nesta ordem:</p>
+      <table>
+        <tr><th>Teste</th><th>Como</th><th>Situação</th></tr>
+        <tr><td><b>1. Restauração em rede isolada</b></td><td>Restaurar um servidor (começando pelo NT-001) numa VLAN sem acesso à produção, passar pelo checklist e medir RPO e RTO reais.</td><td>Não realizado</td></tr>
+        <tr><td><b>2. Teste destrutivo controlado</b></td><td>Desligar um servidor de produção em janela combinada e recuperá-lo seguindo este plano.</td><td>Não realizado</td></tr>
+        <tr><td><b>3. Exercício de mesa</b></td><td>Percorrer o cenário de ransomware com todos os times, fase por fase, conferindo papéis e contatos.</td><td>Não realizado</td></tr>
+      </table>
+    </section>
+
+    <!-- 15 -->
+    <section id="s15">
+      <h2><span class="n">15</span>Lacunas conhecidas</h2>
+      <div class="caixa aviso"><span class="rot">O que ainda falta validar</span>
+        <ul class="lista" style="margin:4px 0 0">
+          <li><b>Teste de restauração</b> ainda não realizado: os tempos deste plano são metas, não medições.</li>
+          <li><b>Cópia offsite (3-2-1)</b> depende da VPN. Até lá, o NT-003 é ponto único de falha.</li>
+          <li><b>Ambiente externo</b>: a recuperação da fase 1 depende do administrador da VLAN 200.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- anexo -->
+    <section id="s16">
+      <h2><span class="n">A</span>Anexo: inventário de restauração</h2>
+      <div class="tabela-rola"><table>
+        <tr><th>Fase</th><th>Servidor</th><th>IP</th><th>VLAN</th><th>Função</th><th>Como volta</th><th>Responsável</th></tr>
+        <tr><td>2</td><td>UniFi (2 gateways) e Cisco 2960</td><td class="mono">10.10.X.1</td><td>—</td><td>SD-WAN, firewall, VLANs</td><td>Conferência; backup de configuração se preciso</td><td>Network</td></tr>
+        <tr class="forte"><td>3</td><td><b>NT-003 · Backup</b></td><td class="mono">10.10.60.143</td><td>60</td><td>Veeam, repositório</td><td>Sobrevive isolado; conferência e conta local</td><td>GRC</td></tr>
+        <tr><td>4</td><td><b>NT-001 · AD-01</b></td><td class="mono">10.10.20.10</td><td>20</td><td>Controlador de domínio, DNS</td><td>Entire Machine Restore (Veeam)</td><td>IAM</td></tr>
+        <tr><td>4</td><td><b>NT-002 · AD-02</b></td><td class="mono">10.10.20.11</td><td>20</td><td>Controlador de domínio, DNS</td><td>Reconstruído e replicado do NT-001</td><td>IAM</td></tr>
+        <tr><td>5</td><td>Wazuh Manager</td><td class="mono">10.10.50.21</td><td>50</td><td>SIEM</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>5</td><td>Zabbix + Grafana</td><td class="mono">10.10.50.15</td><td>50</td><td>Disponibilidade e painéis</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>5</td><td>OpenVAS</td><td class="mono">10.10.50.7</td><td>50</td><td>Varredura de vulnerabilidades</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>5</td><td>CyberFin IA</td><td class="mono">10.10.50.19</td><td>50</td><td>Classificação de alertas</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>5</td><td>ITSM</td><td class="mono">10.10.50.x</td><td>50</td><td>Registro de incidentes</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>6</td><td>Reverse Proxy</td><td class="mono">10.10.30.3</td><td>30</td><td>Publicação da aplicação (DMZ)</td><td>Entire Machine Restore (Veeam)</td><td>Network</td></tr>
+        <tr><td>7</td><td>Estações</td><td class="mono">10.10.10.x / 10.10.40.x</td><td>10, 40</td><td>Gerência e usuários</td><td>Reimagem e reingresso no domínio</td><td>Endpoint</td></tr>
+      </table></div>
+    </section>
+
+    <p class="rodape">Cyberappfin · GRC-DRP-001 v1.0 · Defesa Cibernética · Impacta</p>
+  </main>
+</div>
+</body>
+</html>

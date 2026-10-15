@@ -14,7 +14,7 @@
     --text:#EEF3F8; --muted:#9FB1C3; --soft:#C7D4E1;
     --net:#14B8A6; --iam:#8B5CF6; --soc:#F59E0B; --end:#22C55E; --grc:#EAB308;
     --brand:#4C8DF6; --danger:#F87171;
-    --panel-w:560px;
+    --panel-w:640px;
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans', system-ui, sans-serif; overflow:hidden; }
@@ -41,6 +41,7 @@
   .barramento{ fill:none; stroke:#3E5A75; stroke-width:7; stroke-linecap:round; }
   .host rect{ transition:stroke .3s, fill .3s; }
   .host.alerta rect{ stroke:var(--danger) !important; fill:#3A1C21 !important; }
+  .host.ok rect{ stroke:#4ADE80 !important; fill:#13301F !important; }
   .pulso{ animation:pulso 1.4s ease-in-out infinite; }
   @keyframes pulso{ 0%,100%{ opacity:1 } 50%{ opacity:.35 } }
 
@@ -56,42 +57,49 @@
     display:flex; flex-direction:column; overflow:hidden;
   }
   #painel .topo{ padding:28px 36px 0; display:flex; flex-direction:column; gap:10px; }
-  #quem{ align-self:flex-start; font-size:13px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  #quem{ align-self:flex-start; font-size:16px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
          padding:6px 12px; border-radius:999px; background:#1C2F42; color:var(--soft); }
-  #painel h1{ font-family:'Sora', system-ui, sans-serif; font-size:32px; line-height:1.15; font-weight:700; }
-  #painel .sub{ color:var(--muted); font-size:16px; }
+  #painel h1{ font-family:'Sora', system-ui, sans-serif; font-size:38px; line-height:1.15; font-weight:700; }
+  #painel .sub{ color:var(--muted); font-size:19px; }
   #conteudo{ padding:20px 36px 32px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:16px; }
-  #conteudo p{ font-size:17px; line-height:1.55; color:var(--soft); }
+  #conteudo p{ font-size:20px; line-height:1.55; color:var(--soft); }
   #conteudo b{ color:var(--text); }
-  #conteudo h3{ font-family:'Sora', system-ui, sans-serif; font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+  #conteudo h3{ font-family:'Sora', system-ui, sans-serif; font-size:18px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-top:6px; }
   #conteudo ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
-  #conteudo li{ font-size:16.5px; line-height:1.45; color:var(--soft); padding-left:18px; position:relative; }
+  #conteudo li{ font-size:20px; line-height:1.45; color:var(--soft); padding-left:18px; position:relative; }
   #conteudo li::before{ content:""; position:absolute; left:0; top:.6em; width:7px; height:7px; border-radius:50%; background:var(--cor, var(--brand)); }
-  #conteudo table{ width:100%; border-collapse:collapse; font-size:15px; }
+  #conteudo table{ width:100%; border-collapse:collapse; font-size:18px; }
   #conteudo th{ text-align:left; color:var(--muted); font-weight:700; padding:7px 8px; border-bottom:1px solid var(--line-2); }
   #conteudo td{ padding:7px 8px; border-bottom:1px solid var(--line); color:var(--soft); vertical-align:top; }
   #conteudo tr.dest td{ color:var(--text); background:#2A2112; }
   #conteudo tr.perigo td{ color:var(--text); background:#2C1A1E; }
   .chips{ display:flex; flex-wrap:wrap; gap:8px; }
-  .chip{ font-size:14px; padding:5px 11px; border-radius:999px; background:#1C2F42; color:var(--soft); }
+  .chip{ font-size:17px; padding:5px 11px; border-radius:999px; background:#1C2F42; color:var(--soft); }
   .cards{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .card{ background:var(--bg-2); border:1px solid var(--line); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:4px; }
-  .card .n{ font-family:'Sora', system-ui, sans-serif; font-size:28px; font-weight:800; color:var(--cor, var(--brand)); line-height:1.1; }
-  .card .l{ font-size:14px; color:var(--muted); }
+  .card .n{ font-family:'Sora', system-ui, sans-serif; font-size:34px; font-weight:800; color:var(--cor, var(--brand)); line-height:1.1; }
+  .card .l{ font-size:17px; color:var(--muted); }
   .barras{ display:flex; flex-direction:column; gap:7px; }
-  .barra{ display:grid; grid-template-columns:100px 1fr 44px; align-items:center; gap:10px; font-size:15px; color:var(--soft); }
+  .barra{ display:grid; grid-template-columns:100px 1fr 44px; align-items:center; gap:10px; font-size:18px; color:var(--soft); }
   .barra i{ display:block; height:14px; border-radius:4px; }
-  .aviso{ font-size:14px; color:#F5B95A; border-left:3px solid #F5B95A; padding:6px 10px; background:#241C10; border-radius:0 8px 8px 0; }
+  .aviso{ font-size:17px; color:#F5B95A; border-left:3px solid #F5B95A; padding:6px 10px; background:#241C10; border-radius:0 8px 8px 0; }
   .passos{ display:flex; flex-direction:column; gap:8px; counter-reset:p; }
-  .passo{ display:flex; gap:12px; align-items:flex-start; font-size:16px; color:var(--muted); transition:color .3s; }
+  .passo{ display:flex; gap:12px; align-items:flex-start; font-size:19px; color:var(--muted); transition:color .3s; }
   .passo::before{ counter-increment:p; content:counter(p); flex-shrink:0; width:26px; height:26px; border-radius:50%;
-                  display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; background:#1C2F42; color:var(--muted); }
+                  display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; background:#1C2F42; color:var(--muted); }
   .passo.ativo{ color:var(--text); }
-  .passo.ativo::before{ background:var(--danger); color:#1A0E10; }
+  .passo.ativo::before{ background:var(--cp, var(--danger)); color:#1A0E10; }
+  .passo.feito{ color:var(--soft); }
+  .passo.feito::before{ content:"✓"; background:#1F3A2C; color:#4ADE80; }
+  /* link para documento (painel e telas cheias) */
+  .doc-link{ align-self:flex-start; display:inline-flex; gap:10px; align-items:center; text-decoration:none; font-weight:700;
+             font-size:18px; color:#0B1520; background:#EAB308; padding:10px 18px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,.3); }
+  .doc-link:hover{ background:#FACC15; }
+  .doc-link small{ font-weight:500; font-size:.8em; opacity:.8; }
   /* notas de fala: flutuam acima do rodapé, nos dois modos */
   #notas{ display:none; position:fixed; left:24px; bottom:80px; width:min(760px, 60vw); z-index:20; padding:16px 18px;
           background:rgba(9,18,27,.96); border:1px dashed #4B6580; border-radius:12px;
-          font-size:16px; line-height:1.5; color:var(--soft); max-height:32vh; overflow-y:auto; box-shadow:0 12px 30px rgba(0,0,0,.4); }
+          font-size:19px; line-height:1.5; color:var(--soft); max-height:32vh; overflow-y:auto; box-shadow:0 12px 30px rgba(0,0,0,.4); }
   body.com-notas #notas{ display:block; }
 
   /* ---------- foto (ou vídeo) do prédio na abertura ---------- */
@@ -138,99 +146,99 @@
   }
   body.modo-sala #sala{ opacity:1; pointer-events:auto; transform:none; }
   .s-head{ display:flex; flex-direction:column; gap:1.2vh; }
-  .s-quem{ align-self:flex-start; font-size:clamp(12px, .9vw, 15px); font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  .s-quem{ align-self:flex-start; font-size:clamp(14px, 1.08vw, 18px); font-weight:700; letter-spacing:.12em; text-transform:uppercase;
            padding:6px 14px; border-radius:999px; background:#1C2F42; }
-  .s-titulo{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(34px, 3.6vw, 64px); font-weight:800; line-height:1.05; letter-spacing:-.01em; }
-  .s-sub{ font-size:clamp(16px, 1.2vw, 22px); color:var(--muted); }
+  .s-titulo{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(41px, 4.32vw, 77px); font-weight:800; line-height:1.05; letter-spacing:-.01em; }
+  .s-sub{ font-size:clamp(19px, 1.44vw, 26px); color:var(--muted); }
   .s-corpo{ flex:1; display:flex; flex-direction:column; gap:2.6vh; min-height:0; }
-  .s-txt{ font-size:clamp(16px, 1.15vw, 21px); line-height:1.5; color:var(--soft); }
+  .s-txt{ font-size:clamp(19px, 1.38vw, 25px); line-height:1.5; color:var(--soft); }
   .s-txt b{ color:var(--text); }
-  .s-rot{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(12px, .85vw, 15px); font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .s-rot{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(14px, 1.02vw, 18px); font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
   .linha{ display:grid; gap:1.4vw; }
   .bloco{ background:#132233; border:1px solid var(--line); border-radius:16px; padding:clamp(16px, 1.6vw, 28px);
           display:flex; flex-direction:column; gap:10px; position:relative; overflow:hidden; }
   .bloco::before{ content:""; position:absolute; left:0; top:0; right:0; height:5px; background:var(--cor, var(--brand)); }
-  .bloco h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(18px, 1.45vw, 26px); font-weight:700; line-height:1.2; }
-  .bloco p{ font-size:clamp(14px, 1vw, 18px); line-height:1.45; color:var(--soft); }
-  .bloco .grande{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(34px, 3.4vw, 60px); font-weight:800; line-height:1; color:var(--cor, var(--brand)); }
-  .bloco .rot{ font-size:clamp(12px, .85vw, 15px); font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
-  .bloco .rodape{ margin-top:auto; padding-top:10px; border-top:1px solid var(--line); font-size:clamp(14px, 1vw, 18px); color:var(--text); }
+  .bloco h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(22px, 1.74vw, 31px); font-weight:700; line-height:1.2; }
+  .bloco p{ font-size:clamp(17px, 1.2vw, 22px); line-height:1.45; color:var(--soft); }
+  .bloco .grande{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(41px, 4.08vw, 72px); font-weight:800; line-height:1; color:var(--cor, var(--brand)); }
+  .bloco .rot{ font-size:clamp(14px, 1.02vw, 18px); font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .bloco .rodape{ margin-top:auto; padding-top:10px; border-top:1px solid var(--line); font-size:clamp(17px, 1.2vw, 22px); color:var(--text); }
   .chips2{ display:flex; flex-wrap:wrap; gap:10px; }
-  .chips2 span{ font-size:clamp(14px, 1vw, 18px); padding:7px 14px; border-radius:999px; background:#1C2F42; color:var(--soft); }
+  .chips2 span{ font-size:clamp(17px, 1.2vw, 22px); padding:7px 14px; border-radius:999px; background:#1C2F42; color:var(--soft); }
   /* linha do tempo */
   .tempo{ display:grid; grid-template-columns:repeat(var(--n), 1fr); gap:0; position:relative; }
   .tempo::before{ content:""; position:absolute; left:4%; right:4%; top:22px; height:3px; background:linear-gradient(90deg, var(--brand), var(--soc)); opacity:.6; }
   .etapa{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; padding:0 8px; position:relative; }
   .etapa .bola{ width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-                font-family:'Sora', system-ui, sans-serif; font-weight:800; font-size:18px; background:#0B1520; border:3px solid var(--cor, var(--brand)); color:var(--text); }
-  .etapa h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(15px, 1.15vw, 21px); font-weight:700; line-height:1.2; }
-  .etapa p{ font-size:clamp(13px, .95vw, 17px); line-height:1.4; color:var(--muted); }
+                font-family:'Sora', system-ui, sans-serif; font-weight:800; font-size:22px; background:#0B1520; border:3px solid var(--cor, var(--brand)); color:var(--text); }
+  .etapa h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(18px, 1.38vw, 25px); font-weight:700; line-height:1.2; }
+  .etapa p{ font-size:clamp(16px, 1.14vw, 20px); line-height:1.4; color:var(--muted); }
   /* organograma do CSIRT */
   .org{ display:flex; flex-direction:column; align-items:center; gap:0; }
   .org .chefe{ background:#2A2112; border:2px solid var(--soc); border-radius:14px; padding:14px 26px; text-align:center; }
-  .org .chefe h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.3vw, 23px); }
-  .org .chefe p{ font-size:clamp(13px, .95vw, 16px); color:var(--soft); }
+  .org .chefe h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 1.56vw, 28px); }
+  .org .chefe p{ font-size:clamp(16px, 1.14vw, 19px); color:var(--soft); }
   .org .tronco{ width:3px; height:22px; background:var(--line-2); }
   .org .ramos{ display:grid; grid-template-columns:repeat(6, 1fr); gap:12px; width:100%; position:relative; padding-top:22px; }
   .org .ramos::before{ content:""; position:absolute; top:0; left:8.3%; right:8.3%; height:3px; background:var(--line-2); }
   .org .membro{ background:#132233; border:1px solid var(--line); border-top:4px solid var(--cor); border-radius:12px; padding:14px; position:relative; }
   .org .membro::before{ content:""; position:absolute; top:-26px; left:50%; width:3px; height:22px; background:var(--line-2); }
-  .org .membro h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(14px, 1.05vw, 19px); margin-bottom:6px; }
-  .org .membro p{ font-size:clamp(12px, .9vw, 16px); line-height:1.4; color:var(--soft); }
+  .org .membro h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.26vw, 23px); margin-bottom:6px; }
+  .org .membro p{ font-size:clamp(14px, 1.08vw, 19px); line-height:1.4; color:var(--soft); }
   /* barras de tempo (RTO) */
   .rto{ display:flex; flex-direction:column; gap:14px; }
   .rto .item{ display:grid; grid-template-columns:minmax(160px, 22%) 1fr; gap:16px; align-items:center; }
-  .rto .nome{ font-size:clamp(15px, 1.1vw, 20px); font-weight:700; }
+  .rto .nome{ font-size:clamp(18px, 1.32vw, 24px); font-weight:700; }
   .rto .trilho{ position:relative; height:38px; background:#132233; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
   .rto .trilho i{ position:absolute; left:0; top:0; bottom:0; border-radius:10px 0 0 10px; }
-  .rto .trilho span{ position:absolute; top:50%; transform:translateY(-50%); font-size:clamp(13px, .95vw, 17px); white-space:nowrap; color:var(--text); }
+  .rto .trilho span{ position:absolute; top:50%; transform:translateY(-50%); font-size:clamp(16px, 1.14vw, 20px); white-space:nowrap; color:var(--text); }
   /* documentos */
   .doc{ background:#F3F1EA; color:#1D2733; border-radius:6px 26px 6px 6px; padding:clamp(18px, 1.6vw, 28px); display:flex; flex-direction:column; gap:10px;
         box-shadow:0 18px 40px rgba(0,0,0,.35); position:relative; }
   .doc::after{ content:""; position:absolute; top:0; right:0; width:26px; height:26px; background:linear-gradient(225deg, #0B1520 50%, #CFCAB9 50%); border-radius:0 0 0 6px; }
-  .doc .cod{ font-family:'JetBrains Mono', monospace; font-size:clamp(12px, .85vw, 15px); color:#5B6573; }
-  .doc h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.3vw, 23px); line-height:1.2; }
-  .doc p{ font-size:clamp(13px, .95vw, 17px); line-height:1.45; color:#3B4654; }
-  .doc .selo2{ align-self:flex-start; margin-top:auto; font-size:clamp(12px, .85vw, 15px); font-weight:700; padding:5px 12px; border-radius:999px; }
+  .doc .cod{ font-family:'JetBrains Mono', monospace; font-size:clamp(14px, 1.02vw, 18px); color:#5B6573; }
+  .doc h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 1.56vw, 28px); line-height:1.2; }
+  .doc p{ font-size:clamp(16px, 1.14vw, 20px); line-height:1.45; color:#3B4654; }
+  .doc .selo2{ align-self:flex-start; margin-top:auto; font-size:clamp(14px, 1.02vw, 18px); font-weight:700; padding:5px 12px; border-radius:999px; }
   /* camadas da aplicação */
   .pilha{ display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:14px; align-items:stretch; }
-  .seta{ align-self:center; font-size:34px; color:var(--line-2); }
-  .s-aviso{ font-size:clamp(13px, .95vw, 17px); color:#F5B95A; border-left:3px solid #F5B95A; padding:8px 12px; background:#241C10; border-radius:0 8px 8px 0; align-self:flex-start; }
-  .lema2{ display:flex; gap:20px; flex-wrap:wrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 2vw, 34px); font-weight:700; color:var(--soft); }
+  .seta{ align-self:center; font-size:41px; color:var(--line-2); }
+  .s-aviso{ font-size:clamp(16px, 1.14vw, 20px); color:#F5B95A; border-left:3px solid #F5B95A; padding:8px 12px; background:#241C10; border-radius:0 8px 8px 0; align-self:flex-start; }
+  .lema2{ display:flex; gap:20px; flex-wrap:wrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(24px, 2.4vw, 41px); font-weight:700; color:var(--soft); }
   .lema2 span:nth-child(even){ color:#4B6580; }
   .faixa{ height:6px; width:min(520px, 60%); border-radius:3px; background:linear-gradient(90deg, var(--brand), var(--iam), var(--net), var(--soc), var(--end)); }
   /* BIA: relógios por serviço */
   .relogio{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; padding:6px 0; }
   .relogio div{ display:flex; flex-direction:column; gap:2px; }
-  .relogio b{ white-space:nowrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.6vw, 30px); font-weight:800; line-height:1.05; color:var(--cor); }
-  .relogio span{ font-size:clamp(11px, .8vw, 14px); font-weight:700; letter-spacing:.1em; color:var(--muted); }
+  .relogio b{ white-space:nowrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 1.92vw, 36px); font-weight:800; line-height:1.05; color:var(--cor); }
+  .relogio span{ font-size:clamp(13px, 0.96vw, 17px); font-weight:700; letter-spacing:.1em; color:var(--muted); }
   /* BIA: mapa de calor no tempo */
   .calor{ display:grid; grid-template-columns:minmax(150px, 15%) repeat(5, 1fr); gap:6px; }
-  .calor .cab{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(13px, 1vw, 18px); font-weight:700; color:var(--muted); text-align:center; padding:6px 0; }
-  .calor .srv{ font-size:clamp(14px, 1.05vw, 19px); font-weight:700; display:flex; align-items:center; }
-  .calor .cel{ border-radius:8px; padding:clamp(8px, .8vw, 14px) 6px; text-align:center; font-size:clamp(13px, .95vw, 17px); font-weight:700; color:#160C0E; }
+  .calor .cab{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(16px, 1.2vw, 22px); font-weight:700; color:var(--muted); text-align:center; padding:6px 0; }
+  .calor .srv{ font-size:clamp(17px, 1.26vw, 23px); font-weight:700; display:flex; align-items:center; }
+  .calor .cel{ border-radius:8px; padding:clamp(8px, .8vw, 14px) 6px; text-align:center; font-size:clamp(16px, 1.14vw, 20px); font-weight:700; color:#160C0E; }
   .calor .n2{ background:#FACC15; } .calor .n3{ background:#FB923C; } .calor .n4{ background:#F87171; }
   .marcos{ display:grid; grid-template-columns:minmax(150px, 15%) repeat(5, 1fr); gap:6px; margin-top:4px; }
-  .marcos p{ font-size:clamp(12px, .88vw, 16px); line-height:1.4; color:var(--soft); border-top:2px solid var(--line-2); padding-top:8px; }
+  .marcos p{ font-size:clamp(14px, 1.06vw, 19px); line-height:1.4; color:var(--soft); border-top:2px solid var(--line-2); padding-top:8px; }
   /* BIA: ordem de recuperação */
   .ordem .bloco{ flex-direction:row; align-items:flex-start; gap:14px; }
-  .ordem .num{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(26px, 2.4vw, 44px); font-weight:800; line-height:1; color:var(--cor); min-width:1.2em; }
+  .ordem .num{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(31px, 2.88vw, 53px); font-weight:800; line-height:1; color:var(--cor); min-width:1.2em; }
   /* escalonamento em escada */
   .escada{ display:grid; grid-template-columns:repeat(5, 1fr); gap:1vw; align-items:end; }
   .escada .bloco{ gap:8px; }
   .escada .bloco:nth-child(2){ margin-bottom:2.2vh; } .escada .bloco:nth-child(3){ margin-bottom:4.4vh; }
   .escada .bloco:nth-child(4){ margin-bottom:6.6vh; } .escada .bloco:nth-child(5){ margin-bottom:8.8vh; }
-  .escada .rodape{ font-size:clamp(13px, .92vw, 16px); color:var(--soft); }
+  .escada .rodape{ font-size:clamp(16px, 1.1vw, 19px); color:var(--soft); }
   .escada .rodape b{ color:var(--cor); }
   /* DRP: fluxo da restauração e checklist */
   .fluxo{ display:flex; align-items:stretch; gap:8px; }
   .fluxo .passo2{ flex:1; background:#132233; border:1px solid var(--line); border-top:4px solid var(--cor, #EAB308); border-radius:12px;
                   padding:clamp(10px, .9vw, 16px); display:flex; flex-direction:column; gap:4px; }
-  .fluxo .passo2 b{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(14px, 1.05vw, 19px); line-height:1.2; }
-  .fluxo .passo2 span{ font-size:clamp(12px, .85vw, 15px); color:var(--muted); line-height:1.35; }
-  .fluxo .seta2{ align-self:center; color:var(--line-2); font-size:22px; }
+  .fluxo .passo2 b{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.26vw, 23px); line-height:1.2; }
+  .fluxo .passo2 span{ font-size:clamp(14px, 1.02vw, 18px); color:var(--muted); line-height:1.35; }
+  .fluxo .seta2{ align-self:center; color:var(--line-2); font-size:26px; }
   .check{ list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; }
-  .check li{ font-size:clamp(13px, .95vw, 17px); color:var(--soft); padding-left:24px; position:relative; }
+  .check li{ font-size:clamp(16px, 1.14vw, 20px); color:var(--soft); padding-left:24px; position:relative; }
   .check li::before{ content:""; position:absolute; left:2px; top:.25em; width:12px; height:12px; border-radius:3px; border:2px solid var(--cor, #22C55E); }
   /* prancheta com folha pautada */
   .prancheta{ position:relative; background:linear-gradient(160deg, #7A5232, #5C3B22); border-radius:16px;
@@ -244,9 +252,36 @@
                      box-shadow:0 2px 0 #E9E3D2, 0 4px 0 #DCD5C2; }
   .prancheta .papel .rot{ display:block; color:#7C5A3A; padding-bottom:6px; border-bottom:1px solid #BFD3EC; }
   .prancheta .check{ gap:0 18px; }
-  .prancheta .check li{ color:#2B3440; line-height:1.9em; font-size:clamp(13px, .95vw, 17px); border-bottom:1px solid #BFD3EC; }
+  .prancheta .check li{ color:#2B3440; line-height:1.9em; font-size:clamp(16px, 1.14vw, 20px); border-bottom:1px solid #BFD3EC; }
   .prancheta .check li::before{ border-color:#3B7D52; background:#FFFFFF; top:.55em; }
-  .gigante{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(56px, 7.5vw, 140px); font-weight:800; line-height:.95; letter-spacing:-.03em; }
+  /* tratamento do incidente: o ticket do ITSM */
+  .ticket{ display:grid; grid-template-columns:minmax(260px, 27%) 1fr; gap:1.6vw; align-items:start; }
+  .tk-cab{ background:#132233; border:1px solid var(--line); border-top:5px solid var(--soc); border-radius:16px; padding:clamp(16px, 1.4vw, 26px); display:flex; flex-direction:column; gap:10px; }
+  .tk-cab .cod{ font-family:'JetBrains Mono', monospace; font-size:clamp(14px, 1vw, 18px); color:var(--soc); font-weight:600; }
+  .tk-cab h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 1.5vw, 28px); line-height:1.2; }
+  .tk-cab dl{ display:grid; grid-template-columns:auto 1fr; gap:4px 12px; font-size:clamp(14px, 1vw, 18px); }
+  .tk-cab dt{ color:var(--muted); } .tk-cab dd{ color:var(--text); font-weight:700; }
+  .tk-cab .kpi{ display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:4px; }
+  .tk-cab .kpi div{ background:#0F1B28; border-radius:10px; padding:8px 10px; }
+  .tk-cab .kpi b{ display:block; font-family:'Sora', system-ui, sans-serif; font-size:clamp(22px, 1.9vw, 34px); color:#4ADE80; line-height:1.1; }
+  .tk-cab .kpi span{ font-size:clamp(12px, .85vw, 15px); color:var(--muted); line-height:1.3; display:block; }
+  .tk-linha{ display:flex; flex-direction:column; gap:6px; }
+  .tk-ev{ display:grid; grid-template-columns:5.6em 9.5em 1fr; gap:12px; align-items:baseline; background:#132233; border:1px solid var(--line);
+          border-left:5px solid var(--cor); border-radius:10px; padding:clamp(7px, .6vw, 11px) 14px; }
+  .tk-ev .h{ font-family:'JetBrains Mono', monospace; font-weight:600; font-size:clamp(14px, 1vw, 18px); color:var(--text); }
+  .tk-ev .f{ font-size:clamp(12px, .85vw, 15px); font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--cor); }
+  .tk-ev p{ font-size:clamp(15px, 1.08vw, 20px); line-height:1.4; color:var(--soft); }
+  /* BIA: impacto x mitigação */
+  .mitiga{ display:grid; grid-template-columns:minmax(150px, 13%) minmax(200px, 27%) 1fr; gap:6px; }
+  .mitiga .cab{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(14px, 1.02vw, 18px); font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:4px 10px; }
+  .mitiga .pil{ font-family:'Sora', system-ui, sans-serif; font-weight:700; font-size:clamp(16px, 1.2vw, 22px); display:flex; align-items:center; padding:10px; border-left:5px solid var(--grc); background:#132233; border-radius:8px; }
+  .mitiga .imp{ font-size:clamp(14px, 1.02vw, 19px); line-height:1.4; color:var(--soft); background:#2A1A1D; border-radius:8px; padding:10px 12px; display:flex; align-items:center; }
+  .mitiga .acoes{ display:flex; flex-wrap:wrap; gap:6px; align-content:center; background:#132233; border-radius:8px; padding:8px 10px; }
+  .mitiga .acoes span{ font-size:clamp(14px, 1.02vw, 19px); padding:4px 12px; border-radius:999px; background:#173225; color:#C9F5D8; }
+  .mitiga .acoes span.pend{ background:#33270F; color:#F5D08A; }
+  .legenda{ display:flex; gap:18px; font-size:clamp(14px, 1vw, 18px); color:var(--muted); }
+  .legenda b{ color:#C9F5D8; } .legenda b.pend{ color:#F5D08A; }
+  .gigante{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(67px, 9vw, 168px); font-weight:800; line-height:.95; letter-spacing:-.03em; }
 
   /* ---------- rodapé de navegação ---------- */
   #rodape{
@@ -254,29 +289,36 @@
     display:flex; align-items:center; gap:20px; padding:0 24px;
   }
   #rodape button{ background:#1A2B3C; color:var(--text); border:1px solid var(--line-2); border-radius:10px;
-                  font:600 15px 'DM Sans', system-ui, sans-serif; padding:9px 16px; cursor:pointer; }
+                  font:600 18px 'DM Sans', system-ui, sans-serif; padding:9px 16px; cursor:pointer; }
   #rodape button:hover{ background:#22384D; }
   #rodape button:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
   #pontos{ flex:1; display:flex; gap:6px; align-items:center; overflow:hidden; }
   #pontos button{ flex:1; min-width:6px; height:8px; padding:0; border-radius:4px; border:none; background:#22384D; }
   #pontos button.feito{ background:#3D5F82; }
   #pontos button.atual{ background:var(--brand); height:12px; }
-  #contador{ font-size:15px; color:var(--muted); min-width:64px; text-align:right; }
-  #dica{ font-size:13px; color:#5F7790; }
+  #contador{ font-size:18px; color:var(--muted); min-width:64px; text-align:right; }
+  #dica{ font-size:16px; color:#5F7790; }
 
   @media (max-height:820px){
     #painel .topo{ padding-top:20px; gap:6px; }
-    #painel h1{ font-size:27px; }
+    #painel h1{ font-size:32px; }
     #conteudo{ padding:14px 32px 20px; gap:11px; }
-    #conteudo p{ font-size:15.5px; line-height:1.45; }
-    #conteudo li{ font-size:15px; line-height:1.4; }
+    #conteudo p{ font-size:19px; line-height:1.45; }
+    #conteudo li{ font-size:18px; line-height:1.4; }
     #conteudo ul{ gap:6px; }
     #conteudo h3{ margin-top:2px; }
-    .chip{ font-size:13px; padding:4px 10px; }
+    .chip{ font-size:16px; padding:4px 10px; }
+  }
+  @media (max-height:820px){
+    #sala{ padding:4vh 5vw 3vh; gap:2.2vh; }
+    .s-corpo{ gap:2vh; }
+    .s-titulo{ font-size:clamp(34px, 3.6vw, 64px); }
+    .escada .bloco:nth-child(2){ margin-bottom:1.4vh; } .escada .bloco:nth-child(3){ margin-bottom:2.8vh; }
+    .escada .bloco:nth-child(4){ margin-bottom:4.2vh; } .escada .bloco:nth-child(5){ margin-bottom:5.6vh; }
   }
   @media (max-width:1100px){
-    :root{ --panel-w:420px; }
-    #painel h1{ font-size:26px; }
+    :root{ --panel-w:480px; }
+    #painel h1{ font-size:31px; }
   }
   @media (max-width:760px){
     #stage{ inset:0 0 55vh 0; }
@@ -379,8 +421,8 @@ defs.innerHTML = `
 el('rect', { x:-2000, y:-2000, width:5600, height:4920, fill:'url(#grade)' });
 
 // rótulos de camada
-texto(svg, 30, 30, 'PERÍMETRO', { class:'t-mono', 'font-size':13, 'letter-spacing':2 });
-texto(svg, 30, 395, 'VLANs · TRUNK 802.1Q', { class:'t-mono', 'font-size':13, 'letter-spacing':2 });
+texto(svg, 30, 30, 'PERÍMETRO', { class:'t-mono', 'font-size':16, 'letter-spacing':2 });
+texto(svg, 30, 395, 'VLANs · TRUNK 802.1Q', { class:'t-mono', 'font-size':16, 'letter-spacing':2 });
 
 // ligações do perímetro (desenhadas antes das caixas)
 const gLig = grupo('ligacoes');
@@ -394,7 +436,7 @@ el('path', { d:`M820 225 V${BUS_Y}`, class:'lig' }, gLig);
   const g = grupo('sdwan');
   el('rect', { x:30, y:120, width:180, height:100, rx:50, fill:'#12263A', stroke:COR.net, 'stroke-width':2 }, g);
   texto(g, 120, 164, 'SD-WAN', { 'text-anchor':'middle', class:'t-title', 'font-size':22 });
-  texto(g, 120, 188, 'entrada da internet', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
+  texto(g, 120, 188, 'entrada da internet', { 'text-anchor':'middle', class:'t-muted', 'font-size':16 });
 })();
 
 // UniFi: dois gateways formando o SD-WAN
@@ -405,10 +447,10 @@ el('path', { d:`M820 225 V${BUS_Y}`, class:'lig' }, gLig);
   [344, 486].forEach(x => {
     el('rect', { x, y:146, width:90, height:52, rx:10, fill:'#16354C', stroke:'#2BD4C0', 'stroke-width':1.5 }, g);
     texto(g, x + 45, 170, 'U', { 'text-anchor':'middle', class:'t-title', 'font-size':20, fill:'#5EEAD4' });
-    texto(g, x + 45, 189, 'gateway', { 'text-anchor':'middle', class:'t-mono', 'font-size':11 });
+    texto(g, x + 45, 189, 'gateway', { 'text-anchor':'middle', class:'t-mono', 'font-size':13 });
   });
   el('path', { d:'M434 172 H486', fill:'none', stroke:'#2BD4C0', 'stroke-width':2, 'stroke-dasharray':'5 5' }, g);
-  texto(g, 460, 228, 'SD-WAN · firewall · VLANs', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
+  texto(g, 460, 228, 'SD-WAN · firewall · VLANs', { 'text-anchor':'middle', class:'t-muted', 'font-size':16 });
 })();
 
 // Cisco 2960
@@ -416,19 +458,19 @@ el('path', { d:`M820 225 V${BUS_Y}`, class:'lig' }, gLig);
   const g = grupo('cisco');
   el('rect', { x:700, y:115, width:240, height:110, rx:16, fill:'#10283A', stroke:COR.net, 'stroke-width':2.5 }, g);
   texto(g, 722, 153, 'Cisco 2960', { class:'t-title', 'font-size':22 });
-  texto(g, 722, 180, 'Layer 2 · VLANs', { class:'t-muted', 'font-size':15 });
-  texto(g, 722, 204, 'Trunks 802.1Q', { class:'t-muted', 'font-size':15 });
+  texto(g, 722, 180, 'Layer 2 · VLANs', { class:'t-muted', 'font-size':18 });
+  texto(g, 722, 204, 'Trunks 802.1Q', { class:'t-muted', 'font-size':18 });
 })();
 
 // Ambiente externo (VLAN 200): fora do escopo do projeto
 (() => {
   const g = grupo('externo');
   el('rect', { x:1030, y:60, width:540, height:240, rx:18, fill:'#101B27', stroke:'#5B7389', 'stroke-width':2, 'stroke-dasharray':'8 6' }, g);
-  texto(g, 1052, 94, 'Ambiente externo · VLAN 200', { class:'t-title', 'font-size':20 });
-  texto(g, 1052, 118, 'fora do escopo do projeto, administrado externamente', { class:'t-muted', 'font-size':13 });
+  texto(g, 1052, 94, 'Ambiente externo · VLAN 200', { class:'t-title', 'font-size':22 });
+  texto(g, 1052, 118, 'fora do escopo do projeto, administrado externamente', { class:'t-muted', 'font-size':15 });
   [['Hosts ESXi', 1052, 140], ['vCenter', 1306, 140], ['Jump Server', 1052, 214], ['Storage / TrueNAS', 1306, 214]].forEach(([n, x, y]) => {
     el('rect', { x, y, width:242, height:60, rx:10, fill:'#15222F', stroke:'#33475A', 'stroke-width':1.5 }, g);
-    texto(g, x + 18, y + 37, n, { 'font-size':16, 'font-weight':700, fill:'#AFC1D2' });
+    texto(g, x + 18, y + 37, n, { 'font-size':19, 'font-weight':700, fill:'#AFC1D2' });
   });
 })();
 
@@ -443,14 +485,14 @@ VLANS.forEach((v, i) => {
   const x = COL_X(i);
   el('rect', { x, y:400, width:COL_W, height:500, rx:14, fill:'#0F1D2B', stroke:v.cor, 'stroke-width':2, 'stroke-opacity':.75 }, g);
   el('rect', { x, y:400, width:COL_W, height:6, rx:3, fill:v.cor }, g);
-  texto(g, x + 16, 444, String(v.n), { class:'t-title', 'font-size':30, fill:v.cor });
-  texto(g, x + 16, 466, v.uso, { 'font-size':15, 'font-weight':700 });
-  texto(g, x + 16, 485, v.rede, { class:'t-mono', 'font-size':12 });
+  texto(g, x + 16, 444, String(v.n), { class:'t-title', 'font-size':34, fill:v.cor });
+  texto(g, x + 16, 468, v.uso, { 'font-size':18, 'font-weight':700 });
+  texto(g, x + 16, 489, v.rede, { class:'t-mono', 'font-size':14 });
   v.hosts.forEach(([nome, ip], j) => {
     const h = el('g', { class:'host', 'data-host': `${i}-${j}` }, g);
     el('rect', { x:x + 10, y:HOST_Y(j), width:COL_W - 20, height:58, rx:9, fill:'#16283A', stroke:'#2C4560', 'stroke-width':1.5 }, h);
-    texto(h, x + 22, HOST_Y(j) + 25, nome, { 'font-size':15, 'font-weight':700 });
-    texto(h, x + 22, HOST_Y(j) + 45, ip, { class:'t-mono', 'font-size':12 });
+    texto(h, x + 22, HOST_Y(j) + 26, nome, { 'font-size':18, 'font-weight':700 });
+    texto(h, x + 22, HOST_Y(j) + 48, ip, { class:'t-mono', 'font-size':14 });
     hostEls[`${i}-${j}`] = h;
   });
 });
@@ -531,15 +573,66 @@ function focar(ids){
 /* ---------- incidente: a workstation da VLAN 40 que recebe o phishing ---------- */
 const WS = hostEls['3-0'];
 const ITSM = hostEls['4-4'];
-function selo(host, txt, cor){
+function selo(host, txt, cor, linha = 1){
   host.querySelector('.selo')?.remove();
   const r = host.querySelector('rect');
-  const x = +r.getAttribute('x') + (+r.getAttribute('width')) - 12, y = +r.getAttribute('y') + 22;
-  const s = el('text', { x, y, 'text-anchor':'end', class:'selo pulso', 'font-size':12, 'font-weight':700, 'letter-spacing':1.5, fill:cor }, host);
+  const x = +r.getAttribute('x') + (+r.getAttribute('width')) - 12, y = +r.getAttribute('y') + (linha === 1 ? 22 : 47);
+  const s = el('text', { x, y, 'text-anchor':'end', class:'selo pulso', 'font-size':14, 'font-weight':700, 'letter-spacing':1.5, fill:cor }, host);
   s.textContent = txt;
 }
 function resetIncidente(){
-  [WS, ITSM].forEach(h => { h.classList.remove('alerta'); h.querySelector('.selo')?.remove(); });
+  Object.values(hostEls).forEach(h => { h.classList.remove('alerta', 'ok'); h.querySelector('.selo')?.remove(); });
+}
+// lista de passos: os já feitos ficam só com o rótulo, o atual mostra o texto todo
+function passos(lista, atual, cor){
+  return `<div class="passos" style="--cp:${cor}">${lista.map(([rot, txt], k) =>
+    `<div class="passo ${k < atual ? 'feito' : k === atual ? 'ativo' : ''}"><span><b>${rot}</b>${k === atual ? ' ' + txt : ''}</span></div>`).join('')}</div>`;
+}
+const LINK_DRP = `<a class="doc-link" href="drp.html" target="_blank" rel="noopener">Abrir o documento do DRP ↗ <small>GRC-DRP-001</small></a>`;
+
+/* ---------- DR: restauração do ambiente a partir do NT-003 ---------- */
+const DR = { ad:['1-0', '1-1'], soc:['4-0', '4-1', '4-2', '4-3', '4-4'], dmz:['2-0'], bk:'5-0' };
+const SERVIDORES = [...DR.ad, ...DR.soc, ...DR.dmz];
+const centroDe = k => { const [i, j] = k.split('-').map(Number); return hostCentro(i, j); };
+function cifrado(k){ const h = hostEls[k]; h.classList.remove('ok'); h.classList.add('alerta'); selo(h, 'CIFRADO', COR.danger, 2); }
+function restaurado(k){ const h = hostEls[k]; h.classList.remove('alerta'); h.classList.add('ok'); selo(h, '✓ OK', '#4ADE80', 2); h.querySelector('.selo').classList.remove('pulso'); }
+async function rodarDR(passo){
+  const minha = geracao;
+  const vivo = () => minha === geracao;
+  const bk = centroDe(DR.bk);
+  // estado de partida: o que já voltou nas fases anteriores
+  const fases = [[], [], DR.ad, DR.soc, DR.dmz];
+  const prontos = passo >= 5 ? SERVIDORES : fases.slice(0, passo).flat();
+  SERVIDORES.forEach(k => prontos.includes(k) ? restaurado(k) : cifrado(k));
+  hostEls[DR.bk].classList.add('ok'); selo(hostEls[DR.bk], 'ÍNTEGRO', '#4ADE80', 2);
+  if(passo === 0){
+    // o ransomware se espalha a partir de uma estação da VLAN 40
+    SERVIDORES.forEach(k => { hostEls[k].classList.remove('alerta'); hostEls[k].querySelector('.selo')?.remove(); });
+    const origem = hostCentro(3, 0);
+    hostEls['3-0'].classList.add('alerta');
+    for(const k of SERVIDORES){
+      if(!vivo()) return;
+      pacote(viaBus(origem, centroDe(k)), COR.danger, 1300, 6).then(ok => { if(ok && vivo()) cifrado(k); });
+      await new Promise(r => setTimeout(r, 260));
+    }
+    return;
+  }
+  if(passo === 1){
+    // rede conferida VLAN por VLAN e backup íntegro
+    emLoop(() => VLANS.forEach((v, i) => setTimeout(() => pacote([{x:820,y:225},{x:820,y:BUS_Y},{x:COL_CX(i),y:BUS_Y},{x:COL_CX(i),y:400}], COR.net, 1500, 6), i * 140)), 3200);
+    return;
+  }
+  // fases 2 a 4: cada servidor sai do NT-003, um depois do outro
+  const restaurar = async (k, de = bk, cor = COR.grc) => { if(await pacote(viaBus(de, centroDe(k)), cor, 1300, 7) && vivo()) restaurado(k); };
+  if(passo === 2){ await restaurar('1-0'); if(vivo()) await restaurar('1-1', centroDe('1-0'), '#C4B5FD'); return; }
+  if(passo === 3){ for(const k of DR.soc){ if(!vivo()) return; await restaurar(k); } return; }
+  if(passo === 4){ await restaurar('2-0'); return; }
+  // fase 5: agentes voltam a falar com o Wazuh e o backup novo vai para o NT-003
+  const wz = centroDe('4-0');
+  emLoop(() => {
+    SERVIDORES.filter(k => k !== '4-0').forEach((k, n) => setTimeout(() => pacote(viaBus(centroDe(k), wz), COR.soc, 1500, 5), n * 120));
+    setTimeout(() => SERVIDORES.forEach((k, n) => setTimeout(() => pacote(viaBus(centroDe(k), bk), COR.grc, 1500, 5), n * 120)), 1700);
+  }, 4200);
 }
 
 /* ---------- conteúdo das paradas ---------- */
@@ -720,23 +813,30 @@ const PARADAS = [
   },
 
   /* =================== MAPA: simulação de incidente (PB-010, 4 passos) =================== */
-  ...[0, 1, 2, 3].map(passo => ({
+  ...[0, 1, 2, 3, 4, 5].map(passo => ({
     quem:P34, cor:COR.danger, titulo:'Simulação de incidente', sub:'Phishing · playbook PB-010',
     cam:[0, 20, 1600, 900], incidente:passo,
     foco: passo === 0 ? ['sdwan', 'unifi', 'cisco', 'barramento', 'ligacoes', 'vlan40']
         : passo === 1 ? ['vlan40', 'vlan50', 'barramento']
         : passo === 2 ? ['vlan50']
-        : ['vlan50', 'unifi', 'vlan20', 'vlan40', 'barramento', 'ligacoes', 'cisco'],
-    html:`<div class="passos">
-        <div class="passo ${passo >= 0 ? 'ativo' : ''}"><span><b>Entrada:</b> um e-mail de phishing chega à workstation de um colaborador de Contas a Pagar (VLAN 40), que clica no link.</span></div>
-        <div class="passo ${passo >= 1 ? 'ativo' : ''}"><span><b>Detecção:</b> o Wazuh detecta a conexão a um domínio suspeito logo após o e-mail. A CyberFin IA classifica o alerta e avisa o SOC.</span></div>
-        <div class="passo ${passo >= 2 ? 'ativo' : ''}"><span><b>Registro:</b> o analista confirma e abre o ticket no <b>ITSM</b>. O SOC conduz a investigação pelo playbook PB-010.</span></div>
-        <div class="passo ${passo >= 3 ? 'ativo' : ''}"><span><b>Contenção:</b> Network bloqueia o domínio no UniFi, IAM reseta a senha e revoga as sessões, Endpoint verifica a estação.</span></div></div>`,
+        : passo === 3 ? ['vlan50', 'unifi', 'vlan20', 'vlan40', 'barramento', 'ligacoes', 'cisco']
+        : passo === 4 ? ['vlan20', 'vlan30', 'vlan40', 'vlan50', 'barramento']
+        : ['vlan40', 'vlan50', 'barramento'],
+    html: passos([
+      ['Entrada:', 'um e-mail de phishing chega à workstation de um colaborador de Contas a Pagar (VLAN 40), que clica no link.'],
+      ['Detecção:', 'o Wazuh detecta a conexão a um domínio suspeito logo após o e-mail. A CyberFin IA classifica o alerta e avisa o SOC.'],
+      ['Registro:', 'o analista confirma e abre o ticket no <b>ITSM</b>. O SOC conduz a investigação pelo playbook PB-010.'],
+      ['Contenção:', 'Network bloqueia o domínio no UniFi, IAM reseta a senha e revoga as sessões, Endpoint verifica a estação.'],
+      ['Erradicação:', 'o SOC procura o mesmo domínio nos logs de <b>todos os agentes</b> do Wazuh, IAM revisa os logons da conta no AD desde o clique e Endpoint faz a varredura completa da estação (reimagem se houver artefato).'],
+      ['Recuperação:', 'a estação volta à rede depois da verificação, o colaborador recebe a nova senha e a conta fica sob <b>monitoramento reforçado</b>. O ticket segue para o pós-incidente.']
+    ], passo, COR.danger),
     notas: [
       'Cenário fictício baseado no playbook PB-010 (Phishing e Engenharia Social). O pacote vermelho é o e-mail: entra pelo SD-WAN, passa pelo firewall e pelo switch e chega a uma workstation da VLAN de usuários.',
       'O gatilho é um dos previstos no PB-010: conexão a domínio recém-registrado logo após abrir um e-mail. A IA classifica, mas o analista é quem confirma. Alerta não é sinônimo de incidente confirmado.',
       'Confirmado, o incidente vira um ticket no ITSM. A partir daí cada ação fica registrada na linha do tempo do incidente.',
-      'Contenção proporcional e autorizada pelo coordenador do SOC: bloqueio do domínio no UniFi, reset da credencial no AD e verificação da estação. A seguir, o processo por trás de cada passo.'
+      'Contenção proporcional e autorizada pelo coordenador do SOC: bloqueio do domínio no UniFi, reset da credencial no AD e verificação da estação.',
+      'Conter não é o fim: é preciso ter certeza de que a ameaça saiu do ambiente. Os pacotes laranja são a busca do domínio malicioso nos logs de todos os agentes. Se outro host tivesse acessado o mesmo domínio, ele entraria no incidente.',
+      'Recuperação: a estação volta a funcionar e a conta fica sob observação. Com isso o ticket vai para o pós-incidente, que aparece na tela do ticket logo adiante. A seguir, o processo por trás de cada passo.'
     ][passo]
   })),
 
@@ -807,6 +907,31 @@ const PARADAS = [
         </div>
       </div>`,
     notas:'Ler da esquerda para a direita, subindo. O alerta nasce no Wazuh e a IA classifica, mas quem confirma é o analista. O coordenador decide o nível e autoriza a contenção. Nível 3 ou 4 aciona o CSIRT; nível 4, dados de clientes ou pagamento indevido sobem à Diretoria, que é quem pode declarar o desastre e disparar o DRP. No nosso phishing: o analista confirmou, o coordenador classificou como nível 3 e o CSIRT foi acionado.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Tratamento do incidente: o ticket do início ao fim', sub:'ITSM · cenário simulado do PB-010 · cada ação fica registrada no ticket',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="ticket">
+          <div class="tk-cab">
+            <span class="cod">INC-0001 · ITSM</span>
+            <h4>Phishing em Contas a Pagar</h4>
+            <dl><dt>Nível</dt><dd>3 · Alta</dd><dt>Playbook</dt><dd>PB-010</dd><dt>Origem</dt><dd>Wazuh + CyberFin IA</dd>
+                <dt>Responsável</dt><dd>Analista do SOC</dd><dt>Contenção</dt><dd>Coordenador do SOC</dd><dt>Situação</dt><dd style="color:#4ADE80">Encerrado</dd></dl>
+            <div class="kpi"><div><b>4 min</b><span>clique → alerta<br>meta MTTD &lt; 15 min</span></div><div><b>22 min</b><span>alerta → contenção<br>meta MTTR &lt; 30 min</span></div></div>
+          </div>
+          <div class="tk-linha">
+            <div class="tk-ev" style="--cor:#F87171"><span class="h">09:12</span><span class="f">Entrada</span><p>Colaborador de Contas a Pagar clica no link do e-mail (VLAN 40).</p></div>
+            <div class="tk-ev" style="--cor:${COR.soc}"><span class="h">09:16</span><span class="f">Detecção</span><p>Wazuh alerta a conexão ao domínio suspeito; a CyberFin IA classifica e avisa o SOC no Telegram.</p></div>
+            <div class="tk-ev" style="--cor:${COR.soc}"><span class="h">09:20</span><span class="f">Registro</span><p>Analista confirma, abre o ticket no ITSM, anexa as evidências e propõe o nível 3.</p></div>
+            <div class="tk-ev" style="--cor:#FB923C"><span class="h">09:24</span><span class="f">Decisão</span><p>Coordenador do SOC confirma o nível 3, autoriza a contenção e aciona o CSIRT.</p></div>
+            <div class="tk-ev" style="--cor:#F87171"><span class="h">09:38</span><span class="f">Contenção</span><p>Domínio bloqueado no UniFi, senha resetada e sessões revogadas no AD, estação em verificação.</p></div>
+            <div class="tk-ev" style="--cor:${COR.end}"><span class="h">11:40</span><span class="f">Erradicação</span><p>Busca do domínio em todos os agentes: nenhum outro host. Estação limpa após a varredura.</p></div>
+            <div class="tk-ev" style="--cor:${COR.end}"><span class="h">D+1</span><span class="f">Recuperação</span><p>Estação de volta à rede; conta sob monitoramento reforçado por 7 dias.</p></div>
+            <div class="tk-ev" style="--cor:${COR.grc}"><span class="h">D+5 úteis</span><span class="f">Pós-incidente</span><p>RCI entregue; nova regra no Wazuh para o domínio e treinamento de phishing em Contas a Pagar. Ticket encerrado.</p></div>
+          </div>
+        </div>
+      </div>`,
+    notas:'Este é o mesmo phishing da simulação, agora visto pelo ticket do ITSM. Cada fase do ciclo de resposta vira uma entrada com hora e responsável. É do ticket que saem os tempos: 4 minutos do clique ao alerta e 22 do alerta à contenção, dentro das metas da POL-GI-001. O tratamento só termina no pós-incidente, com o RCI em 5 dias úteis e a lição aprendida virando regra no Wazuh. Horários do cenário simulado.'
   },
   {
     quem:P3, cor:COR.soc, titulo:'Como medimos o SOC', sub:'Metas de desempenho da POL-GI-001',
@@ -901,23 +1026,69 @@ const PARADAS = [
     notas:'Ler a tabela da esquerda para a direita: cada coluna é uma janela de tempo depois da parada. Crédito vira crítico já nas primeiras horas; Valuation é o último a chegar ao crítico. Os marcos embaixo mostram quando cada prazo vence e quem é acionado.'
   },
   {
+    quem:P4, cor:COR.grc, titulo:'Impacto e como mitigamos', sub:'GRC-BIA-001 · para cada pilar, o que reduz o impacto hoje e o que ainda falta',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="mitiga">
+          <span class="cab">Pilar</span><span class="cab">Impacto</span><span class="cab">Como mitigamos</span>
+          <span class="pil">Segurança física</span><span class="imp">Infraestrutura em ambiente externo: reconstruir depende de acesso e de hardware.</span>
+          <span class="acoes"><span>✓ Backup em VLAN isolada (NT-003)</span><span>✓ Kit de emergência fora dos servidores</span><span class="pend">◐ Cópia offsite 3-2-1</span></span>
+          <span class="pil">Financeiro</span><span class="imp">Param o faturamento e o crédito operado.</span>
+          <span class="acoes"><span>✓ RTO e RPO por serviço</span><span>✓ Recuperação na ordem do MTPD: Crédito primeiro</span><span>✓ Pagamento só com token do cliente</span></span>
+          <span class="pil">Legislação e regulação</span><span class="imp">SCD regulada: BACEN, LGPD e sigilo bancário.</span>
+          <span class="acoes"><span>✓ Backups criptografados</span><span>✓ Trilha de auditoria no Wazuh</span><span>✓ Rito de notificação: GRC, DPO e Jurídico</span></span>
+          <span class="pil">Operação</span><span class="imp">Param BPO, crédito e Folha; o monitoramento do SOC cai junto.</span>
+          <span class="acoes"><span>✓ Dois ADs com replicação</span><span>✓ SD-WAN com dois gateways</span><span>✓ VLANs limitam a propagação</span><span>✓ DRP com ordem de restauração</span><span class="pend">◐ Teste de restauração</span></span>
+          <span class="pil">Reputação</span><span class="imp">Um desastre atinge a Cyberappfin e a holding.</span>
+          <span class="acoes"><span>✓ Só a Diretoria fala com o público</span><span>✓ Atualizações a cada 15 min na crise</span><span>✓ Canal alternativo se e-mail e AD caírem</span></span>
+        </div>
+        <div class="legenda"><span><b>✓</b> implantado</span><span><b class="pend">◐</b> em validação</span></div>
+      </div>`,
+    notas:'A BIA não termina no impacto: para cada pilar, o que já reduz esse impacto hoje e o que ainda falta. O verde já está no ambiente; o amarelo está em validação. Destacar a operação: dois ADs, SD-WAN redundante e as VLANs evitam que uma falha derrube tudo, e o DRP, que vem a seguir, é a resposta para quando mesmo assim tudo cair.'
+  },
+  {
     quem:P4, cor:COR.grc, titulo:'Em que ordem recuperar', sub:'Runbook de recuperação · camada por camada, sem pular etapas',
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="linha ordem" style="grid-template-columns:repeat(4, 1fr)">
-          <div class="bloco" style="--cor:#9FB1C3"><span class="num">0</span><div><h4>Declarar o desastre</h4><p>Diretoria declara, por recomendação do CSIRT, e inventaria o que sobreviveu.</p></div></div>
-          <div class="bloco" style="--cor:#9FB1C3"><span class="num">1</span><div><h4>Infraestrutura</h4><p>Virtualização e armazenamento do ambiente externo (VLAN 200) e acesso administrativo.</p></div></div>
-          <div class="bloco" style="--cor:${COR.net}"><span class="num">2</span><div><h4>Rede</h4><p>SD-WAN, firewall e VLANs no UniFi e no Cisco 2960; gateway, DNS e NTP.</p></div></div>
-          <div class="bloco" style="--cor:${COR.iam}"><span class="num">3</span><div><h4>Identidade</h4><p>NT-001 e NT-002: Active Directory, autenticação e DNS.</p></div></div>
-          <div class="bloco" style="--cor:${COR.grc}"><span class="num">4</span><div><h4>Backup</h4><p>NT-003 com Veeam: repositório íntegro e pontos de restauração conferidos.</p></div></div>
-          <div class="bloco" style="--cor:${COR.soc}"><span class="num">5</span><div><h4>Serviços do SOC</h4><p>Wazuh, Zabbix + Grafana, OpenVAS, CyberFin IA e ITSM.</p></div></div>
-          <div class="bloco" style="--cor:${COR.danger}"><span class="num">6</span><div><h4>Aplicação</h4><p>Reverse Proxy na DMZ e serviços de negócio, na ordem dos MTPD: Crédito, BPO, Folha, Valuation.</p></div></div>
-          <div class="bloco" style="--cor:${COR.brand}"><span class="num">7</span><div><h4>Segurança e observação</h4><p>Agentes, logs, regras de firewall, monitoramento e novo backup depois da recuperação.</p></div></div>
+          <div class="bloco" style="--cor:#9FB1C3"><span class="num">0</span><div><h4>Declarar e conter</h4><p>Diretoria declara, por recomendação do CSIRT. Isolar as VLANs, preservar evidências e escolher o ponto limpo.</p></div></div>
+          <div class="bloco" style="--cor:#9FB1C3"><span class="num">1</span><div><h4>Infraestrutura</h4><p>VMs novas e limpas no ambiente externo (VLAN 200).</p></div></div>
+          <div class="bloco" style="--cor:${COR.net}"><span class="num">2</span><div><h4>Rede</h4><p>SD-WAN, firewall e VLANs no UniFi e no Cisco 2960; gateways .1.</p></div></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="num">3</span><div><h4>Backup</h4><p>NT-003 com Veeam, por conta local: repositório íntegro e ponto limpo escolhido.</p></div></div>
+          <div class="bloco" style="--cor:${COR.iam}"><span class="num">4</span><div><h4>Identidade</h4><p>NT-001 restaurado do backup; NT-002 reconstruído e replicado. Troca de senhas.</p></div></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="num">5</span><div><h4>Serviços do SOC</h4><p>Wazuh primeiro; depois Zabbix + Grafana, OpenVAS, CyberFin IA e ITSM.</p></div></div>
+          <div class="bloco" style="--cor:${COR.danger}"><span class="num">6</span><div><h4>Aplicação</h4><p>Reverse Proxy na DMZ e serviços na ordem dos MTPD: Crédito, BPO, Folha, Valuation.</p></div></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="num">7</span><div><h4>Volta à operação</h4><p>Agentes, varredura contra o baseline, backup novo e só então a internet.</p></div></div>
         </div>
-        <p class="s-txt"><b>Regra do runbook:</b> não iniciar restaurações em massa antes de confirmar infraestrutura, rede, AD/DNS e a integridade dos backups.</p>
-        <p class="s-aviso">Restauração ainda não testada: o runbook exige um teste real para validar o backup e medir os tempos.</p>
+        <p class="s-txt"><b>Por que o backup vem antes do AD:</b> é do backup que sai o AD. Por isso o NT-003 tem uma conta local de emergência, fora do domínio.</p>
+        ${LINK_DRP}
       </div>`,
-    notas:'A ordem vem do runbook de recuperação: primeiro o que sustenta tudo (infraestrutura, rede e identidade), depois o backup, os serviços do SOC e por último as aplicações, seguindo a criticidade da BIA. Sem AD e DNS de pé, nada mais autentica; por isso a identidade vem antes do backup.'
+    notas:'A ordem vem do runbook de recuperação, em camadas: cada uma depende da anterior. Primeiro conter e preparar a base (infraestrutura e rede). Depois o backup, porque é dele que sai todo o resto, inclusive o AD; por isso o NT-003 entra com conta local. Com AD e DNS de pé, os serviços do SOC (o Wazuh primeiro, para enxergar o ambiente voltando) e por último as aplicações, na ordem da BIA. Nenhuma fase começa sem a anterior passar no critério de saída. O documento completo do DRP está no link; na próxima tela, essa ordem acontecendo no mapa.'
   },
+  ...[0, 1, 2, 3, 4, 5].map(passo => ({
+    quem:P4, cor:COR.grc, titulo:'DR na prática: restaurando o ambiente', sub:'Cenário: ransomware nos servidores · tudo volta a partir do NT-003',
+    cam:[0, 20, 1600, 900], dr:passo,
+    foco: [['vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
+           ['unifi', 'cisco', 'externo', 'ligacoes', 'barramento', 'vlan60'],
+           ['vlan20', 'vlan60', 'barramento'],
+           ['vlan20', 'vlan50', 'vlan60', 'barramento'],
+           ['vlan20', 'vlan30', 'vlan50', 'vlan60', 'barramento'],
+           ['vlan20', 'vlan30', 'vlan50', 'vlan60', 'barramento']][passo],
+    html: passos([
+      ['Desastre:', 'um ransomware criptografa os servidores das VLANs 20, 30 e 50. A Diretoria declara o desastre, o Network isola as VLANs no UniFi e as máquinas criptografadas ficam guardadas para perícia. O <b>NT-003</b>, na VLAN 60 isolada, está íntegro.'],
+      ['Base:', 'o ambiente externo entrega VMs novas e limpas e o Network confere SD-WAN, firewall e VLANs. No NT-003, com <b>conta local</b>, o Veeam confere o repositório e escolhe o último ponto limpo, anterior à infecção.'],
+      ['Identidade:', 'o NT-001 volta pela restauração completa do Veeam; o NT-002 é reconstruído e <b>replica a partir dele</b>. IAM troca as senhas privilegiadas e a da conta krbtgt.'],
+      ['SOC:', '<b>Wazuh primeiro</b>, para enxergar o ambiente enquanto ele volta; depois Zabbix + Grafana, OpenVAS, CyberFin IA e ITSM.'],
+      ['Aplicação:', 'Reverse Proxy na DMZ e serviços de negócio na ordem do MTPD: Crédito, BPO, Folha, Valuation. Cada servidor só é liberado depois do checklist.'],
+      ['Volta à operação:', 'agentes reportando ao Wazuh, OpenVAS comparando com o baseline, <b>backup novo</b> no NT-003 e só então a internet é liberada. RPO e RTO reais vão para o registro.']
+    ], passo, COR.grc) + LINK_DRP,
+    notas: [
+      'Escolhemos um desastre concreto: ransomware, nível 4 na matriz. Os pacotes vermelhos saem de uma estação e criptografam os servidores. O que salva é o NT-003: está numa VLAN isolada e os backups são criptografados. Antes de restaurar, conter e preservar as evidências.',
+      'Fases 1 a 3: infraestrutura, rede e backup. O ponto de restauração escolhido é o último anterior à infecção; restaurar um ponto infectado traria o ransomware de volta. Por isso a fase 0 descobre quando a infecção começou.',
+      'Fase 4: o AD sai do backup. Só um controlador volta do backup; o outro é reconstruído e replica, para não termos dois ADs inconsistentes. Como o ataque pode ter roubado senhas, todas as privilegiadas são trocadas.',
+      'Fase 5: o Wazuh vem primeiro porque, enquanto o ambiente volta, o SOC precisa enxergar se a ameaça reaparece.',
+      'Fase 6: as aplicações por último, na ordem da BIA. Nada é liberado sem o checklist que mostramos a seguir.',
+      'Fase 7: o ambiente só reabre monitorado, varrido e com backup novo. Os tempos reais são comparados com a BIA. Tudo isso está no documento do DRP, no link do painel.'
+    ][passo]
+  })),
   {
     quem:P4, cor:COR.grc, titulo:'DRP: como restauramos um servidor', sub:'Runbook de DR · rota Veeam para a perda total de uma máquina',
     sala:`<div class="s-corpo" style="justify-content:center">
@@ -931,7 +1102,7 @@ const PARADAS = [
             <p><b>Integridade</b>: arquivos, hash, banco e configurações</p>
             <p>Os tempos medidos são comparados com as metas da BIA.</p></div>
         </div>
-        <p class="s-aviso">Teste obrigatório ainda não realizado: primeiro em rede isolada, depois um teste destrutivo controlado.</p>
+        <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap">${LINK_DRP}<p class="s-aviso">Teste obrigatório ainda não realizado: primeiro em rede isolada, depois um teste destrutivo controlado.</p></div>
       </div>`,
     notas:'Esta é a parte prática do DRP: como se recupera um servidor perdido usando o Veeam no NT-003. Depois de restaurar, nada é liberado sem passar pelo checklist, que inclui voltar a mandar logs para o Wazuh e a ser monitorado pelo Zabbix. Ao final se registram o RPO e o RTO reais, que são comparados com as metas da BIA. A documentação e os scripts ficam numa pasta de emergência fora dos servidores. Ser honesto: o teste real ainda vai ser feito, primeiro em rede isolada.'
   },
@@ -1004,6 +1175,20 @@ async function rodarIncidente(passo){
     // e-mail de phishing: SD-WAN -> UniFi -> Cisco -> workstation da VLAN 40
     await pacote([{x:120,y:170},{x:300,y:170},{x:460,y:172},{x:700,y:170},{x:820,y:170},{x:820,y:BUS_Y},{x:ws.x,y:BUS_Y},ws], COR.danger, 3200, 9);
     if(minha === geracao){ WS.classList.add('alerta'); selo(WS, 'CLICOU', COR.danger); }
+    return;
+  }
+  if(passo >= 4){
+    selo(ITSM, passo === 4 ? 'INC ABERTO' : 'RESOLVIDO', passo === 4 ? '#FCD34D' : '#4ADE80');
+    WS.classList.add('ok'); selo(WS, passo === 4 ? 'VERIFICANDO' : 'RECUPERADA', '#4ADE80');
+    const wz = hostCentro(4, 0);
+    if(passo === 4){
+      // busca do domínio malicioso nos logs de todos os agentes
+      const agentes = [hostCentro(1,0), hostCentro(1,1), hostCentro(2,0), hostCentro(4,1), hostCentro(4,2)];
+      emLoop(() => agentes.forEach((a, k) => setTimeout(() => pacote(viaBus(wz, a), '#FB923C', 1500, 6), k * 260)), 3200);
+    } else {
+      // monitoramento reforçado: a estação volta a mandar logs ao Wazuh
+      emLoop(() => pacote(viaBus(ws, wz), COR.end, 1600, 7), 2200);
+    }
     return;
   }
   WS.classList.add('alerta');
@@ -1083,6 +1268,7 @@ function ir(i){
     if(minha !== geracao) return;
     if(p.anim) p.anim();
     if(p.incidente !== undefined) rodarIncidente(p.incidente);
+    if(p.dr !== undefined) rodarDR(p.dr);
   }, sala ? 0 : (corpo.classList.contains('entrando') ? 1900 : 950));
 
   $('contador').textContent = `${i + 1} / ${PARADAS.length}`;
