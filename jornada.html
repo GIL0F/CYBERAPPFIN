@@ -799,6 +799,27 @@ const PARADAS = [
     notas:'A BIA do GRC define, para cada serviço, quanto tempo ele pode ficar parado e quanto dado pode ser perdido. Crédito é o mais sensível porque a Cyberappfin é uma SCD regulada pelo Banco Central: 2 horas para voltar e no máximo 15 minutos de dados perdidos. Se perguntarem como chegaram nos números: são metas definidas pela criticidade de cada serviço, e o teste de restauração é o que vai comprovar.'
   },
   {
+    quem:P4, cor:COR.grc, titulo:'Os cinco pilares do impacto', sub:'GRC-BIA-001 · cenário de perda do ambiente, nível máximo nas primeiras 72 h',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="calor">
+          <span></span><span class="cab">Segurança física</span><span class="cab">Financeiro</span><span class="cab">Legislação e regulação</span><span class="cab">Operação</span><span class="cab">Reputação</span>
+          <span class="srv">Crédito</span><span class="cel n3">3 Alto</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span>
+          <span class="srv">BPO Financeiro</span><span class="cel n3">3 Alto</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span>
+          <span class="srv">Folha</span><span class="cel n3">3 Alto</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span>
+          <span class="srv">Valuation e M&amp;A</span><span class="cel n3">3 Alto</span><span class="cel n2">2 Médio</span><span class="cel n3">3 Alto</span><span class="cel n2">2 Médio</span><span class="cel n2">2 Médio</span>
+        </div>
+        <div class="marcos">
+          <span></span>
+          <p>A infraestrutura fica em ambiente externo (VLAN 200). Reconstruir depende do acesso liberado e de hardware novo.</p>
+          <p>Param o faturamento e o crédito operado. O pagamento segue autorizado só pelo cliente, com token próprio.</p>
+          <p>Como SCD, a parada de crédito leva GRC e Jurídico ao BACEN. Envolve LGPD, sigilo bancário (LC 105/2001) e PLD.</p>
+          <p>Param contas a pagar e a receber, conciliação, crédito, cobrança e a Folha; o monitoramento do SOC cai junto.</p>
+          <p>O cliente vem pela confiança na holding: um desastre atinge as duas marcas. Só a Diretoria fala com o público.</p>
+        </div>
+      </div>`,
+    notas:'Os cinco pilares são as dimensões em que a BIA mede o impacto: segurança física, financeiro, legislação e regulação, operação e reputação. Crédito, BPO e Folha chegam ao crítico em quatro das cinco; Valuation é o menos sensível. Por ser uma SCD regulada, o pilar regulatório é o que leva mais rápido ao Banco Central. Depois de 72 h sem recuperação, Valuation também chega ao crítico no financeiro e na operação.'
+  },
+  {
     quem:P4, cor:COR.grc, titulo:'O impacto cresce a cada hora', sub:'GRC-BIA-001 · cenário de perda do ambiente, nível de impacto ao longo do tempo',
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="calor">
