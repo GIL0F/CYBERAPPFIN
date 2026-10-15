@@ -215,6 +215,13 @@
   /* BIA: ordem de recuperação */
   .ordem .bloco{ flex-direction:row; align-items:flex-start; gap:14px; }
   .ordem .num{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(26px, 2.4vw, 44px); font-weight:800; line-height:1; color:var(--cor); min-width:1.2em; }
+  /* escalonamento em escada */
+  .escada{ display:grid; grid-template-columns:repeat(5, 1fr); gap:1vw; align-items:end; }
+  .escada .bloco{ gap:8px; }
+  .escada .bloco:nth-child(2){ margin-bottom:2.2vh; } .escada .bloco:nth-child(3){ margin-bottom:4.4vh; }
+  .escada .bloco:nth-child(4){ margin-bottom:6.6vh; } .escada .bloco:nth-child(5){ margin-bottom:8.8vh; }
+  .escada .rodape{ font-size:clamp(13px, .92vw, 16px); color:var(--soft); }
+  .escada .rodape b{ color:var(--cor); }
   .gigante{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(56px, 7.5vw, 140px); font-weight:800; line-height:.95; letter-spacing:-.03em; }
 
   /* ---------- rodapé de navegação ---------- */
@@ -747,6 +754,35 @@ const PARADAS = [
         </div>
       </div>`,
     notas:'No nosso phishing: detecção pelo Wazuh, triagem com a IA, ticket no ITSM e contenção pelos times. Como é nível 3, o CSIRT é acionado. Cada time tem um papel. Ninguém fala publicamente sobre o incidente sem a Diretoria. As lições aprendidas viram ajuste de regra no Wazuh.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Escalonamento: quem chama quem', sub:'POL-GI-001 · PB-010 · BIA-001 · cada degrau tem um gatilho para subir',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="escada">
+          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Degrau 1 · detecção</span><h4>Wazuh e CyberFin IA</h4>
+            <p>O Wazuh gera o alerta e a IA classifica. O aviso chega ao canal do SOC no Telegram.</p>
+            <div class="rodape"><b>Sobe sempre:</b> alerta não é incidente; quem confirma é uma pessoa.</div></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">Degrau 2 · triagem</span><h4>Analista do SOC</h4>
+            <p>Confirma, registra o ticket no ITSM, coleta evidências e propõe o nível pela matriz.</p>
+            <div class="rodape"><b>Sobe quando:</b> o incidente é confirmado, no prazo do nível (15 min a 2 h).</div></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="rot">Degrau 3 · decisão</span><h4>Coordenador do SOC</h4>
+            <p>Define o nível, autoriza a contenção e aciona Network, IAM e Endpoint.</p>
+            <div class="rodape"><b>Sobe quando:</b> nível 3 ou 4 (equivale a S2 e S1).</div></div>
+          <div class="bloco" style="--cor:#F87171"><span class="rot">Degrau 4 · resposta</span><h4>CSIRT</h4>
+            <p>SOC, IAM, Network, Endpoint, GRC e DPO, Jurídico. GRC e DPO avaliam ANPD; GRC e Jurídico, o BACEN.</p>
+            <div class="rodape"><b>Sobe quando:</b> nível 4, dados de clientes acessados ou pagamento indevido.</div></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="rot">Degrau 5 · governança</span><h4>Diretoria Executiva</h4>
+            <p>Aprova a comunicação externa e, por recomendação do CSIRT, <b>declara o desastre</b>.</p>
+            <div class="rodape"><b>Dispara:</b> o plano de recuperação (DRP), na ordem do runbook.</div></div>
+        </div>
+        <div class="linha" style="grid-template-columns:1fr 1fr">
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">Atualizações durante a contenção</span>
+            <p><b>Níveis 3 e 4:</b> a cada 15 min no canal do SOC. <b>Níveis 1 e 2:</b> a cada 30 a 60 min. Times técnicos por WhatsApp e canal técnico; GRC e Diretoria por e-mail e WhatsApp.</p></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="rot">Quem fala para fora</span>
+            <p>Só o Coordenador do SOC e o GRC falam com regulador e cliente, e só a Diretoria fala com o público. Se o e-mail ou o AD estiverem comprometidos: telefone e WhatsApp.</p></div>
+        </div>
+      </div>`,
+    notas:'Ler da esquerda para a direita, subindo. O alerta nasce no Wazuh e a IA classifica, mas quem confirma é o analista. O coordenador decide o nível e autoriza a contenção. Nível 3 ou 4 aciona o CSIRT; nível 4, dados de clientes ou pagamento indevido sobem à Diretoria, que é quem pode declarar o desastre e disparar o DRP. No nosso phishing: o analista confirmou, o coordenador classificou como nível 3 e o CSIRT foi acionado.'
   },
   {
     quem:P3, cor:COR.soc, titulo:'Como medimos o SOC', sub:'Metas de desempenho da POL-GI-001',
