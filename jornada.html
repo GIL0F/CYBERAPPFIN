@@ -573,7 +573,7 @@ const PARADAS = [
       <tr><td>40</td><td>Usuários</td><td class="mono">10.10.40.0/24</td></tr>
       <tr class="dest"><td>50</td><td>Segurança / SOC</td><td class="mono">10.10.50.0/24</td></tr>
       <tr><td>60</td><td>Backup</td><td class="mono">10.10.60.0/24</td></tr></table>
-      <p>Gateway de cada VLAN no <b>.1</b>. VLANs e trunks em <b>95%</b>, DMZ em <b>100%</b>.</p>
+      <p>Gateway de cada VLAN no <b>.1</b>. VLANs e trunks em <b>100%</b>, DMZ em <b>100%</b>.</p>
       <p>A infraestrutura de virtualização fica na <b>VLAN 200</b>, em ambiente externo (próxima parada).</p>`,
     notas:'O Cisco 2960 leva todas as VLANs por um único cabo (trunk 802.1Q), marcando cada pacote com o número da VLAN. Segmentar limita o movimento lateral: quem compromete uma workstation da VLAN 40 não chega direto aos controladores de domínio.'
   },
@@ -794,11 +794,10 @@ const PARADAS = [
         </div>
         <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
           <div class="bloco" style="--cor:${COR.grc}"><span class="grande">100%</span><p>Inventário de ativos</p></div>
-          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">45%</span><p>PSI e políticas complementares</p></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">90%</span><p>PSI e políticas complementares</p></div>
           <div class="bloco" style="--cor:${COR.grc}"><span class="grande">11</span><p>Playbooks de resposta (PB-000 a PB-010)</p></div>
-          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">40%</span><p>Documentação do projeto</p></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">90%</span><p>Documentação do projeto</p></div>
         </div>
-        <p class="s-aviso">Percentuais de 11/09. Confirmar com o GRC.</p>
       </div>`,
     notas:'Banco Central e LGPD exigem política escrita, não só prática. GRC coordena e cada time contribui com a política da sua área: o SOC escreveu as de incidentes e continuidade. São 11 playbooks: o PB-000 é o mestre e o PB-010, de phishing, é o usado na simulação.'
   },
