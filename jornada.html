@@ -199,6 +199,22 @@
   .lema2{ display:flex; gap:20px; flex-wrap:wrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 2vw, 34px); font-weight:700; color:var(--soft); }
   .lema2 span:nth-child(even){ color:#4B6580; }
   .faixa{ height:6px; width:min(520px, 60%); border-radius:3px; background:linear-gradient(90deg, var(--brand), var(--iam), var(--net), var(--soc), var(--end)); }
+  /* BIA: relógios por serviço */
+  .relogio{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; padding:6px 0; }
+  .relogio div{ display:flex; flex-direction:column; gap:2px; }
+  .relogio b{ white-space:nowrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.6vw, 30px); font-weight:800; line-height:1.05; color:var(--cor); }
+  .relogio span{ font-size:clamp(11px, .8vw, 14px); font-weight:700; letter-spacing:.1em; color:var(--muted); }
+  /* BIA: mapa de calor no tempo */
+  .calor{ display:grid; grid-template-columns:minmax(150px, 15%) repeat(5, 1fr); gap:6px; }
+  .calor .cab{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(13px, 1vw, 18px); font-weight:700; color:var(--muted); text-align:center; padding:6px 0; }
+  .calor .srv{ font-size:clamp(14px, 1.05vw, 19px); font-weight:700; display:flex; align-items:center; }
+  .calor .cel{ border-radius:8px; padding:clamp(8px, .8vw, 14px) 6px; text-align:center; font-size:clamp(13px, .95vw, 17px); font-weight:700; color:#160C0E; }
+  .calor .n2{ background:#FACC15; } .calor .n3{ background:#FB923C; } .calor .n4{ background:#F87171; }
+  .marcos{ display:grid; grid-template-columns:minmax(150px, 15%) repeat(5, 1fr); gap:6px; margin-top:4px; }
+  .marcos p{ font-size:clamp(12px, .88vw, 16px); line-height:1.4; color:var(--soft); border-top:2px solid var(--line-2); padding-top:8px; }
+  /* BIA: ordem de recuperação */
+  .ordem .bloco{ flex-direction:row; align-items:flex-start; gap:14px; }
+  .ordem .num{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(26px, 2.4vw, 44px); font-weight:800; line-height:1; color:var(--cor); min-width:1.2em; }
   .gigante{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(56px, 7.5vw, 140px); font-weight:800; line-height:.95; letter-spacing:-.03em; }
 
   /* ---------- rodapé de navegação ---------- */
@@ -596,7 +612,7 @@ const PARADAS = [
       <ul><li style="--cor:${COR.iam}">Dois controladores de domínio com replicação confirmada</li>
       <li style="--cor:${COR.iam}"><b>GPO:</b> senha mínima de 10 caracteres, bloqueio após 5 tentativas</li>
       <li style="--cor:${COR.iam}"><b>11 OUs e 18 grupos</b> de segurança, um por perfil RBAC</li></ul>
-      <p>Política vigente: <b>POL-GDI-001 / POL-CA-001 v1.3</b>.</p>`,
+      <p>Política vigente: <b>POL-GDI-001 / POL-CA-001 v1.6</b>.</p>`,
     notas:'Dois controladores evitam que a queda de um derrube o login de todos (a bolinha lilás é a replicação). A permissão vai para o grupo, nunca direto para a pessoa: menor privilégio.'
   },
 
@@ -762,35 +778,73 @@ const PARADAS = [
 
   /* =================== SALA: continuidade, GRC, riscos, plano, aplicação =================== */
   {
-    quem:P4, cor:COR.grc, titulo:'Continuidade do negócio', sub:'POL-CN-001 · BIA e DRP',
-    sala:`<div class="s-corpo">
-        <p class="s-rot">Metas da BIA: tempo máximo de parada (RTO) e perda de dados aceitável (RPO), escala de 24 h</p>
-        <div class="rto">
-          <div class="item"><span class="nome">Operações de Crédito</span><div class="trilho"><i style="width:8.3%;background:#F87171"></i><span style="left:10%">RTO 2 h · RPO 15 min · MTPD 6 h</span></div></div>
-          <div class="item"><span class="nome">BPO Financeiro</span><div class="trilho"><i style="width:16.7%;background:#FB923C"></i><span style="left:18.5%">RTO 4 h · RPO 1 h · MTPD 12 h</span></div></div>
-          <div class="item"><span class="nome">Folha de Pagamento</span><div class="trilho"><i style="width:16.7%;background:#FB923C"></i><span style="left:18.5%">RTO 4 h · RPO 1 h · MTPD 24 h</span></div></div>
-          <div class="item"><span class="nome">Valuation e M&amp;A</span><div class="trilho"><i style="width:100%;background:#3D5F82"></i><span style="left:2%">RTO 24 h · RPO 12 h · MTPD 72 h</span></div></div>
+    quem:P4, cor:COR.grc, titulo:'BIA: quatro serviços, quatro relógios', sub:'GRC-BIA-001 · quanto tempo cada serviço pode ficar parado',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="bloco" style="--cor:#F87171"><span class="rot" style="color:#F87171">Crítico · S1</span><h4>Operações de Crédito</h4>
+            <div class="relogio"><div><b>2 h</b><span>RTO</span></div><div><b>15 min</b><span>RPO</span></div><div><b>6 h</b><span>MTPD</span></div></div>
+            <p>Bloqueio de liquidez das PMEs, perda de receita de juros e sanções do Banco Central.</p></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="rot" style="color:#FB923C">Alto · S2</span><h4>BPO Financeiro</h4>
+            <div class="relogio"><div><b>4 h</b><span>RTO</span></div><div><b>1 h</b><span>RPO</span></div><div><b>12 h</b><span>MTPD</span></div></div>
+            <p>Atraso no pagamento de fornecedores dos clientes, multas e quebra de contrato.</p></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="rot" style="color:#FB923C">Alto · S2</span><h4>Folha de Pagamento</h4>
+            <div class="relogio"><div><b>4 h</b><span>RTO</span></div><div><b>1 h</b><span>RPO</span></div><div><b>24 h</b><span>MTPD</span></div></div>
+            <p>Salários de funcionários dos clientes sem pagamento e passivos trabalhistas.</p></div>
+          <div class="bloco" style="--cor:#FACC15"><span class="rot" style="color:#FACC15">Médio-Baixo · S3-S4</span><h4>Valuation e M&amp;A</h4>
+            <div class="relogio"><div><b>24 h</b><span>RTO</span></div><div><b>12 h</b><span>RPO</span></div><div><b>72 h</b><span>MTPD</span></div></div>
+            <p>Atraso na entrega de relatórios de avaliação, sem impacto transacional imediato.</p></div>
         </div>
-        <div class="linha" style="grid-template-columns:1.2fr 1fr">
-          <div class="bloco" style="--cor:${COR.grc}"><h4>Backup hoje</h4>
-            <p><b>Em operação:</b> Veeam no NT-003 (VLAN 60), backup por agente Windows e Linux, cópias criptografadas.</p>
-            <p><b>Em validação:</b> cópia offsite da estratégia 3-2-1, que depende da VPN, e o primeiro teste de restauração.</p></div>
-          <div class="bloco" style="--cor:${COR.brand}"><h4>Plano de testes</h4>
-            <p><b>Mensal:</b> restauração de backup (SOC e Endpoint)</p>
-                        <p><b>Anual:</b> exercício de mesa (SOC, GRC e Diretoria)</p></div>
-        </div>
-        <p class="s-aviso">Os tempos são metas da política. Só o teste de restauração vai dizer se são cumpridos.</p>
+        <p class="s-txt"><b>RTO</b>: tempo máximo para voltar · <b>RPO</b>: perda máxima de dados · <b>MTPD</b>: a partir daqui o dano é inaceitável. Metas da BIA-001 e da POL-CN-001.</p>
       </div>`,
-    notas:'RTO é o tempo máximo para voltar, RPO quanto dado pode ser perdido, MTPD o limite do dano aceitável. São metas definidas na BIA pela criticidade de cada serviço: crédito é o mais sensível. Se perguntarem como chegamos nos números: são metas da política, e o teste de restauração, ainda em validação, é o que vai comprovar. Planos complementares: PCO, Comunicação em Crise e Trabalho Remoto por VPN.'
+    notas:'A BIA do GRC define, para cada serviço, quanto tempo ele pode ficar parado e quanto dado pode ser perdido. Crédito é o mais sensível porque a Cyberappfin é uma SCD regulada pelo Banco Central: 2 horas para voltar e no máximo 15 minutos de dados perdidos. Se perguntarem como chegaram nos números: são metas definidas pela criticidade de cada serviço, e o teste de restauração é o que vai comprovar.'
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:'O impacto cresce a cada hora', sub:'GRC-BIA-001 · cenário de perda do ambiente, nível de impacto ao longo do tempo',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="calor">
+          <span></span><span class="cab">T0 a 2 h</span><span class="cab">2 a 6 h</span><span class="cab">6 a 24 h</span><span class="cab">24 a 72 h</span><span class="cab">mais de 72 h</span>
+          <span class="srv">Crédito</span><span class="cel n3">3 Alto</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span>
+          <span class="srv">BPO Financeiro</span><span class="cel n3">3 Alto</span><span class="cel n3">3 Alto</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span>
+          <span class="srv">Folha</span><span class="cel n3">3 Alto</span><span class="cel n3">3 Alto</span><span class="cel n3">3 Alto</span><span class="cel n4">4 Crítico</span><span class="cel n4">4 Crítico</span>
+          <span class="srv">Valuation e M&amp;A</span><span class="cel n2">2 Médio</span><span class="cel n3">3 Alto</span><span class="cel n3">3 Alto</span><span class="cel n3">3 Alto</span><span class="cel n4">4 Crítico</span>
+        </div>
+        <div class="marcos">
+          <span></span>
+          <p>SOC classifica nível 4 e aciona o CSIRT. Vence o RTO de Crédito (2 h).</p>
+          <p>Vence o RTO de BPO e Folha (4 h). Às 6 h, Crédito passa do MTPD: GRC e Jurídico acionam o BACEN.</p>
+          <p>BPO passa do MTPD (12 h): contas das PMEs atrasam. Folha chega ao MTPD (24 h).</p>
+          <p>Valuation e M&amp;A chega ao MTPD (72 h). Só a Diretoria comunica.</p>
+          <p>Todos os MTPD vencidos: danos irreversíveis ou sanções regulatórias.</p>
+        </div>
+      </div>`,
+    notas:'Ler a tabela da esquerda para a direita: cada coluna é uma janela de tempo depois da parada. Crédito vira crítico já nas primeiras horas; Valuation é o último a chegar ao crítico. Os marcos embaixo mostram quando cada prazo vence e quem é acionado.'
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:'Em que ordem recuperar', sub:'Runbook de recuperação · camada por camada, sem pular etapas',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="linha ordem" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="bloco" style="--cor:#9FB1C3"><span class="num">0</span><div><h4>Declarar o desastre</h4><p>Diretoria declara, por recomendação do CSIRT, e inventaria o que sobreviveu.</p></div></div>
+          <div class="bloco" style="--cor:#9FB1C3"><span class="num">1</span><div><h4>Infraestrutura</h4><p>Virtualização e armazenamento do ambiente externo (VLAN 200) e acesso administrativo.</p></div></div>
+          <div class="bloco" style="--cor:${COR.net}"><span class="num">2</span><div><h4>Rede</h4><p>SD-WAN, firewall e VLANs no UniFi e no Cisco 2960; gateway, DNS e NTP.</p></div></div>
+          <div class="bloco" style="--cor:${COR.iam}"><span class="num">3</span><div><h4>Identidade</h4><p>NT-001 e NT-002: Active Directory, autenticação e DNS.</p></div></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="num">4</span><div><h4>Backup</h4><p>NT-003 com Veeam: repositório íntegro e pontos de restauração conferidos.</p></div></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="num">5</span><div><h4>Serviços do SOC</h4><p>Wazuh, Zabbix + Grafana, OpenVAS, CyberFin IA e ITSM.</p></div></div>
+          <div class="bloco" style="--cor:${COR.danger}"><span class="num">6</span><div><h4>Aplicação</h4><p>Reverse Proxy na DMZ e serviços de negócio, na ordem dos MTPD: Crédito, BPO, Folha, Valuation.</p></div></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="num">7</span><div><h4>Segurança e observação</h4><p>Agentes, logs, regras de firewall, monitoramento e novo backup depois da recuperação.</p></div></div>
+        </div>
+        <p class="s-txt"><b>Regra do runbook:</b> não iniciar restaurações em massa antes de confirmar infraestrutura, rede, AD/DNS e a integridade dos backups.</p>
+        <p class="s-aviso">Restauração ainda não testada: o runbook exige um teste real para validar o backup e medir os tempos.</p>
+      </div>`,
+    notas:'A ordem vem do runbook de recuperação: primeiro o que sustenta tudo (infraestrutura, rede e identidade), depois o backup, os serviços do SOC e por último as aplicações, seguindo a criticidade da BIA. Sem AD e DNS de pé, nada mais autentica; por isso a identidade vem antes do backup.'
   },
   {
     quem:P4, cor:COR.grc, titulo:'GRC: políticas e conformidade', sub:'Uma financeira regulada precisa provar que é segura',
     sala:`<div class="s-corpo">
         <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
-          <div class="doc"><span class="cod">POL-GDI-001 · POL-CA-001</span><h4>Identidades e Controle de Acesso</h4><p>Ciclo de vida de identidades, MFA, controle de contas privilegiadas e trilhas de auditoria.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.3 · vigente</span></div>
-          <div class="doc"><span class="cod">POL-CR-001</span><h4>Criptografia</h4><p>Algoritmos, gestão de chaves e proteção de dados em trânsito e em repouso.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.2 · vigente</span></div>
-          <div class="doc"><span class="cod">POL-GI-001</span><h4>Gestão de Incidentes</h4><p>Matriz de severidade, ciclo de resposta, CSIRT, notificação e KPIs.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.0 · SOC</span></div>
-          <div class="doc"><span class="cod">POL-CN-001</span><h4>Continuidade do Negócio</h4><p>BIA, RTO/RPO, backup 3-2-1, DRP e plano de testes.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.0 · SOC</span></div>
+          <div class="doc"><span class="cod">POL-GDI-001 · POL-CA-001</span><h4>Identidades e Controle de Acesso</h4><p>Ciclo de vida de identidades, MFA, controle de contas privilegiadas e trilhas de auditoria.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.6 · vigente</span></div>
+          <div class="doc"><span class="cod">POL-CR-001</span><h4>Criptografia</h4><p>Algoritmos, gestão de chaves e proteção de dados em trânsito e em repouso.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.4 · vigente</span></div>
+          <div class="doc"><span class="cod">POL-GI-001</span><h4>Gestão de Incidentes</h4><p>Matriz de severidade, ciclo de resposta, CSIRT, notificação e KPIs.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.2 · SOC</span></div>
+          <div class="doc"><span class="cod">POL-CN-001</span><h4>Continuidade do Negócio</h4><p>BIA, RTO/RPO, backup 3-2-1, DRP e plano de testes.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.2 · SOC</span></div>
         </div>
         <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
           <div class="bloco" style="--cor:${COR.grc}"><span class="grande">100%</span><p>Inventário de ativos</p></div>
