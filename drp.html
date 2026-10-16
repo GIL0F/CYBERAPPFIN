@@ -96,16 +96,33 @@
   .ficha td.cx{ width:46px; text-align:center; }
   .ficha td.cx::before{ content:""; display:inline-block; width:16px; height:16px; border:2px solid var(--soft); border-radius:3px; vertical-align:middle; }
 
+  .item{ border:1px solid var(--linha); border-radius:12px; margin:14px 0; overflow:hidden; break-inside:avoid; }
+  .item > header{ display:flex; gap:12px; align-items:center; padding:10px 16px; background:#FAF8F3; border-bottom:1px solid var(--linha); }
+  .item > header .n{ width:30px; height:30px; border-radius:50%; background:var(--grc); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-family:'Sora', system-ui, sans-serif; flex-shrink:0; }
+  .item > header h3{ margin:0; font-size:18px; }
+  .item .corpo{ padding:12px 18px 6px; display:grid; grid-template-columns:1fr 1fr; gap:4px 24px; }
+  .item .corpo .larga{ grid-column:1 / -1; }
+  .item .os{ font-size:12px; letter-spacing:.1em; text-transform:uppercase; font-weight:800; color:var(--muted); display:block; margin-bottom:4px; }
+  .item pre{ font-family:'JetBrains Mono', monospace; font-size:13.5px; background:#14202C; color:#B8F2E6; border-radius:8px; padding:8px 12px; white-space:pre-wrap; word-break:break-word; margin-bottom:10px; }
+  .item .ok{ background:#F1F8F3; border:1px solid #CBE6D3; color:#1F3B2A; border-radius:8px; padding:8px 12px; }
+  .item .x{ background:#FFF8EA; border:1px solid #F2D597; color:#6B4400; border-radius:8px; padding:8px 12px; }
+  @media (max-width:760px){ .item .corpo{ grid-template-columns:1fr; } }
   .rodape{ text-align:center; color:var(--muted); font-size:14px; margin-top:30px; }
 
   @media (max-width:980px){
-    .grade{ grid-template-columns:1fr; }
+    .grade{ grid-template-columns:minmax(0, 1fr); }
     nav.indice{ position:static; }
     main{ padding:28px 22px; }
     .meta{ grid-template-columns:1fr 1fr; }
     .linha-rest{ grid-template-columns:repeat(4, 1fr); }
   }
   @media (max-width:560px){
+    .grade{ padding:16px 10px 60px; }
+    main{ padding:22px 14px; }
+    code{ white-space:normal; word-break:break-word; }
+    table{ font-size:14px; }
+    th, td{ padding:6px 6px; }
+    .ficha td.cx{ width:30px; }
     .cabeca h1{ font-size:30px; }
     .linha-rest{ grid-template-columns:repeat(2, 1fr); }
     .meta{ grid-template-columns:1fr; }
@@ -156,12 +173,12 @@
 
   <main>
     <div class="cabeca">
-      <span class="cod">GRC-DRP-001 · baseado em POL-CN-001, GRC-BIA-001, POL-GI-001 e no runbook de DR</span>
+      <span class="cod">GRC-DRP-001 · baseado em POL-CN-001, GRC-BIA-001, POL-GI-001 e no runbook técnico (<a href="runbook-tecnico.html">abrir</a>)</span>
       <h1>Plano de Recuperação de Desastres</h1>
       <p class="sub">Como a Cyberappfin restaura o ambiente inteiro a partir do backup, em que ordem e com que validação entre uma etapa e outra.</p>
       <div class="meta">
-        <div><span>Versão</span><b>1.0</b></div>
-        <div><span>Data</span><b>15/10/2026</b></div>
+        <div><span>Versão</span><b>1.1</b></div>
+        <div><span>Data</span><b>16/10/2026</b></div>
         <div><span>Dono</span><b>GRC</b></div>
         <div><span>Classificação</span><b>Uso interno</b></div>
       </div>
@@ -175,7 +192,7 @@
       <table>
         <tr><th>Dentro do escopo</th><th>Fora do escopo</th></tr>
         <tr><td>Servidores das VLANs 20 (AD), 30 (DMZ), 50 (SOC) e 60 (Backup); configuração de rede (UniFi e Cisco 2960); estações das VLANs 10 e 40.</td>
-            <td>Ambiente externo da VLAN 200 (hosts ESXi, vCenter, Jump Server e Storage/TrueNAS). O grupo usa essa infraestrutura, mas não a administra: aqui só se descreve <b>o que pedir</b> a quem a administra.</td></tr>
+            <td>Ambiente externo da VLAN 200 (hosts ESXi, vCenter, Jump Server e Storage/TrueNAS). O grupo usa essa infraestrutura, inclusive o <b>TrueNAS como repositório de backup</b>, mas não a administra: aqui só se descreve <b>o que pedir</b> a quem a administra.</td></tr>
       </table>
     </section>
 
@@ -184,15 +201,16 @@
       <h2><span class="n">2</span>Cenário de desastre</h2>
       <div class="caixa alerta">
         <span class="rot">Cenário de referência</span>
-        <p><b>Ransomware criptografa os servidores das VLANs 20, 30 e 50.</b> Os dois controladores de domínio (NT-001 e NT-002), o Reverse Proxy da DMZ e toda a stack do SOC ficam inacessíveis. O SOC classifica como <b>nível 4 (crítico)</b> pela matriz da POL-GI-001, o CSIRT é acionado e recomenda à Diretoria declarar o desastre.</p>
+        <p><b>Perda das VMs do ambiente.</b> As máquinas virtuais (NT-001, NT-002, NT-003, o Firefly e toda a stack do SOC) ficam inutilizáveis, por exemplo por falha do storage das VMs, erro em massa ou perda da plataforma de virtualização. A infraestrutura de virtualização continua disponível ou é reconstruída pelo ambiente externo, e os serviços precisam voltar <b>a partir dos backups e da documentação</b>. O SOC classifica como <b>nível 4 (crítico)</b> pela matriz da POL-GI-001, o CSIRT é acionado e recomenda à Diretoria declarar o desastre.</p>
       </div>
       <p>O que sobrevive e por quê:</p>
       <ul class="lista">
-        <li><b>NT-003 (Backup, 10.10.60.143)</b>: está na VLAN 60, isolada das demais pelo firewall, e os backups do Veeam são criptografados. É a partir dele que o ambiente volta.</li>
-        <li><b>Rede (UniFi e Cisco 2960)</b>: não é afetada pelo ransomware, mas suas regras são revistas antes de reabrir o tráfego.</li>
+        <li><b>Repositório de backup no TrueNAS</b> (ambiente externo): os backups do Veeam e o backup dedicado do Firefly ficam fora das VMs perdidas. É dele que o ambiente volta.</li>
+        <li><b>Rede (UniFi e Cisco 2960)</b>: não depende das VMs; é conferida antes de qualquer restauração.</li>
         <li><b>Ambiente externo (VLAN 200)</b>: fornece as máquinas virtuais novas onde os servidores serão restaurados.</li>
+        <li><b>Kit de emergência</b> (<a href="#s6">seção 6</a>): documentação, credenciais locais e mídias de recuperação, guardados fora dos servidores.</li>
       </ul>
-      <p>O mesmo plano serve para outros desastres que levam à perda dos servidores (falha do storage, erro humano em massa, perda do ambiente de virtualização). Nesses casos, a <a href="#f0">fase 0</a> muda (não há perícia de malware) e o resto da sequência é igual.</p>
+      <p>O mesmo plano serve para um <b>ransomware</b>. Nesse caso, a <a href="#f0">fase 0</a> inclui isolar as VLANs e preservar as máquinas para perícia, o ponto de restauração tem de ser <b>anterior à infecção</b>, cada ponto é varrido com antivírus antes de voltar, e na fase 4 as senhas privilegiadas são trocadas (inclusive duas vezes a da conta krbtgt).</p>
     </section>
 
     <!-- 3 -->
@@ -207,6 +225,14 @@
         <tr><td><b>Valuation e M&amp;A</b></td><td>Médio-Baixo · S3-S4</td><td>24 h</td><td>12 h</td><td>72 h</td><td>4º</td></tr>
       </table></div>
       <p><b>RTO</b>: tempo máximo para o serviço voltar. <b>RPO</b>: perda máxima de dados aceitável. <b>MTPD</b>: a partir daqui o dano é inaceitável.</p>
+      <h3>Como o backup é feito hoje</h3>
+      <table>
+        <tr><th>Ativo</th><th>Método</th><th>Frequência</th><th>Situação</th></tr>
+        <tr><td><b>VMs</b></td><td>Veeam (NT-003), imagem completa, gravada no TrueNAS</td><td>Full aos domingos; incrementais nos dias úteis</td><td>Jobs configurados; restore real ainda a comprovar</td></tr>
+        <tr><td><b>Firefly</b></td><td>Script dedicado <code>/opt/cyberfin-dr/backup-firefly-dr.sh</code> (banco, arquivos e configuração), copiado para o TrueNAS</td><td>Às 00h e às 12h</td><td>Backup, cópia e SHA-256 já validados</td></tr>
+      </table>
+      <div class="caixa aviso"><span class="rot">Atenção ao RPO</span>
+        <p>Com essa frequência, a perda real de dados pode passar de 24 h nas VMs e chegar a 12 h no Firefly, acima das metas da tabela (15 min para Crédito; 1 h para BPO e Folha). Ver <a href="#s15">lacunas</a>.</p></div>
     </section>
 
     <!-- 4 -->
@@ -228,12 +254,12 @@
         <tr><th>Papel</th><th>Quem</th><th>O que faz no DR</th></tr>
         <tr><td><b>Declara o desastre</b></td><td><span class="tag dir">Diretoria</span></td><td>Declara, aprova a comunicação externa e é a única que fala com o público.</td></tr>
         <tr><td><b>Coordenador do DR</b></td><td><span class="tag grc">GRC</span></td><td>Conduz o plano, libera cada fase pelo critério de saída, mantém o registro e os tempos.</td></tr>
-        <tr><td><b>Coordenador do SOC</b></td><td><span class="tag soc">SOC</span></td><td>Lidera a parte de incidente (perícia, contenção) e decide quando é seguro reconectar.</td></tr>
-        <tr><td><b>Rede</b></td><td><span class="tag net">Network</span></td><td>Isola as VLANs, valida SD-WAN, firewall, VLANs e trunks; restaura o Reverse Proxy na DMZ.</td></tr>
-        <tr><td><b>Identidade</b></td><td><span class="tag iam">IAM</span></td><td>Restaura o NT-001, reconstrói o NT-002, troca as senhas privilegiadas e valida o AD.</td></tr>
-        <tr><td><b>Backup</b></td><td><span class="tag grc">GRC</span></td><td>Opera o Veeam no NT-003: integridade do repositório, escolha do ponto limpo e restaurações.</td></tr>
-        <tr><td><b>Serviços do SOC</b></td><td><span class="tag soc">SOC</span></td><td>Restaura e valida Wazuh, Zabbix + Grafana, OpenVAS, CyberFin IA e ITSM.</td></tr>
-        <tr><td><b>Estações e hardening</b></td><td><span class="tag end">Endpoint</span></td><td>Varre os pontos de restauração com antivírus, confere o hardening e faz a reimagem das estações.</td></tr>
+        <tr><td><b>Coordenador do SOC</b></td><td><span class="tag soc">SOC</span></td><td>Lidera a parte de incidente e decide quando é seguro reabrir o ambiente.</td></tr>
+        <tr><td><b>Rede</b></td><td><span class="tag net">Network</span></td><td>Valida SD-WAN, firewall, VLANs e trunks; confere a publicação do Firefly pelo proxy 10.0.50.2.</td></tr>
+        <tr><td><b>Identidade</b></td><td><span class="tag iam">IAM</span></td><td>Restaura o NT-001, reconstrói o NT-002 e valida o AD.</td></tr>
+        <tr><td><b>Backup</b></td><td><span class="tag grc">GRC</span></td><td>Traz o NT-003 de volta primeiro, opera o Veeam e o repositório no TrueNAS: escolha do ponto íntegro e restaurações.</td></tr>
+        <tr><td><b>Serviços do SOC</b></td><td><span class="tag soc">SOC</span></td><td>Restaura e valida Wazuh, Zabbix + Grafana, OpenVAS, CyberFin IA e Zammad.</td></tr>
+        <tr><td><b>Estações e hardening</b></td><td><span class="tag end">Endpoint</span></td><td>Confere o hardening dos servidores restaurados e faz a reimagem das estações.</td></tr>
         <tr><td><b>Notificações</b></td><td><span class="tag grc">GRC</span> <span class="tag">DPO</span> <span class="tag">Jurídico</span></td><td>Avaliam e fazem a notificação à ANPD (LGPD) e ao BACEN (SCD).</td></tr>
       </table></div>
     </section>
@@ -245,13 +271,14 @@
       <ul class="lista">
         <li>Este plano e o runbook de DR, impressos e em mídia offline;</li>
         <li>Credenciais de emergência guardadas em cofre: <b>conta local</b> do NT-003 e do Veeam (fora do domínio), senha de DSRM do AD, administradores do UniFi e do Cisco;</li>
-        <li>Mídias de recuperação do Veeam (Recovery Media para Windows e Linux), em ISO;</li>
+        <li>Mídias de recuperação do Veeam (Recovery Media para Windows e Linux), em ISO, e o <b>instalador do Veeam</b> com o <b>backup da configuração</b> do NT-003;</li>
+        <li>Acesso ao <b>TrueNAS</b> (repositório de backup) e o caminho dos backups do Veeam e do Firefly;</li>
         <li>Backup da configuração do UniFi e do Cisco 2960 (<code>running-config</code>);</li>
         <li>Inventário de IPs e de servidores (o <a href="#s16">anexo</a> deste plano);</li>
         <li>Contatos: times, ambiente externo (VLAN 200), Diretoria, DPO e Jurídico, por telefone e WhatsApp, porque o e-mail e o AD podem estar fora.</li>
       </ul>
       <div class="caixa aviso"><span class="rot">Por que conta local</span>
-        <p>O backup precisa voltar <b>antes</b> do AD, porque é dele que sai o AD. Se o login do NT-003 dependesse do domínio, ninguém conseguiria entrar para restaurar. Por isso o NT-003 e o Veeam têm uma conta local de emergência.</p></div>
+        <p>O NT-003 é o <b>primeiro servidor a voltar</b>: é nele que roda o Veeam, e é do Veeam que sai o AD. Se o login do NT-003 dependesse do domínio, ninguém conseguiria entrar para restaurar. Por isso o NT-003 e o Veeam têm uma conta local de emergência.</p></div>
     </section>
 
     <!-- 7 -->
@@ -259,10 +286,10 @@
       <h2><span class="n">7</span>Linha de restauração</h2>
       <p>O ambiente volta <b>em camadas</b>, de baixo para cima: cada camada depende da anterior. <b>Nenhuma fase começa antes de a anterior passar pelo critério de saída.</b></p>
       <div class="linha-rest">
-        <a href="#f0" style="--cor:#66727F"><b>0</b><span>Declarar e conter</span><small>Diretoria, CSIRT</small></a>
-        <a href="#f1" style="--cor:#66727F"><b>1</b><span>Infraestrutura</span><small>VMs limpas</small></a>
+        <a href="#f0" style="--cor:#66727F"><b>0</b><span>Declarar o desastre</span><small>Diretoria, CSIRT</small></a>
+        <a href="#f1" style="--cor:#66727F"><b>1</b><span>Infraestrutura</span><small>TrueNAS, VMs novas</small></a>
         <a href="#f2" style="--cor:var(--net)"><b>2</b><span>Rede</span><small>UniFi, Cisco</small></a>
-        <a href="#f3" style="--cor:var(--grc)"><b>3</b><span>Backup</span><small>NT-003, Veeam</small></a>
+        <a href="#f3" style="--cor:var(--grc)"><b>3</b><span>Backup</span><small>NT-003 primeiro</small></a>
         <a href="#f4" style="--cor:var(--iam)"><b>4</b><span>Identidade</span><small>NT-001, NT-002</small></a>
         <a href="#f5" style="--cor:var(--soc)"><b>5</b><span>SOC</span><small>Wazuh primeiro</small></a>
         <a href="#f6" style="--cor:var(--danger)"><b>6</b><span>Aplicação</span><small>DMZ, por MTPD</small></a>
@@ -276,31 +303,32 @@
       <h2><span class="n">8</span>Fases, passo a passo</h2>
 
       <div class="fase" id="f0" style="--cor:#66727F">
-        <header><span class="num">0</span><div><h3>Declarar o desastre e conter</h3><p>Parar a propagação, preservar as evidências e definir de que ponto restaurar</p></div></header>
+        <header><span class="num">0</span><div><h3>Declarar o desastre</h3><p>Registrar, delimitar o escopo e parar mudanças que não sejam do DR</p></div></header>
         <div class="corpo">
-          <div class="quem"><span class="tag dir">Diretoria</span><span class="tag soc">SOC (CSIRT)</span><span class="tag net">Network</span><span class="tag grc">GRC</span></div>
+          <div class="quem"><span class="tag dir">Diretoria</span><span class="tag soc">SOC (CSIRT)</span><span class="tag grc">GRC</span></div>
           <ol class="passos">
             <li>Diretoria declara o desastre por recomendação do CSIRT; o Coordenador do DR registra a <b>hora da declaração</b> (início do RTO real).</li>
-            <li>Network <b>isola as VLANs no UniFi</b>: bloqueia o tráfego entre VLANs e a saída para a internet, mantendo só o acesso administrativo necessário. A VLAN 60 (backup) fica fechada para tudo que não seja o próprio DR.</li>
-            <li>SOC <b>preserva as evidências</b>: as máquinas criptografadas não são apagadas nem reaproveitadas; ficam desligadas para perícia. Coletar a nota de resgate e os últimos alertas do Wazuh que ainda estiverem acessíveis.</li>
-            <li>SOC identifica <b>quando a infecção começou</b> (primeiro alerta, primeiro arquivo criptografado). Isso define o <b>último ponto de restauração limpo</b>: o mais recente que seja anterior ao comprometimento.</li>
-            <li>Inventariar o que sobreviveu (NT-003, rede, estações) e abrir o ticket do desastre no ITSM, ou em papel se o ITSM estiver perdido.</li>
+            <li>Registrar o <b>escopo</b>: ativos afetados, responsável e causa conhecida ou provável.</li>
+            <li><b>Suspender alterações</b> que não tenham relação com a recuperação.</li>
+            <li>Se houver suspeita de ataque, seguir também a rota de incidente: isolar as VLANs no UniFi e preservar as máquinas para perícia (<a href="#s2">seção 2</a>).</li>
+            <li>Inventariar o que sobreviveu (TrueNAS, rede, estações) e abrir o ticket do desastre no Zammad, ou em papel se ele estiver perdido.</li>
             <li>GRC, DPO e Jurídico avaliam as notificações (ANPD e BACEN). Diretoria aprova a comunicação externa.</li>
           </ol>
-          <div class="portao"><p><b>Critério de saída:</b> ambiente isolado, evidências preservadas, ponto de restauração limpo definido e responsáveis acionados.</p></div>
+          <div class="portao"><p><b>Critério de saída:</b> desastre declarado e registrado, escopo definido, mudanças suspensas e responsáveis acionados.</p></div>
         </div>
       </div>
 
       <div class="fase" id="f1" style="--cor:#66727F">
-        <header><span class="num">1</span><div><h3>Infraestrutura (ambiente externo, VLAN 200)</h3><p>Onde os servidores vão ser restaurados</p></div></header>
+        <header><span class="num">1</span><div><h3>Infraestrutura (ambiente externo, VLAN 200)</h3><p>Virtualização, storage e o repositório de backup</p></div></header>
         <div class="corpo">
           <div class="quem"><span class="tag grc">GRC (solicita)</span><span class="tag">Administrador do ambiente externo</span></div>
           <ol class="passos">
             <li>Solicitar ao administrador do ambiente externo a confirmação de que hosts, storage e rede de gerência estão íntegros.</li>
-            <li>Pedir <b>máquinas virtuais novas e vazias</b> para cada servidor perdido, com os mesmos recursos das originais (inventário no <a href="#s16">anexo</a>). Não restaurar sobre as VMs criptografadas: elas são evidência.</li>
+            <li>Confirmar que o <b>TrueNAS</b> está íntegro e acessível: é nele que estão os backups.</li>
+            <li>Pedir <b>máquinas virtuais novas e vazias</b> para cada servidor perdido, com os mesmos recursos das originais (inventário no <a href="#s16">anexo</a>). As VMs danificadas ficam desligadas até a causa ser entendida.</li>
             <li>Confirmar o acesso administrativo às VMs e às suas consoles.</li>
           </ol>
-          <div class="portao"><p><b>Critério de saída:</b> VMs novas criadas, conectadas às VLANs corretas e com console acessível.</p></div>
+          <div class="portao"><p><b>Critério de saída:</b> TrueNAS acessível e VMs novas criadas, conectadas às VLANs corretas e com console acessível.</p></div>
         </div>
       </div>
 
@@ -319,19 +347,19 @@
       </div>
 
       <div class="fase" id="f3" style="--cor:var(--grc)">
-        <header><span class="num">3</span><div><h3>Backup: NT-003 com Veeam</h3><p>10.10.60.143 · a fonte de tudo o que vem depois</p></div></header>
+        <header><span class="num">3</span><div><h3>Backup: NT-003 com Veeam, o primeiro servidor a voltar</h3><p>10.10.60.143 · a fonte de tudo o que vem depois</p></div></header>
         <div class="corpo">
-          <div class="quem"><span class="tag grc">GRC</span><span class="tag end">Endpoint</span><span class="tag soc">SOC</span></div>
+          <div class="quem"><span class="tag grc">GRC</span><span class="tag soc">SOC</span></div>
           <ol class="passos">
-            <li>Entrar no NT-003 com a <b>conta local de emergência</b> (o AD ainda não existe).</li>
-            <li>Verificar se o próprio NT-003 não foi atingido: serviços do Veeam no ar, sem arquivos criptografados, sem nota de resgate.</li>
+            <li>Se o NT-003 sobreviveu: entrar com a <b>conta local de emergência</b> (o AD ainda não existe) e conferir os serviços do Veeam.</li>
+            <li>Se o NT-003 foi perdido: criar a VM nova com o IP 10.10.60.143, <b>instalar o Veeam</b>, restaurar a <b>configuração do Veeam</b> do kit e <b>conectar o repositório no TrueNAS</b>, para que os backups apareçam de novo.</li>
             <li>No Veeam, conferir a <b>integridade do repositório</b> e listar os pontos de restauração de cada servidor.</li>
-            <li>Para cada servidor, escolher o <b>ponto limpo</b> definido na fase 0 e registrar data e hora (será o <b>RPO real</b>).</li>
-            <li>Endpoint <b>monta o ponto escolhido e varre com antivírus</b> antes de restaurá-lo. Se o ponto estiver contaminado, voltar para um ponto anterior.</li>
+            <li>Para cada servidor, escolher o <b>último ponto íntegro anterior ao desastre</b> e registrar data e hora (será o <b>RPO real</b>).</li>
+            <li>Para o Firefly, localizar o pacote do backup dedicado no TrueNAS e conferir o <b>SHA-256</b>.</li>
           </ol>
-          <div class="caixa alerta"><span class="rot">Se o NT-003 também estiver perdido</span>
-            <p>A recuperação depende da cópia fora do ambiente (regra 3-2-1), que ainda está em validação e depende da VPN. Enquanto ela não estiver pronta, o NT-003 é um ponto único de falha (<a href="#s15">lacunas</a>).</p></div>
-          <div class="portao"><p><b>Critério de saída:</b> repositório íntegro e, para cada servidor, um ponto de restauração limpo escolhido, verificado e registrado.</p></div>
+          <div class="caixa alerta"><span class="rot">Se o repositório também estiver perdido</span>
+            <p>A recuperação depende da cópia fora do ambiente (regra 3-2-1), que ainda está em validação e depende da VPN. Enquanto ela não estiver pronta, o TrueNAS é um ponto único de falha (<a href="#s15">lacunas</a>).</p></div>
+          <div class="portao"><p><b>Critério de saída:</b> Veeam no ar, repositório íntegro e, para cada servidor, um ponto de restauração escolhido e registrado.</p></div>
         </div>
       </div>
 
@@ -343,7 +371,6 @@
             <li>Restaurar o <b>NT-001</b> com a restauração completa da máquina pelo Veeam (<a href="#s9">seção 9</a>) na VM nova, com o IP 10.10.20.10.</li>
             <li>Ligar o NT-001 <b>sem o NT-002 na rede</b> e verificar AD, DNS e SYSVOL. Ele é, por enquanto, o único controlador de domínio.</li>
             <li>Não restaurar o NT-002 do backup ao mesmo tempo: dois controladores voltando de pontos diferentes podem ficar inconsistentes. O <b>NT-002 é reconstruído</b>: Windows Server novo, IP 10.10.20.11, promovido a controlador de domínio e <b>replicado a partir do NT-001</b>. Antes, remover do AD os metadados do NT-002 antigo.</li>
-            <li>Como o ataque pode ter roubado credenciais: <b>trocar as senhas</b> dos administradores e contas de serviço e <b>trocar duas vezes a senha da conta krbtgt</b>, com intervalo para replicar, o que invalida tickets Kerberos forjados.</li>
             <li>Conferir as GPOs (senha mínima de 10 caracteres, bloqueio após 5 tentativas) e os 18 grupos de segurança.</li>
           </ol>
           <div class="portao"><p><b>Critério de saída:</b> <code>dcdiag</code> sem erros, <code>repadmin /replsummary</code> sem falhas entre NT-001 e NT-002, <code>nslookup cyberappfin.local</code> responde e um usuário de teste consegue fazer login.</p></div>
@@ -354,24 +381,25 @@
         <header><span class="num">5</span><div><h3>Serviços do SOC</h3><p>VLAN 50 · visibilidade antes de reabrir o ambiente</p></div></header>
         <div class="corpo">
           <div class="quem"><span class="tag soc">SOC</span><span class="tag grc">GRC (Veeam)</span></div>
-          <p>O <b>Wazuh vem primeiro</b>: é ele que deixa o SOC enxergar o ambiente enquanto ele volta e perceber se a ameaça reaparece.</p>
+          <p>O <b>Wazuh vem primeiro</b>: é ele que deixa o SOC enxergar o ambiente enquanto ele volta e perceber qualquer problema na recuperação.</p>
           <ol class="passos">
             <li><b>Wazuh Manager</b> (10.10.50.21): restaurar e conferir <code>systemctl status wazuh-manager</code>, o dashboard e as regras customizadas.</li>
             <li><b>Zabbix + Grafana</b> (10.10.50.15): restaurar e conferir os hosts monitorados e os painéis.</li>
             <li><b>OpenVAS</b> (10.10.50.7): restaurar e conferir as tarefas por VLAN e por servidor (será usado na fase 7).</li>
             <li><b>CyberFin IA</b> (10.10.50.19): restaurar e testar a classificação de um alerta.</li>
-            <li><b>ITSM</b> (VLAN 50): restaurar e passar para ele o registro do desastre feito até aqui.</li>
+            <li><b>ITSM: Zammad</b> (10.10.50.17): restaurar e passar para ele o registro do desastre feito até aqui.</li>
           </ol>
-          <div class="portao"><p><b>Critério de saída:</b> Wazuh recebendo eventos dos agentes já restaurados (portas 1514 e 1515), Zabbix monitorando, OpenVAS com as tarefas e ITSM aberto.</p></div>
+          <div class="portao"><p><b>Critério de saída:</b> Wazuh recebendo eventos dos agentes já restaurados (portas 1514 e 1515), Zabbix monitorando, OpenVAS com as tarefas e Zammad aberto.</p></div>
         </div>
       </div>
 
       <div class="fase" id="f6" style="--cor:var(--danger)">
-        <header><span class="num">6</span><div><h3>Aplicação</h3><p>Reverse Proxy na DMZ e serviços de negócio, na ordem do MTPD</p></div></header>
+        <header><span class="num">6</span><div><h3>Aplicação</h3><p>Firefly na DMZ e serviços de negócio, na ordem do MTPD</p></div></header>
         <div class="corpo">
-          <div class="quem"><span class="tag net">Network (DMZ)</span><span class="tag grc">GRC (Veeam)</span><span class="tag">Áreas de negócio</span></div>
+          <div class="quem"><span class="tag net">Network (DMZ)</span><span class="tag grc">GRC (backup)</span><span class="tag">Áreas de negócio</span></div>
           <ol class="passos">
-            <li>Restaurar o <b>Reverse Proxy</b> (10.10.30.3) na DMZ e conferir que ele só alcança o que a regra de firewall permite.</li>
+            <li>Restaurar o <b>Firefly</b> (firesrv, 10.10.30.3) na DMZ: banco, arquivos e configuração pelo <b>pacote do backup dedicado</b>, reconstruindo os containers quando necessário.</li>
+            <li>Validar a aplicação <b>antes de publicar</b>; depois conferir que só o proxy <b>10.0.50.2</b> alcança a porta 8080 e que a publicação volta a funcionar.</li>
             <li>Religar os serviços de negócio na ordem do <a href="#s3">MTPD</a>: <b>Crédito → BPO Financeiro → Folha → Valuation e M&amp;A</b>.</li>
             <li>Cada servidor passa pelo <a href="#s10">checklist pós-restauração</a> antes de ser liberado.</li>
             <li>Uma pessoa da área de negócio confere os dados críticos (por exemplo, os últimos lançamentos antes do ponto restaurado).</li>
@@ -386,13 +414,14 @@
           <div class="quem"><span class="tag soc">SOC</span><span class="tag end">Endpoint</span><span class="tag net">Network</span><span class="tag grc">GRC</span></div>
           <ol class="passos">
             <li>Conferir que <b>todos os agentes</b> reportam ao Wazuh e que o Zabbix monitora todos os hosts.</li>
+            <li><b>Teste ponta a ponta:</b> gerar um evento controlado e comprovar que ele é detectado no Wazuh, correlacionado no CyberFin e vira ticket no Zammad. Validar também o acesso legítimo às aplicações.</li>
             <li>Rodar o <b>OpenVAS</b> em cada servidor restaurado e <b>comparar com o baseline</b>: nenhuma porta ou serviço novo.</li>
-            <li>Endpoint confere ClamAV e UFW nos servidores e faz a <b>reimagem das estações</b> das VLANs 10 e 40 atingidas, que voltam ao domínio.</li>
+            <li>Endpoint confere ClamAV e UFW nos servidores e faz a <b>reimagem das estações</b> das VLANs 10 e 40, se tiverem sido afetadas.</li>
             <li>Executar um <b>backup completo novo</b> de todos os servidores no NT-003.</li>
             <li>Network reabre as regras normais entre VLANs e a <b>saída para a internet</b>.</li>
-            <li>Coordenador do DR registra a hora do serviço validado (fim do <b>RTO real</b>) e encerra o DR.</li>
+            <li>Coordenador do DR registra a hora do serviço validado (fim do <b>RTO real</b>), as perdas, as exceções e as evidências, e encerra o DR.</li>
           </ol>
-          <div class="portao"><p><b>Critério de saída:</b> ambiente monitorado, varredura sem diferenças em relação ao baseline, backup novo concluído e Diretoria informada do encerramento.</p></div>
+          <div class="portao"><p><b>Critério de saída:</b> ambiente monitorado, teste ponta a ponta concluído, varredura sem diferenças em relação ao baseline, backup novo concluído e Diretoria informada do encerramento.</p></div>
         </div>
       </div>
     </section>
@@ -414,7 +443,7 @@
     <!-- 10 -->
     <section id="s10">
       <h2><span class="n">10</span>Checklist pós-restauração</h2>
-      <p>Um por servidor. Nenhum servidor é liberado com item pendente.</p>
+      <p>Um por servidor. Nenhum servidor é liberado com item pendente. Primeiro a ficha para marcar; depois, cada item detalhado: por que conferir, como conferir, o resultado esperado e o que fazer se falhar.</p>
       <table class="ficha">
         <tr><th>Item</th><th>Como conferir</th><th>OK</th></tr>
         <tr><td>Sistema operacional inicializa</td><td>Boot sem erro, serviços principais no ar</td><td class="cx"></td></tr>
@@ -423,13 +452,76 @@
         <tr><td>DNS e NTP funcionam</td><td><code>nslookup cyberappfin.local</code>, hora sincronizada</td><td class="cx"></td></tr>
         <tr><td>Autenticação no AD funciona</td><td>Login com usuário de teste do domínio</td><td class="cx"></td></tr>
         <tr><td>Banco de dados íntegro</td><td>Serviço do banco no ar, sem erro de consistência</td><td class="cx"></td></tr>
-        <tr><td>Aplicação responde</td><td>Acesso pelo caminho normal (pelo Reverse Proxy, se for o caso)</td><td class="cx"></td></tr>
+        <tr><td>Aplicação responde</td><td>Acesso pelo caminho normal (no caso do Firefly, pelo proxy 10.0.50.2)</td><td class="cx"></td></tr>
         <tr><td>Dados críticos conferidos</td><td>Área de negócio confere os últimos registros</td><td class="cx"></td></tr>
         <tr><td>Wazuh recebe eventos</td><td>Agente ativo no Wazuh</td><td class="cx"></td></tr>
         <tr><td>Zabbix monitora o host</td><td>Host disponível no Zabbix</td><td class="cx"></td></tr>
         <tr><td>Firewall e hardening preservados</td><td>UFW ou Windows Firewall ativos, SSH restrito, ClamAV no ar</td><td class="cx"></td></tr>
         <tr><td>Novo backup pós-DR executado</td><td>Job do Veeam concluído com sucesso</td><td class="cx"></td></tr>
       </table>
+    
+      <h3 style="margin-top:26px">Cada item, em detalhe</h3>
+      <h3>A máquina voltou? <span style="font-weight:500; color:var(--muted)">· quem confere: GRC e o time dono do servidor</span></h3>
+      <div class="item"><header><span class="n">1</span><h3>Sistema operacional inicializa</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> Prova que a restauração não corrompeu o boot nem o sistema.</p><div><span class="os">Windows</span><pre>Get-Service | Where-Object {$_.StartType -eq &quot;Automatic&quot; -and $_.Status -ne &quot;Running&quot;}</pre></div><div><span class="os">Linux</span><pre>systemctl --failed
+journalctl -b -p err</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> Chega à tela de login pela console da VM e nenhum serviço automático fica parado.</p><p class="x larga"><b>Se falhar:</b> Restaurar de novo pela Recovery Media; se o erro se repetir, usar o ponto de restauração anterior.</p></div></div>
+      <div class="item"><header><span class="n">2</span><h3>Discos e partições corretos</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> Um disco faltando ou menor que o original quebra o banco e a aplicação.</p><div><span class="os">Windows</span><pre>Get-Disk
+Get-Volume</pre></div><div><span class="os">Linux</span><pre>lsblk
+df -h</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> Mesmos discos, tamanhos e pontos de montagem do inventário, com espaço livre coerente.</p><p class="x larga"><b>Se falhar:</b> Conferir se a VM tem disco igual ou maior que o original e refazer o restore mapeando cada disco.</p></div></div>
+      <div class="item"><header><span class="n">3</span><h3>IP, gateway e VLAN corretos</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> A VM nova pode subir com outra placa de rede e perder o IP fixo.</p><div><span class="os">Windows</span><pre>ipconfig /all
+Test-NetConnection 10.10.20.1</pre></div><div><span class="os">Linux</span><pre>ip a ; ip r
+ping -c 3 10.10.50.1</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> IP do inventário (ex.: NT-001 = 10.10.20.10) e o gateway .1 da VLAN respondendo.</p><p class="x larga"><b>Se falhar:</b> Reconfigurar o IP na placa nova. Se o gateway não responde, o Network confere a VLAN da porta virtual.</p></div></div>
+
+      <h3>Ela conversa com o domínio? <span style="font-weight:500; color:var(--muted)">· quem confere: IAM</span></h3>
+      <div class="item"><header><span class="n">4</span><h3>DNS e NTP funcionam</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> Sem DNS nada encontra o AD; com o relógio errado o Kerberos recusa o login (tolerância de 5 min).</p><div><span class="os">Windows</span><pre>nslookup cyberappfin.local
+w32tm /query /status</pre></div><div><span class="os">Linux</span><pre>dig cyberappfin.local
+timedatectl</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> O domínio resolve para 10.10.20.10 e 10.10.20.11; hora sincronizada, diferença menor que 5 min.</p><p class="x larga"><b>Se falhar:</b> Apontar o DNS para NT-001 e NT-002 e ressincronizar a hora (w32tm /resync no Windows, reiniciar o serviço de hora no Linux).</p></div></div>
+      <div class="item"><header><span class="n">5</span><h3>Autenticação no AD funciona</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> Um servidor restaurado de um ponto antigo pode perder a senha de máquina com o domínio.</p><div><span class="os">Servidor Windows</span><pre>Test-ComputerSecureChannel
+gpresult /r</pre></div><div><span class="os">Nos controladores</span><pre>dcdiag
+repadmin /replsummary</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> Canal seguro True, GPOs aplicadas, replicação sem falhas e login com um usuário de teste.</p><p class="x larga"><b>Se falhar:</b> Reparar o canal com Test-ComputerSecureChannel -Repair -Credential (administrador do domínio).</p></div></div>
+
+      <h3>O serviço e os dados estão certos? <span style="font-weight:500; color:var(--muted)">· quem confere: Dono do serviço e área de negócio</span></h3>
+      <div class="item"><header><span class="n">6</span><h3>Banco de dados íntegro</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> Um banco restaurado no meio de uma escrita pode voltar inconsistente.</p><div><span class="os">MySQL / MariaDB</span><pre>systemctl status mariadb
+mysqlcheck --all-databases --check</pre></div><div><span class="os">Indexador do Wazuh</span><pre>curl -k -u admin https://localhost:9200/_cluster/health</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> Serviço do banco no ar, verificação sem erros e o indexador com status green.</p><p class="x larga"><b>Se falhar:</b> Não liberar. Restaurar o banco de um ponto anterior ou de um dump; nunca reparar sem antes copiar os arquivos.</p></div></div>
+      <div class="item"><header><span class="n">7</span><h3>Aplicação responde</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> O serviço pode estar no ar e a aplicação não atender pelo caminho normal.</p><div><span class="os">No servidor</span><pre>ss -tlnp
+curl -kI https://10.10.50.21</pre></div><div><span class="os">A partir do proxy 10.0.50.2 (Firefly)</span><pre>curl -I http://10.10.30.3:8080</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> Mesmas portas do baseline, resposta HTTP 200 ou 302 e login na interface funcionando.</p><p class="x larga"><b>Se falhar:</b> Ler o log do serviço (journalctl -u nome-do-serviço) e conferir a publicação no proxy 10.0.50.2.</p></div></div>
+      <div class="item"><header><span class="n">8</span><h3>Dados críticos conferidos</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> É aqui que se mede quanto dado foi perdido de verdade: o RPO real.</p><div><span class="os">Área de negócio</span><ul class="lista" style="margin:0 0 10px"><li>Último lançamento presente x hora do restore point</li><li>Amostra de registros e totais do dia</li></ul></div><div><span class="os">Arquivos (contra a lista de hashes do kit)</span><pre>sha256sum arquivo
+Get-FileHash arquivo</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> Dados presentes até o restore point; perda dentro do RPO da BIA (Crédito: 15 min).</p><p class="x larga"><b>Se falhar:</b> Perda maior que o RPO vai para o RCI; a área relança os registros a partir dos documentos de origem.</p></div></div>
+
+      <h3>O SOC enxerga de novo? <span style="font-weight:500; color:var(--muted)">· quem confere: SOC</span></h3>
+      <div class="item"><header><span class="n">9</span><h3>Wazuh recebe eventos</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> Servidor que não manda log é um ponto cego para o SOC.</p><div><span class="os">No Wazuh Manager</span><pre>/var/ossec/bin/agent_control -l</pre></div><div><span class="os">No servidor</span><pre>systemctl status wazuh-agent
+Get-Service WazuhSvc</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> Agente como Active; um login errado de teste aparece no dashboard em segundos.</p><p class="x larga"><b>Se falhar:</b> O agente restaurado pode conflitar com a chave antiga: remover e registrar de novo (agent-auth -m 10.10.50.21) e conferir as portas 1514 e 1515.</p></div></div>
+      <div class="item"><header><span class="n">10</span><h3>Zabbix monitora o host</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> Sem monitoramento, uma nova queda passa despercebida.</p><div><span class="os">No Zabbix Server</span><pre>zabbix_get -s 10.10.20.10 -k agent.ping</pre></div><div><span class="os">No servidor</span><pre>systemctl status zabbix-agent
+Get-Service &quot;Zabbix Agent*&quot;</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> agent.ping retorna 1, o ícone ZBX fica verde e os gráficos mostram dados novos.</p><p class="x larga"><b>Se falhar:</b> Conferir o Server= no zabbix_agentd.conf e a porta 10050 no firewall do host.</p></div></div>
+
+      <h3>Está protegida e com backup novo? <span style="font-weight:500; color:var(--muted)">· quem confere: Endpoint, SOC e GRC</span></h3>
+      <div class="item"><header><span class="n">11</span><h3>Firewall e hardening preservados</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> Restaurar não pode reabrir uma porta que estava fechada.</p><div><span class="os">Linux</span><pre>ufw status verbose
+systemctl status clamav-daemon</pre></div><div><span class="os">Windows</span><pre>Get-NetFirewallProfile | Select Name,Enabled</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> Entrada bloqueada por padrão, SSH restrito, ClamAV no ar e OpenVAS sem porta nova em relação ao baseline.</p><p class="x larga"><b>Se falhar:</b> Reaplicar as regras do hardening e investigar: mudança inesperada pode indicar um ponto de restauração antigo ou com problema.</p></div></div>
+      <div class="item"><header><span class="n">12</span><h3>Novo backup pós-DR executado</h3></header>
+        <div class="corpo"><p class="larga"><b>Por quê:</b> O servidor restaurado precisa de uma base nova: os próximos backups partem do ambiente recuperado.</p><div><span class="os">No Veeam (NT-003)</span><ul class="lista" style="margin:0 0 10px"><li>Executar o job do servidor (Active Full)</li><li>Conferir o status Success no histórico</li></ul></div><div><span class="os">No servidor</span><pre>Get-Service Veeam*
+systemctl status veeamservice</pre></div>
+          <p class="ok larga"><b>✓ Esperado:</b> Job com Success e um ponto de restauração novo no repositório.</p><p class="x larga"><b>Se falhar:</b> Conferir o agente do Veeam, a rota até 10.10.60.143 e as credenciais do job.</p></div></div>
     </section>
 
     <!-- 11 -->
@@ -443,14 +535,15 @@
       </ul>
       <div class="tabela-rola"><table class="ficha">
         <tr><th>Servidor</th><th>Restore point</th><th>Início</th><th>Fim</th><th>RPO real</th><th>RTO real</th><th>Integridade</th><th>Responsável</th></tr>
+        <tr><td>NT-003 · Backup</td><td>reinstalado / conferido</td><td></td><td></td><td>—</td><td></td><td></td><td></td></tr>
         <tr><td>NT-001 · AD-01</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         <tr><td>NT-002 · AD-02</td><td>reconstruído</td><td></td><td></td><td>—</td><td></td><td></td><td></td></tr>
         <tr><td>Wazuh Manager</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         <tr><td>Zabbix + Grafana</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         <tr><td>OpenVAS</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         <tr><td>CyberFin IA</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td>ITSM</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td>Reverse Proxy</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>ITSM (Zammad)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Firefly (firesrv)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
       </table></div>
     </section>
 
@@ -473,7 +566,7 @@
       <h2><span class="n">13</span>Encerramento e lições aprendidas</h2>
       <ul class="lista">
         <li>O DR termina quando a fase 7 passa pelo critério de saída e a Diretoria é informada.</li>
-        <li>Monitoramento reforçado no Wazuh por pelo menos 7 dias, procurando sinais da mesma ameaça.</li>
+        <li>Monitoramento reforçado no Wazuh por pelo menos 7 dias, procurando sinais de que a causa do desastre se repete.</li>
         <li>Relatório de Causa do Incidente (RCI) em até <b>5 dias úteis</b> (POL-GI-001).</li>
         <li>Reunião de lições aprendidas: tempos reais contra as metas da BIA, o que travou, o que mudar neste plano. As mudanças geram a próxima versão deste documento.</li>
       </ul>
@@ -487,8 +580,19 @@
         <tr><th>Teste</th><th>Como</th><th>Situação</th></tr>
         <tr><td><b>1. Restauração em rede isolada</b></td><td>Restaurar um servidor (começando pelo NT-001) numa VLAN sem acesso à produção, passar pelo checklist e medir RPO e RTO reais.</td><td>Não realizado</td></tr>
         <tr><td><b>2. Teste destrutivo controlado</b></td><td>Desligar um servidor de produção em janela combinada e recuperá-lo seguindo este plano.</td><td>Não realizado</td></tr>
-        <tr><td><b>3. Exercício de mesa</b></td><td>Percorrer o cenário de ransomware com todos os times, fase por fase, conferindo papéis e contatos.</td><td>Não realizado</td></tr>
+        <tr><td><b>3. Exercício de mesa</b></td><td>Percorrer o cenário de perda das VMs com todos os times, fase por fase, conferindo papéis e contatos.</td><td>Não realizado</td></tr>
       </table>
+      <h3>Teste prático de DR (roteiro do runbook)</h3>
+      <ol class="lista">
+        <li>Escolher uma VM não crítica ou uma janela controlada.</li>
+        <li>Registrar o estado inicial e o último restore point.</li>
+        <li>Simular a indisponibilidade ou a perda da VM.</li>
+        <li>Executar a restauração pelo Veeam.</li>
+        <li>Conferir placa de rede, VLAN e IP, o boot do sistema e os serviços.</li>
+        <li>Testar a aplicação ou o serviço pela rede.</li>
+        <li>Comprovar o monitoramento no Zabbix e no Wazuh.</li>
+        <li>Registrar o tempo total, com screenshots e logs.</li>
+      </ol>
     </section>
 
     <!-- 15 -->
@@ -497,7 +601,9 @@
       <div class="caixa aviso"><span class="rot">O que ainda falta validar</span>
         <ul class="lista" style="margin:4px 0 0">
           <li><b>Teste de restauração</b> ainda não realizado: os tempos deste plano são metas, não medições.</li>
-          <li><b>Cópia offsite (3-2-1)</b> depende da VPN. Até lá, o NT-003 é ponto único de falha.</li>
+          <li><b>Cópia offsite (3-2-1)</b> depende da VPN. Até lá, o TrueNAS é ponto único de falha dos backups.</li>
+          <li><b>Frequência do backup x RPO:</b> com incrementais diários nas VMs e o Firefly a cada 12 h, a perda real pode ficar acima das metas da BIA (15 min para Crédito; 1 h para BPO e Folha). É preciso aumentar a frequência dos serviços críticos ou rever as metas com o negócio.</li>
+          <li><b>Dependências entre VMs e restore points disponíveis</b> ainda precisam ser confirmados antes de declarar o DRP homologado.</li>
           <li><b>Ambiente externo</b>: a recuperação da fase 1 depende do administrador da VLAN 200.</li>
         </ul>
       </div>
@@ -508,16 +614,17 @@
       <h2><span class="n">A</span>Anexo: inventário de restauração</h2>
       <div class="tabela-rola"><table>
         <tr><th>Fase</th><th>Servidor</th><th>IP</th><th>VLAN</th><th>Função</th><th>Como volta</th><th>Responsável</th></tr>
+        <tr><td>1</td><td>Storage / TrueNAS</td><td class="mono">—</td><td>200</td><td>Repositório de backup</td><td>Ambiente externo: conferir integridade e acesso</td><td>GRC (solicita)</td></tr>
         <tr><td>2</td><td>UniFi (2 gateways) e Cisco 2960</td><td class="mono">10.10.X.1</td><td>—</td><td>SD-WAN, firewall, VLANs</td><td>Conferência; backup de configuração se preciso</td><td>Network</td></tr>
-        <tr class="forte"><td>3</td><td><b>NT-003 · Backup</b></td><td class="mono">10.10.60.143</td><td>60</td><td>Veeam, repositório</td><td>Sobrevive isolado; conferência e conta local</td><td>GRC</td></tr>
+        <tr class="forte"><td>3</td><td><b>NT-003 · Backup</b></td><td class="mono">10.10.60.143</td><td>60</td><td>Veeam</td><td>Primeiro a voltar: conferir ou reinstalar o Veeam e reconectar o repositório no TrueNAS</td><td>GRC</td></tr>
         <tr><td>4</td><td><b>NT-001 · AD-01</b></td><td class="mono">10.10.20.10</td><td>20</td><td>Controlador de domínio, DNS</td><td>Entire Machine Restore (Veeam)</td><td>IAM</td></tr>
         <tr><td>4</td><td><b>NT-002 · AD-02</b></td><td class="mono">10.10.20.11</td><td>20</td><td>Controlador de domínio, DNS</td><td>Reconstruído e replicado do NT-001</td><td>IAM</td></tr>
-        <tr><td>5</td><td>Wazuh Manager</td><td class="mono">10.10.50.21</td><td>50</td><td>SIEM</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
-        <tr><td>5</td><td>Zabbix + Grafana</td><td class="mono">10.10.50.15</td><td>50</td><td>Disponibilidade e painéis</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
-        <tr><td>5</td><td>OpenVAS</td><td class="mono">10.10.50.7</td><td>50</td><td>Varredura de vulnerabilidades</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
-        <tr><td>5</td><td>CyberFin IA</td><td class="mono">10.10.50.19</td><td>50</td><td>Classificação de alertas</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
-        <tr><td>5</td><td>ITSM</td><td class="mono">10.10.50.x</td><td>50</td><td>Registro de incidentes</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
-        <tr><td>6</td><td>Reverse Proxy</td><td class="mono">10.10.30.3</td><td>30</td><td>Publicação da aplicação (DMZ)</td><td>Entire Machine Restore (Veeam)</td><td>Network</td></tr>
+        <tr><td>5</td><td>Wazuh Manager <span class="mono">(wazuhsrv)</span></td><td class="mono">10.10.50.21</td><td>50</td><td>SIEM</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>5</td><td>Zabbix + Grafana <span class="mono">(zabbix-grafana)</span></td><td class="mono">10.10.50.15</td><td>50</td><td>Disponibilidade e painéis</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>5</td><td>OpenVAS <span class="mono">(openvaz)</span></td><td class="mono">10.10.50.7</td><td>50</td><td>Varredura de vulnerabilidades</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>5</td><td>CyberFin IA <span class="mono">(cyberfinia)</span></td><td class="mono">10.10.50.19</td><td>50</td><td>Classificação de alertas</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>5</td><td>ITSM: Zammad <span class="mono">(zammadsrv)</span></td><td class="mono">10.10.50.17</td><td>50</td><td>Registro de incidentes</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>6</td><td>Firefly <span class="mono">(firesrv)</span></td><td class="mono">10.10.30.3</td><td>30</td><td>Aplicação financeira, publicada pelo proxy 10.0.50.2</td><td>Pacote do backup dedicado (banco, arquivos, configuração)</td><td>Network</td></tr>
         <tr><td>7</td><td>Estações</td><td class="mono">10.10.10.x / 10.10.40.x</td><td>10, 40</td><td>Gerência e usuários</td><td>Reimagem e reingresso no domínio</td><td>Endpoint</td></tr>
       </table></div>
     </section>

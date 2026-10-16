@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>CyberFin — Roteiro Técnico, Evidências e DRP</title>
+<style>
+:root{--blue:#3B90B0;--orange:#FAAD53;--gray:#F4F4F4;--dark:#102631;--ink:#182832;--green:#247a4b;--red:#a83b32;--yellow:#9b6800}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#edf2f4;color:var(--ink);font-family:"Century Gothic","Segoe UI",sans-serif;font-size:19px;line-height:1.58}
+header{background:linear-gradient(125deg,#102631,#245469);color:#fff;padding:58px 6vw 76px}
+header small{font-size:16px;color:var(--orange);font-weight:700;letter-spacing:.12em}h1{font-size:48px;line-height:1.1;margin:10px 0 15px}header p{font-size:22px;max-width:1000px}
+main{max-width:1450px;margin:-42px auto 0;padding:0 30px 70px}.card,.section{background:#fff;border-radius:15px;box-shadow:0 6px 22px #10263116}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}.card{padding:22px;border-top:5px solid var(--blue)}.card b{display:block;font-size:27px;color:var(--dark)}.card span{font-size:16px;color:#667983}
+.section{padding:30px;margin-top:26px}.section h2{font-size:31px;color:var(--dark);margin:0 0 17px}.section h3{font-size:23px;color:var(--blue);margin-top:27px}
+.status{display:inline-block;border-radius:18px;padding:4px 11px;font-weight:bold;font-size:15px}.ok{background:#e3f3e9;color:var(--green)}.pending{background:#fff0cf;color:var(--yellow)}.risk{background:#f9dfdc;color:var(--red)}
+table{width:100%;border-collapse:collapse;font-size:17px;margin:14px 0}th{background:var(--dark);color:#fff;text-align:left;padding:14px}td{padding:13px 14px;border-bottom:1px solid #e2e9ec;vertical-align:top}tr:hover{background:#f7fafb}
+.flow{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;margin:20px 0}.node{background:var(--gray);padding:12px 16px;border-radius:9px;font-weight:bold}.arrow{color:var(--orange);font-size:26px}
+.code{background:#11242d;color:#eef6f8;border-radius:10px;padding:18px 20px;font:17px/1.55 Consolas,monospace;white-space:pre-wrap;overflow:auto}.note{padding:18px 20px;background:#fff8e8;border-left:6px solid var(--orange);border-radius:8px}.critical{padding:18px 20px;background:#fae8e6;border-left:6px solid var(--red);border-radius:8px}
+.step{display:grid;grid-template-columns:56px 1fr;gap:14px;margin:15px 0}.num{width:48px;height:48px;border-radius:50%;background:var(--blue);color:white;display:grid;place-items:center;font-weight:bold;font-size:21px}.step b{font-size:20px}
+.toc a{color:var(--blue);text-decoration:none;font-weight:bold}.toc li{margin:7px 0}li{margin:7px 0}
+.pagebreak{break-before:page}.small{font-size:15px;color:#6b7b84}footer{margin-top:25px;font-size:14px;color:#6c7d85}
+@media(max-width:900px){.section{overflow-x:auto}.code{white-space:pre-wrap;word-break:break-word}body{font-size:17px}.summary{grid-template-columns:1fr 1fr}h1{font-size:36px}.section h2{font-size:27px}}
+@media print{body{background:#fff;font-size:14px}header{padding:28px}h1{font-size:34px}main{margin:0}.card,.section{box-shadow:none;border:1px solid #dfe5e8}.section h2{font-size:23px}.code{font-size:12px}table{font-size:12px}}
+</style>
+</head>
+<body>
+<header>
+<small>CYBERFIN • APRESENTAÇÃO TÉCNICA + RUNBOOK</small>
+<h1>Infraestrutura, Segurança, ITSM e Disaster Recovery</h1>
+<p>Documento operacional para apresentação ao time: o que já existe, o que ainda precisa ser comprovado, demonstrações ao vivo e a sequência de recuperação do ambiente em um desastre.</p>
+</header>
+<main>
+<section class="summary">
+<div class="card"><b>Rede segmentada</b><span>VLANs, DMZ e controles de acesso</span></div>
+<div class="card"><b>Wazuh + CyberFin</b><span>detecção, correlação e tratamento</span></div>
+<div class="card"><b>Zammad ITSM</b><span>registro operacional dos incidentes</span></div>
+<div class="card"><b>Backup + DRP</b><span>TrueNAS, Veeam e backup Firefly</span></div>
+</section>
+
+<section class="section toc">
+<h2>Roteiro da apresentação</h2>
+<ol>
+<li><a href="#estado">Estado atual e pendências</a></li>
+<li><a href="#rede">Rede, VLANs, AD e firewall</a></li>
+<li><a href="#demo-fw">Teste ao vivo das regras</a></li>
+<li><a href="#wazuh">Wazuh: regras, correlação e dashboards</a></li>
+<li><a href="#ia">CyberFin IA</a></li>
+<li><a href="#itsm">ITSM / Zammad e tratamento do incidente</a></li>
+<li><a href="#backup">Backup</a></li>
+<li><a href="#drp">DRP — recuperação completa</a></li>
+<li><a href="#bia">BIA — impacto e mitigação</a></li>
+<li><a href="#kpi">OKRs e KPIs</a></li>
+</ol>
+</section>
+
+<section class="section" id="estado">
+<h2>1. O que temos e o que falta</h2>
+<table>
+<thead><tr><th>Área</th><th>O que temos</th><th>O que falta / precisa comprovar</th><th>Status</th></tr></thead>
+<tbody>
+<tr><td>Segmentação</td><td>DMZ VLAN 30 (10.10.30.0/27), Segurança VLAN 50 (10.10.50.0/27), Backup VLAN 60, requisitos para VLAN 70 PCI e acesso administrativo.</td><td>Consolidar matriz completa origem/destino/porta e evidenciar regras no firewall central.</td><td><span class="pending">VALIDAR</span></td></tr>
+<tr><td>Firefly</td><td>10.10.30.3, acesso Web via reverse proxy 10.0.50.2:8080, SSH administrativo, Zabbix e backup.</td><td>Executar demonstração positiva e negativa de acesso.</td><td><span class="ok">OPERACIONAL</span></td></tr>
+<tr><td>Wazuh</td><td>Manager 10.10.50.21, regras customizadas, agentes, Active Response e Dashboard.</td><td>Mostrar regras, correlação, agentes e dashboards durante a apresentação.</td><td><span class="ok">OPERACIONAL</span></td></tr>
+<tr><td>CyberFin</td><td>Correlação, Cases, integração Wazuh/Zabbix, Zammad e IA local.</td><td>Concluir retirada da IA do caminho crítico do Wazuh e demonstrar fluxo final.</td><td><span class="pending">EM EVOLUÇÃO</span></td></tr>
+<tr><td>ITSM</td><td>Zammad com SOC-N1/N2/N3, campos SOC e integração CyberFin.</td><td>Demonstrar abertura, enriquecimento, classificação e encerramento de incidente.</td><td><span class="ok">OPERACIONAL</span></td></tr>
+<tr><td>Backup</td><td>TrueNAS; backup Firefly validado; jobs Veeam previstos/configurados para VMs.</td><td>Confirmar pontos recentes de restauração e executar restore real via Veeam.</td><td><span class="pending">VALIDAR RESTORE</span></td></tr>
+<tr><td>DRP</td><td>Estratégia e ativos identificados.</td><td>Homologar sequência completa de restauração e registrar tempos/evidências.</td><td><span class="pending">DOCUMENTAR + TESTAR</span></td></tr>
+<tr><td>OKR/KPI</td><td>Fontes de dados existem.</td><td>Definir metas, baseline e indicadores formais.</td><td><span class="pending">POSTERIOR</span></td></tr>
+</tbody></table>
+</section>
+
+<section class="section pagebreak" id="rede">
+<h2>2. Rede, VLANs, AD e regras de firewall</h2>
+<p>A apresentação deve explicar que segmentação não significa “uma VLAN acessa outra inteira”. O acesso deve ser liberado por <b>origem → destino → serviço/porta</b>, seguindo menor privilégio.</p>
+<table>
+<thead><tr><th>Origem</th><th>Destino conhecido</th><th>Serviço</th><th>Regra conhecida</th></tr></thead>
+<tbody>
+<tr><td>VPN administrativa 192.168.4.0/24</td><td>Firefly 10.10.30.3</td><td>SSH TCP/22</td><td><span class="ok">Permitido no UFW</span></td></tr>
+<tr><td>JumpServer 10.128.10.135</td><td>Firefly 10.10.30.3</td><td>SSH TCP/22</td><td><span class="ok">Permitido no UFW</span></td></tr>
+<tr><td>Reverse Proxy 10.0.50.2</td><td>Firefly 10.10.30.3</td><td>HTTP app TCP/8080</td><td><span class="ok">Permitido no UFW</span></td></tr>
+<tr><td>Zabbix 10.10.50.15</td><td>Firefly 10.10.30.3</td><td>Zabbix TCP/10050</td><td><span class="ok">Permitido no UFW</span></td></tr>
+<tr><td>Backup NT-003 10.10.60.143</td><td>Firefly 10.10.30.3</td><td>SSH TCP/22</td><td><span class="ok">Permitido no UFW</span></td></tr>
+</tbody></table>
+
+<h3>Comunicação das VLANs com o Active Directory</h3>
+<p>Para demonstrar corretamente o AD, primeiro deve ser identificada a VLAN/IP dos Domain Controllers e comparada com as regras reais do firewall. <b>Esses IPs não estão confirmados neste documento</b>; portanto não devem ser inventados na apresentação.</p>
+<p>Na matriz final, validar apenas os serviços realmente utilizados. Em um domínio Windows, normalmente serão relevantes DNS, Kerberos, LDAP/LDAPS, SMB, RPC e sincronização de horário, mas a lista efetiva deve ser obtida das regras/configuração do ambiente.</p>
+<div class="note"><b>Evidência esperada:</b> screenshot/export da regra do firewall + teste originado da VLAN correta + log permitindo ou negando o tráfego. Isso comprova a segmentação muito melhor que apenas mostrar a configuração.</div>
+</section>
+
+<section class="section" id="demo-fw">
+<h2>3. Demonstração ao vivo — firewall</h2>
+<p>Escolha uma estação em cada rede que será demonstrada. Faça primeiro um teste que deve funcionar e depois um que deve ser negado. Não altere regras durante a demonstração.</p>
+<div class="step"><div class="num">1</div><div><b>Confirmar origem.</b><div class="code">ipconfig
+# ou Linux
+ip -br addr</div></div></div>
+<div class="step"><div class="num">2</div><div><b>Teste de conectividade.</b><div class="code">ping &lt;IP_DESTINO&gt;</div><p class="small">Ping só comprova ICMP quando ICMP é permitido; falhar não significa necessariamente indisponibilidade.</p></div></div>
+<div class="step"><div class="num">3</div><div><b>Teste do serviço permitido.</b><div class="code">ssh usuario@&lt;IP_DESTINO&gt;
+# ou
+nc -vz -w3 &lt;IP_DESTINO&gt; 22</div></div></div>
+<div class="step"><div class="num">4</div><div><b>Teste negativo.</b><p>De uma VLAN não autorizada, repetir o teste para o mesmo serviço e comprovar que o firewall bloqueia.</p></div></div>
+<div class="step"><div class="num">5</div><div><b>Mostrar evidência.</b><p>Abrir o log do firewall e relacionar origem, destino, porta, horário e ação ALLOW/BLOCK.</p></div></div>
+</section>
+
+<section class="section pagebreak" id="wazuh">
+<h2>4. Wazuh — demonstração no ambiente</h2>
+<p>O objetivo não é apenas abrir o Dashboard. A demonstração deve ligar <b>evento → regra → correlação → incidente → tratamento</b>.</p>
+<div class="flow"><span class="node">Evento</span><span class="arrow">→</span><span class="node">Wazuh</span><span class="arrow">→</span><span class="node">Regra</span><span class="arrow">→</span><span class="node">CyberFin</span><span class="arrow">→</span><span class="node">Case</span><span class="arrow">→</span><span class="node">Zammad</span></div>
+<h3>Roteiro de tela</h3>
+<ol>
+<li>Abrir o Dashboard e mostrar os agentes conectados.</li>
+<li>Mostrar eventos recentes e níveis de severidade.</li>
+<li>Abrir as regras customizadas do Firefly.</li>
+<li>Destacar exemplos: 100160 honeypot, 100113 brute force, 100114 LFI, 100115 SQLi, 100116 RCE e regras críticas de integridade.</li>
+<li>Mostrar que eventos de baixo nível podem alimentar correlação sem obrigatoriamente criar ticket individual.</li>
+<li>Mostrar um incidente real/controlado e sua chegada ao CyberFin/Zammad.</li>
+</ol>
+<div class="note">Caso de evidência já homologado: tentativa de <b>GET /.env</b> no Firefly, resposta HTTP 403, detecção Wazuh 100160 e processamento pelo CyberFin. A conclusão correta é “tentativa confirmada e requisição negada”; não “host comprometido”.</div>
+</section>
+
+<section class="section" id="ia">
+<h2>5. Demonstração da IA / CyberFin</h2>
+<p>A IA deve ser apresentada como apoio ao analista: recebe contexto estruturado, produz classificação/resumo/confiança/recomendação e não executa shell arbitrário. A arquitetura alvo mantém a operação do SOC mesmo se o modelo estiver indisponível.</p>
+<h3>Exemplo de demonstração via SSH no cyberfinia</h3>
+<div class="code">ssh administrador@10.10.50.19
+
+# Entrar no projeto
+cd /opt/cyberfin
+
+# Durante a demonstração, consultar os serviços/logs usando
+# os comandos já homologados no ambiente.
+# Não exibir /etc/cyberfin/cyberfin.env nem tokens/credenciais.</div>
+<p>Na tela, mostrar: evento recebido, correlação, Case, job de IA, resposta estruturada e enriquecimento do ticket. Evitar abrir arquivos de secrets.</p>
+</section>
+
+<section class="section pagebreak" id="itsm">
+<h2>6. ITSM — Zammad e tratamento do incidente</h2>
+<p>O Zammad é a camada operacional do SOC. O CyberFin faz normalização/correlação/contexto; o ticket registra responsabilidade, investigação e decisão humana.</p>
+<div class="flow"><span class="node">Detecção</span><span class="arrow">→</span><span class="node">Triagem</span><span class="arrow">→</span><span class="node">Investigação</span><span class="arrow">→</span><span class="node">Contenção</span><span class="arrow">→</span><span class="node">Monitoramento</span><span class="arrow">→</span><span class="node">Encerramento</span></div>
+<table>
+<thead><tr><th>Fase</th><th>O que demonstrar</th></tr></thead>
+<tbody>
+<tr><td>Detecção</td><td>Alerta Wazuh/Zabbix e evidência original.</td></tr>
+<tr><td>Triagem</td><td>Severidade, ativo, origem, regra, contexto e prioridade.</td></tr>
+<tr><td>Investigação</td><td>Logs, correlações, histórico e enriquecimento da IA.</td></tr>
+<tr><td>Contenção</td><td>Ação autorizada, como Active Response temporário quando aplicável.</td></tr>
+<tr><td>Monitoramento</td><td>Confirmar ausência/recorrência e estado do ativo.</td></tr>
+<tr><td>Encerramento</td><td>Classificar como incidente real, falso positivo ou inconclusivo; registrar conclusão e evidências.</td></tr>
+</tbody></table>
+<p>Grupos existentes: SOC-N1, SOC-N2 e SOC-N3, além dos grupos operacionais Network, Infrastructure, Systems, Applications, Security Engineering e Endpoint.</p>
+</section>
+
+<section class="section" id="backup">
+<h2>7. Backup — situação atual</h2>
+<table>
+<thead><tr><th>Ativo</th><th>Método</th><th>Situação</th></tr></thead>
+<tbody>
+<tr><td>Firefly</td><td>Script /opt/cyberfin-dr/backup-firefly-dr.sh + TrueNAS</td><td><span class="ok">Backup/cópia/SHA-256 já validados</span></td></tr>
+<tr><td>VMs suportadas</td><td>Veeam — imagem completa</td><td><span class="pending">Jobs existentes; restore real ainda precisa ser evidenciado</span></td></tr>
+<tr><td>Wazuh</td><td>Estratégia Veeam</td><td><span class="pending">Confirmar último restore point antes da apresentação de DR</span></td></tr>
+<tr><td>TrueNAS</td><td>Repositório central</td><td><span class="ok">Usado pelo projeto</span></td></tr>
+</tbody></table>
+<p>Planejamento: Full aos domingos; incrementais nos dias úteis. O Firefly possui estratégia dedicada com execução planejada às 00h e 12h.</p>
+</section>
+
+<section class="section pagebreak" id="drp">
+<h2>8. DRP — cenário de desastre e recuperação completa</h2>
+<div class="critical"><b>Cenário proposto para apresentação:</b> perda das VMs/ambiente virtual. A infraestrutura de virtualização permanece disponível ou é reconstruída, e os serviços precisam ser recuperados a partir dos backups e documentação. O teste prático pode usar uma VM controlada, sem destruir o ambiente inteiro.</div>
+
+<h3>Princípio de recuperação</h3>
+<p>Não devemos simplesmente ligar todas as VMs ao mesmo tempo. A restauração segue dependências: <b>infraestrutura → identidade/rede → segurança → aplicações → observabilidade → integrações → validação</b>.</p>
+
+<div class="step"><div class="num">1</div><div><b>Declarar o desastre e preservar evidências.</b><p>Registrar horário, escopo, ativos afetados, responsável e causa conhecida/provável. Suspender alterações não relacionadas.</p></div></div>
+<div class="step"><div class="num">2</div><div><b>Validar infraestrutura base.</b><p>Energia, rede física, switches, VLANs, gateways/firewall, storage e plataforma de virtualização. Confirmar que as redes necessárias existem antes de restaurar servidores.</p></div></div>
+<div class="step"><div class="num">3</div><div><b>Validar o repositório de backup.</b><p>Acessar TrueNAS/Veeam, identificar o último ponto íntegro anterior ao desastre e registrar qual restore point será utilizado.</p></div></div>
+<div class="step"><div class="num">4</div><div><b>Restaurar serviços de identidade e infraestrutura.</b><p>Restaurar/validar AD/DNS e demais serviços-base antes de aplicações que dependem de autenticação ou resolução de nomes. Se DHCP fizer parte do escopo afetado, recuperá-lo nesta etapa.</p></div></div>
+<div class="step"><div class="num">5</div><div><b>Restaurar camada de segurança.</b><p>Recuperar Wazuh e componentes necessários. Validar IP, DNS, certificados, Manager, Indexer, API e Dashboard. Confirmar recepção de eventos.</p></div></div>
+<div class="step"><div class="num">6</div><div><b>Restaurar aplicações.</b><p>Recuperar Firefly e demais cargas. Para Firefly, restaurar banco/arquivos/configuração pelo pacote validado, reconstruir containers quando necessário e validar aplicação antes de publicar.</p></div></div>
+<div class="step"><div class="num">7</div><div><b>Restaurar observabilidade e automação.</b><p>Validar Zabbix/Grafana, CyberFin e integrações. Confirmar comunicação Wazuh/Zabbix → CyberFin → Zammad.</p></div></div>
+<div class="step"><div class="num">8</div><div><b>Validar ITSM.</b><p>Confirmar Zammad, grupos SOC, criação/atualização de tickets e histórico operacional.</p></div></div>
+<div class="step"><div class="num">9</div><div><b>Teste funcional ponta a ponta.</b><p>Executar um evento controlado, comprovar detecção, correlação, ticket e tratamento. Validar também acesso legítimo às aplicações.</p></div></div>
+<div class="step"><div class="num">10</div><div><b>Encerrar o DR.</b><p>Registrar tempo de recuperação, perdas, serviços restaurados, exceções, evidências e lições aprendidas.</p></div></div>
+
+<h3>Ordem lógica de subida</h3>
+<div class="flow"><span class="node">Rede / Firewall</span><span class="arrow">→</span><span class="node">Storage / Virtualização</span><span class="arrow">→</span><span class="node">AD / DNS</span><span class="arrow">→</span><span class="node">Wazuh</span><span class="arrow">→</span><span class="node">Aplicações</span><span class="arrow">→</span><span class="node">Zabbix/Grafana</span><span class="arrow">→</span><span class="node">CyberFin / Zammad</span></div>
+<div class="note"><b>Atenção:</b> esta é a ordem lógica recomendada com base nas dependências conhecidas. Antes de declarar o DRP homologado, precisamos confirmar os Domain Controllers, dependências reais entre VMs e restore points disponíveis.</div>
+
+<h3>Teste prático de DR para apresentação</h3>
+<ol>
+<li>Escolher uma VM não crítica ou janela controlada.</li>
+<li>Registrar estado inicial e último restore point.</li>
+<li>Simular indisponibilidade/perda da VM.</li>
+<li>Executar restauração pelo Veeam.</li>
+<li>Conferir NIC/VLAN/IP, boot do SO e serviços.</li>
+<li>Testar aplicação/serviço pela rede.</li>
+<li>Comprovar monitoramento no Zabbix/Wazuh.</li>
+<li>Registrar tempo total e screenshots/logs.</li>
+</ol>
+</section>
+
+<section class="section pagebreak" id="bia">
+<h2>9. BIA — impacto e mitigação</h2>
+<p>A BIA deve responder principalmente: <b>“se este serviço parar, qual é o impacto para o negócio e quanto tempo podemos tolerar?”</b> O DRP responde como recuperá-lo.</p>
+<table>
+<thead><tr><th>Ativo/serviço</th><th>Impacto de indisponibilidade</th><th>Mitigação atual/proposta</th></tr></thead>
+<tbody>
+<tr><td>AD / DNS</td><td>Falhas de autenticação, resolução de nomes e dependências de domínio.</td><td>Backup, documentação e prioridade máxima na ordem de recuperação.</td></tr>
+<tr><td>Firewall / rede</td><td>Perda de comunicação entre segmentos e serviços.</td><td>Backup de configuração, matriz de regras e restauração antes das aplicações.</td></tr>
+<tr><td>Wazuh</td><td>Perda de visibilidade/detecção e centralização de eventos.</td><td>Backup completo, restauração prioritária e validação dos agentes.</td></tr>
+<tr><td>Firefly</td><td>Indisponibilidade da aplicação e dados associados.</td><td>Backup dedicado de banco/arquivos + TrueNAS + teste de restauração.</td></tr>
+<tr><td>Zabbix/Grafana</td><td>Redução de visibilidade operacional e alertas de disponibilidade.</td><td>Backup da VM/configuração e restauração após serviços-base.</td></tr>
+<tr><td>CyberFin</td><td>Perda de correlação, automação e enriquecimento centralizado.</td><td>Manter fontes e Zammad desacoplados; backup e recuperação após serviços-base.</td></tr>
+<tr><td>Zammad</td><td>Impacto no fluxo operacional e registro dos incidentes.</td><td>Backup, restauração e validação do histórico/tickets.</td></tr>
+</tbody></table>
+<div class="note">Para concluir formalmente a BIA ainda faltam valores aprovados de <b>RTO, RPO, criticidade e impacto financeiro/operacional</b> por serviço. Esses números devem ser definidos com os responsáveis do negócio, não inferidos tecnicamente.</div>
+</section>
+
+<section class="section" id="kpi">
+<h2>10. OKRs e KPIs — não bloqueiam a apresentação atual</h2>
+<p>Os indicadores podem ser concluídos após a demonstração técnica. Já existem fontes para medi-los em Wazuh, Zabbix, CyberFin e Zammad.</p>
+<table>
+<thead><tr><th>Indicador futuro</th><th>Objetivo</th></tr></thead>
+<tbody>
+<tr><td>MTTD</td><td>Tempo entre ocorrência e detecção.</td></tr>
+<tr><td>MTTA</td><td>Tempo entre detecção e início do tratamento.</td></tr>
+<tr><td>MTTR</td><td>Tempo até recuperação/resolução.</td></tr>
+<tr><td>Taxa de falsos positivos</td><td>Avaliar qualidade das regras e correlações.</td></tr>
+<tr><td>Incidentes por severidade</td><td>Acompanhar perfil de risco.</td></tr>
+<tr><td>Backup success rate</td><td>Acompanhar execução dos backups.</td></tr>
+<tr><td>Restore success rate / RTO observado</td><td>Comprovar efetividade do DR.</td></tr>
+</tbody></table>
+</section>
+
+<section class="section">
+<h2>Checklist para amanhã</h2>
+<table>
+<thead><tr><th>Prioridade</th><th>Entrega / demonstração</th><th>Situação</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>Consolidar e testar matriz Firewall/VLAN/AD com teste positivo e negativo.</td><td><span class="pending">FAZER</span></td></tr>
+<tr><td>2</td><td>Abrir Wazuh e mostrar agentes, regras, correlação e dashboards.</td><td><span class="pending">ENSAIAR</span></td></tr>
+<tr><td>3</td><td>Demonstrar incidente completo até o Zammad e fases de tratamento.</td><td><span class="pending">ENSAIAR</span></td></tr>
+<tr><td>4</td><td>Demonstrar CyberFin/IA via SSH sem expor secrets.</td><td><span class="pending">ENSAIAR</span></td></tr>
+<tr><td>5</td><td>Ter este DRP aberto durante a apresentação e mostrar a linha de recuperação.</td><td><span class="ok">DOCUMENTADO</span></td></tr>
+<tr><td>6</td><td>Confirmar restore point Veeam e, se houver janela, executar restore controlado.</td><td><span class="pending">CRÍTICO</span></td></tr>
+<tr><td>7</td><td>OKRs/KPIs formais.</td><td><span class="pending">DEPOIS</span></td></tr>
+</tbody></table>
+</section>
+
+<footer>CyberFin • Documento técnico para apresentação e validação • Atualizado em 15/10/2026. Itens não comprovados foram mantidos explicitamente como pendentes.</footer>
+</main></body></html>

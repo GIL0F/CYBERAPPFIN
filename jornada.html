@@ -7,14 +7,14 @@
 <meta name="description" content="Apresentação interativa do ambiente de segurança da Cyberappfin (Defesa Cibernética, Impacta).">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230B1520'/%3E%3Crect x='12' y='40' width='40' height='6' rx='3' fill='%2314B8A6'/%3E%3Crect x='12' y='29' width='40' height='6' rx='3' fill='%238B5CF6'/%3E%3Crect x='12' y='18' width='40' height='6' rx='3' fill='%23F59E0B'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --bg:#0B1520; --bg-2:#101E2C; --panel:#13212F; --line:#26384A; --line-2:#344B61;
-    --text:#EEF3F8; --muted:#9FB1C3; --soft:#C7D4E1;
+    --text:#F4F7FA; --muted:#B7C6D5; --soft:#DCE5EE;
     --net:#14B8A6; --iam:#8B5CF6; --soc:#F59E0B; --end:#22C55E; --grc:#EAB308;
     --brand:#4C8DF6; --danger:#F87171;
-    --panel-w:640px;
+    --panel-w:560px;
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
   html,body{ height:100%; background:var(--bg); color:var(--text); font-family:'DM Sans', system-ui, sans-serif; overflow:hidden; }
@@ -57,49 +57,49 @@
     display:flex; flex-direction:column; overflow:hidden;
   }
   #painel .topo{ padding:28px 36px 0; display:flex; flex-direction:column; gap:10px; }
-  #quem{ align-self:flex-start; font-size:16px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  #quem{ align-self:flex-start; font-size:13px; font-weight:700; letter-spacing:.12em; text-transform:uppercase;
          padding:6px 12px; border-radius:999px; background:#1C2F42; color:var(--soft); }
-  #painel h1{ font-family:'Sora', system-ui, sans-serif; font-size:38px; line-height:1.15; font-weight:700; }
-  #painel .sub{ color:var(--muted); font-size:19px; }
+  #painel h1{ font-family:'Sora', system-ui, sans-serif; font-size:32px; line-height:1.15; font-weight:700; }
+  #painel .sub{ color:var(--muted); font-size:16px; }
   #conteudo{ padding:20px 36px 32px; overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:16px; }
-  #conteudo p{ font-size:20px; line-height:1.55; color:var(--soft); }
+  #conteudo p{ font-size:17px; line-height:1.55; color:var(--soft); }
   #conteudo b{ color:var(--text); }
-  #conteudo h3{ font-family:'Sora', system-ui, sans-serif; font-size:18px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-top:6px; }
+  #conteudo h3{ font-family:'Sora', system-ui, sans-serif; font-size:15px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-top:6px; }
   #conteudo ul{ list-style:none; display:flex; flex-direction:column; gap:8px; }
-  #conteudo li{ font-size:20px; line-height:1.45; color:var(--soft); padding-left:18px; position:relative; }
+  #conteudo li{ font-size:16.5px; line-height:1.45; color:var(--soft); padding-left:18px; position:relative; }
   #conteudo li::before{ content:""; position:absolute; left:0; top:.6em; width:7px; height:7px; border-radius:50%; background:var(--cor, var(--brand)); }
-  #conteudo table{ width:100%; border-collapse:collapse; font-size:18px; }
+  #conteudo table{ width:100%; border-collapse:collapse; font-size:15px; }
   #conteudo th{ text-align:left; color:var(--muted); font-weight:700; padding:7px 8px; border-bottom:1px solid var(--line-2); }
   #conteudo td{ padding:7px 8px; border-bottom:1px solid var(--line); color:var(--soft); vertical-align:top; }
   #conteudo tr.dest td{ color:var(--text); background:#2A2112; }
   #conteudo tr.perigo td{ color:var(--text); background:#2C1A1E; }
   .chips{ display:flex; flex-wrap:wrap; gap:8px; }
-  .chip{ font-size:17px; padding:5px 11px; border-radius:999px; background:#1C2F42; color:var(--soft); }
+  .chip{ font-size:14px; padding:5px 11px; border-radius:999px; background:#1C2F42; color:var(--soft); }
   .cards{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
   .card{ background:var(--bg-2); border:1px solid var(--line); border-radius:12px; padding:14px; display:flex; flex-direction:column; gap:4px; }
-  .card .n{ font-family:'Sora', system-ui, sans-serif; font-size:34px; font-weight:800; color:var(--cor, var(--brand)); line-height:1.1; }
-  .card .l{ font-size:17px; color:var(--muted); }
+  .card .n{ font-family:'Sora', system-ui, sans-serif; font-size:28px; font-weight:800; color:var(--cor, var(--brand)); line-height:1.1; }
+  .card .l{ font-size:14px; color:var(--muted); }
   .barras{ display:flex; flex-direction:column; gap:7px; }
-  .barra{ display:grid; grid-template-columns:100px 1fr 44px; align-items:center; gap:10px; font-size:18px; color:var(--soft); }
+  .barra{ display:grid; grid-template-columns:100px 1fr 44px; align-items:center; gap:10px; font-size:15px; color:var(--soft); }
   .barra i{ display:block; height:14px; border-radius:4px; }
-  .aviso{ font-size:17px; color:#F5B95A; border-left:3px solid #F5B95A; padding:6px 10px; background:#241C10; border-radius:0 8px 8px 0; }
+  .aviso{ font-size:14px; color:#F5B95A; border-left:3px solid #F5B95A; padding:6px 10px; background:#241C10; border-radius:0 8px 8px 0; }
   .passos{ display:flex; flex-direction:column; gap:8px; counter-reset:p; }
-  .passo{ display:flex; gap:12px; align-items:flex-start; font-size:19px; color:var(--muted); transition:color .3s; }
+  .passo{ display:flex; gap:12px; align-items:flex-start; font-size:16px; color:var(--muted); transition:color .3s; }
   .passo::before{ counter-increment:p; content:counter(p); flex-shrink:0; width:26px; height:26px; border-radius:50%;
-                  display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; background:#1C2F42; color:var(--muted); }
+                  display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; background:#1C2F42; color:var(--muted); }
   .passo.ativo{ color:var(--text); }
   .passo.ativo::before{ background:var(--cp, var(--danger)); color:#1A0E10; }
   .passo.feito{ color:var(--soft); }
   .passo.feito::before{ content:"✓"; background:#1F3A2C; color:#4ADE80; }
   /* link para documento (painel e telas cheias) */
   .doc-link{ align-self:flex-start; display:inline-flex; gap:10px; align-items:center; text-decoration:none; font-weight:700;
-             font-size:18px; color:#0B1520; background:#EAB308; padding:10px 18px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,.3); }
+             font-size:16px; color:#0B1520; background:#EAB308; padding:10px 18px; border-radius:10px; box-shadow:0 6px 18px rgba(0,0,0,.3); }
   .doc-link:hover{ background:#FACC15; }
   .doc-link small{ font-weight:500; font-size:.8em; opacity:.8; }
   /* notas de fala: flutuam acima do rodapé, nos dois modos */
   #notas{ display:none; position:fixed; left:24px; bottom:80px; width:min(760px, 60vw); z-index:20; padding:16px 18px;
           background:rgba(9,18,27,.96); border:1px dashed #4B6580; border-radius:12px;
-          font-size:19px; line-height:1.5; color:var(--soft); max-height:32vh; overflow-y:auto; box-shadow:0 12px 30px rgba(0,0,0,.4); }
+          font-size:16px; line-height:1.5; color:var(--soft); max-height:32vh; overflow-y:auto; box-shadow:0 12px 30px rgba(0,0,0,.4); }
   body.com-notas #notas{ display:block; }
 
   /* ---------- foto (ou vídeo) do prédio na abertura ---------- */
@@ -146,99 +146,99 @@
   }
   body.modo-sala #sala{ opacity:1; pointer-events:auto; transform:none; }
   .s-head{ display:flex; flex-direction:column; gap:1.2vh; }
-  .s-quem{ align-self:flex-start; font-size:clamp(14px, 1.08vw, 18px); font-weight:700; letter-spacing:.12em; text-transform:uppercase;
+  .s-quem{ align-self:flex-start; font-size:clamp(12px, .9vw, 15px); font-weight:700; letter-spacing:.12em; text-transform:uppercase;
            padding:6px 14px; border-radius:999px; background:#1C2F42; }
-  .s-titulo{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(41px, 4.32vw, 77px); font-weight:800; line-height:1.05; letter-spacing:-.01em; }
-  .s-sub{ font-size:clamp(19px, 1.44vw, 26px); color:var(--muted); }
+  .s-titulo{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(34px, 3.6vw, 64px); font-weight:800; line-height:1.05; letter-spacing:-.01em; }
+  .s-sub{ font-size:clamp(16px, 1.2vw, 22px); color:var(--muted); }
   .s-corpo{ flex:1; display:flex; flex-direction:column; gap:2.6vh; min-height:0; }
-  .s-txt{ font-size:clamp(19px, 1.38vw, 25px); line-height:1.5; color:var(--soft); }
+  .s-txt{ font-size:clamp(16px, 1.15vw, 21px); line-height:1.5; color:var(--soft); }
   .s-txt b{ color:var(--text); }
-  .s-rot{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(14px, 1.02vw, 18px); font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+  .s-rot{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(12px, .85vw, 15px); font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
   .linha{ display:grid; gap:1.4vw; }
   .bloco{ background:#132233; border:1px solid var(--line); border-radius:16px; padding:clamp(16px, 1.6vw, 28px);
           display:flex; flex-direction:column; gap:10px; position:relative; overflow:hidden; }
   .bloco::before{ content:""; position:absolute; left:0; top:0; right:0; height:5px; background:var(--cor, var(--brand)); }
-  .bloco h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(22px, 1.74vw, 31px); font-weight:700; line-height:1.2; }
-  .bloco p{ font-size:clamp(17px, 1.2vw, 22px); line-height:1.45; color:var(--soft); }
-  .bloco .grande{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(41px, 4.08vw, 72px); font-weight:800; line-height:1; color:var(--cor, var(--brand)); }
-  .bloco .rot{ font-size:clamp(14px, 1.02vw, 18px); font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
-  .bloco .rodape{ margin-top:auto; padding-top:10px; border-top:1px solid var(--line); font-size:clamp(17px, 1.2vw, 22px); color:var(--text); }
+  .bloco h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(18px, 1.45vw, 26px); font-weight:700; line-height:1.2; }
+  .bloco p{ font-size:clamp(14px, 1vw, 18px); line-height:1.45; color:var(--soft); }
+  .bloco .grande{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(34px, 3.4vw, 60px); font-weight:800; line-height:1; color:var(--cor, var(--brand)); }
+  .bloco .rot{ font-size:clamp(12px, .85vw, 15px); font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); }
+  .bloco .rodape{ margin-top:auto; padding-top:10px; border-top:1px solid var(--line); font-size:clamp(14px, 1vw, 18px); color:var(--text); }
   .chips2{ display:flex; flex-wrap:wrap; gap:10px; }
-  .chips2 span{ font-size:clamp(17px, 1.2vw, 22px); padding:7px 14px; border-radius:999px; background:#1C2F42; color:var(--soft); }
+  .chips2 span{ font-size:clamp(14px, 1vw, 18px); padding:7px 14px; border-radius:999px; background:#1C2F42; color:var(--soft); }
   /* linha do tempo */
   .tempo{ display:grid; grid-template-columns:repeat(var(--n), 1fr); gap:0; position:relative; }
   .tempo::before{ content:""; position:absolute; left:4%; right:4%; top:22px; height:3px; background:linear-gradient(90deg, var(--brand), var(--soc)); opacity:.6; }
   .etapa{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:10px; padding:0 8px; position:relative; }
   .etapa .bola{ width:46px; height:46px; border-radius:50%; display:flex; align-items:center; justify-content:center;
-                font-family:'Sora', system-ui, sans-serif; font-weight:800; font-size:22px; background:#0B1520; border:3px solid var(--cor, var(--brand)); color:var(--text); }
-  .etapa h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(18px, 1.38vw, 25px); font-weight:700; line-height:1.2; }
-  .etapa p{ font-size:clamp(16px, 1.14vw, 20px); line-height:1.4; color:var(--muted); }
+                font-family:'Sora', system-ui, sans-serif; font-weight:800; font-size:18px; background:#0B1520; border:3px solid var(--cor, var(--brand)); color:var(--text); }
+  .etapa h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(15px, 1.15vw, 21px); font-weight:700; line-height:1.2; }
+  .etapa p{ font-size:clamp(13px, .95vw, 17px); line-height:1.4; color:var(--muted); }
   /* organograma do CSIRT */
   .org{ display:flex; flex-direction:column; align-items:center; gap:0; }
   .org .chefe{ background:#2A2112; border:2px solid var(--soc); border-radius:14px; padding:14px 26px; text-align:center; }
-  .org .chefe h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 1.56vw, 28px); }
-  .org .chefe p{ font-size:clamp(16px, 1.14vw, 19px); color:var(--soft); }
+  .org .chefe h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.3vw, 23px); }
+  .org .chefe p{ font-size:clamp(13px, .95vw, 16px); color:var(--soft); }
   .org .tronco{ width:3px; height:22px; background:var(--line-2); }
   .org .ramos{ display:grid; grid-template-columns:repeat(6, 1fr); gap:12px; width:100%; position:relative; padding-top:22px; }
   .org .ramos::before{ content:""; position:absolute; top:0; left:8.3%; right:8.3%; height:3px; background:var(--line-2); }
   .org .membro{ background:#132233; border:1px solid var(--line); border-top:4px solid var(--cor); border-radius:12px; padding:14px; position:relative; }
   .org .membro::before{ content:""; position:absolute; top:-26px; left:50%; width:3px; height:22px; background:var(--line-2); }
-  .org .membro h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.26vw, 23px); margin-bottom:6px; }
-  .org .membro p{ font-size:clamp(14px, 1.08vw, 19px); line-height:1.4; color:var(--soft); }
+  .org .membro h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(14px, 1.05vw, 19px); margin-bottom:6px; }
+  .org .membro p{ font-size:clamp(12px, .9vw, 16px); line-height:1.4; color:var(--soft); }
   /* barras de tempo (RTO) */
   .rto{ display:flex; flex-direction:column; gap:14px; }
   .rto .item{ display:grid; grid-template-columns:minmax(160px, 22%) 1fr; gap:16px; align-items:center; }
-  .rto .nome{ font-size:clamp(18px, 1.32vw, 24px); font-weight:700; }
+  .rto .nome{ font-size:clamp(15px, 1.1vw, 20px); font-weight:700; }
   .rto .trilho{ position:relative; height:38px; background:#132233; border:1px solid var(--line); border-radius:10px; overflow:hidden; }
   .rto .trilho i{ position:absolute; left:0; top:0; bottom:0; border-radius:10px 0 0 10px; }
-  .rto .trilho span{ position:absolute; top:50%; transform:translateY(-50%); font-size:clamp(16px, 1.14vw, 20px); white-space:nowrap; color:var(--text); }
+  .rto .trilho span{ position:absolute; top:50%; transform:translateY(-50%); font-size:clamp(13px, .95vw, 17px); white-space:nowrap; color:var(--text); }
   /* documentos */
   .doc{ background:#F3F1EA; color:#1D2733; border-radius:6px 26px 6px 6px; padding:clamp(18px, 1.6vw, 28px); display:flex; flex-direction:column; gap:10px;
         box-shadow:0 18px 40px rgba(0,0,0,.35); position:relative; }
   .doc::after{ content:""; position:absolute; top:0; right:0; width:26px; height:26px; background:linear-gradient(225deg, #0B1520 50%, #CFCAB9 50%); border-radius:0 0 0 6px; }
-  .doc .cod{ font-family:'JetBrains Mono', monospace; font-size:clamp(14px, 1.02vw, 18px); color:#5B6573; }
-  .doc h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 1.56vw, 28px); line-height:1.2; }
-  .doc p{ font-size:clamp(16px, 1.14vw, 20px); line-height:1.45; color:#3B4654; }
-  .doc .selo2{ align-self:flex-start; margin-top:auto; font-size:clamp(14px, 1.02vw, 18px); font-weight:700; padding:5px 12px; border-radius:999px; }
+  .doc .cod{ font-family:'JetBrains Mono', monospace; font-size:clamp(12px, .85vw, 15px); color:#5B6573; }
+  .doc h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.3vw, 23px); line-height:1.2; }
+  .doc p{ font-size:clamp(13px, .95vw, 17px); line-height:1.45; color:#3B4654; }
+  .doc .selo2{ align-self:flex-start; margin-top:auto; font-size:clamp(12px, .85vw, 15px); font-weight:700; padding:5px 12px; border-radius:999px; }
   /* camadas da aplicação */
   .pilha{ display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:14px; align-items:stretch; }
-  .seta{ align-self:center; font-size:41px; color:var(--line-2); }
-  .s-aviso{ font-size:clamp(16px, 1.14vw, 20px); color:#F5B95A; border-left:3px solid #F5B95A; padding:8px 12px; background:#241C10; border-radius:0 8px 8px 0; align-self:flex-start; }
-  .lema2{ display:flex; gap:20px; flex-wrap:wrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(24px, 2.4vw, 41px); font-weight:700; color:var(--soft); }
+  .seta{ align-self:center; font-size:34px; color:var(--line-2); }
+  .s-aviso{ font-size:clamp(13px, .95vw, 17px); color:#F5B95A; border-left:3px solid #F5B95A; padding:8px 12px; background:#241C10; border-radius:0 8px 8px 0; align-self:flex-start; }
+  .lema2{ display:flex; gap:20px; flex-wrap:wrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 2vw, 34px); font-weight:700; color:var(--soft); }
   .lema2 span:nth-child(even){ color:#4B6580; }
   .faixa{ height:6px; width:min(520px, 60%); border-radius:3px; background:linear-gradient(90deg, var(--brand), var(--iam), var(--net), var(--soc), var(--end)); }
   /* BIA: relógios por serviço */
   .relogio{ display:grid; grid-template-columns:repeat(3, 1fr); gap:8px; padding:6px 0; }
   .relogio div{ display:flex; flex-direction:column; gap:2px; }
-  .relogio b{ white-space:nowrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(20px, 1.92vw, 36px); font-weight:800; line-height:1.05; color:var(--cor); }
-  .relogio span{ font-size:clamp(13px, 0.96vw, 17px); font-weight:700; letter-spacing:.1em; color:var(--muted); }
+  .relogio b{ white-space:nowrap; font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.6vw, 30px); font-weight:800; line-height:1.05; color:var(--cor); }
+  .relogio span{ font-size:clamp(11px, .8vw, 14px); font-weight:700; letter-spacing:.1em; color:var(--muted); }
   /* BIA: mapa de calor no tempo */
   .calor{ display:grid; grid-template-columns:minmax(150px, 15%) repeat(5, 1fr); gap:6px; }
-  .calor .cab{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(16px, 1.2vw, 22px); font-weight:700; color:var(--muted); text-align:center; padding:6px 0; }
-  .calor .srv{ font-size:clamp(17px, 1.26vw, 23px); font-weight:700; display:flex; align-items:center; }
-  .calor .cel{ border-radius:8px; padding:clamp(8px, .8vw, 14px) 6px; text-align:center; font-size:clamp(16px, 1.14vw, 20px); font-weight:700; color:#160C0E; }
+  .calor .cab{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(13px, 1vw, 18px); font-weight:700; color:var(--muted); text-align:center; padding:6px 0; }
+  .calor .srv{ font-size:clamp(14px, 1.05vw, 19px); font-weight:700; display:flex; align-items:center; }
+  .calor .cel{ border-radius:8px; padding:clamp(8px, .8vw, 14px) 6px; text-align:center; font-size:clamp(13px, .95vw, 17px); font-weight:700; color:#160C0E; }
   .calor .n2{ background:#FACC15; } .calor .n3{ background:#FB923C; } .calor .n4{ background:#F87171; }
   .marcos{ display:grid; grid-template-columns:minmax(150px, 15%) repeat(5, 1fr); gap:6px; margin-top:4px; }
-  .marcos p{ font-size:clamp(14px, 1.06vw, 19px); line-height:1.4; color:var(--soft); border-top:2px solid var(--line-2); padding-top:8px; }
+  .marcos p{ font-size:clamp(12px, .88vw, 16px); line-height:1.4; color:var(--soft); border-top:2px solid var(--line-2); padding-top:8px; }
   /* BIA: ordem de recuperação */
   .ordem .bloco{ flex-direction:row; align-items:flex-start; gap:14px; }
-  .ordem .num{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(31px, 2.88vw, 53px); font-weight:800; line-height:1; color:var(--cor); min-width:1.2em; }
+  .ordem .num{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(26px, 2.4vw, 44px); font-weight:800; line-height:1; color:var(--cor); min-width:1.2em; }
   /* escalonamento em escada */
   .escada{ display:grid; grid-template-columns:repeat(5, 1fr); gap:1vw; align-items:end; }
   .escada .bloco{ gap:8px; }
   .escada .bloco:nth-child(2){ margin-bottom:2.2vh; } .escada .bloco:nth-child(3){ margin-bottom:4.4vh; }
   .escada .bloco:nth-child(4){ margin-bottom:6.6vh; } .escada .bloco:nth-child(5){ margin-bottom:8.8vh; }
-  .escada .rodape{ font-size:clamp(16px, 1.1vw, 19px); color:var(--soft); }
+  .escada .rodape{ font-size:clamp(13px, .92vw, 16px); color:var(--soft); }
   .escada .rodape b{ color:var(--cor); }
   /* DRP: fluxo da restauração e checklist */
   .fluxo{ display:flex; align-items:stretch; gap:8px; }
   .fluxo .passo2{ flex:1; background:#132233; border:1px solid var(--line); border-top:4px solid var(--cor, #EAB308); border-radius:12px;
                   padding:clamp(10px, .9vw, 16px); display:flex; flex-direction:column; gap:4px; }
-  .fluxo .passo2 b{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(17px, 1.26vw, 23px); line-height:1.2; }
-  .fluxo .passo2 span{ font-size:clamp(14px, 1.02vw, 18px); color:var(--muted); line-height:1.35; }
-  .fluxo .seta2{ align-self:center; color:var(--line-2); font-size:26px; }
+  .fluxo .passo2 b{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(14px, 1.05vw, 19px); line-height:1.2; }
+  .fluxo .passo2 span{ font-size:clamp(12px, .85vw, 15px); color:var(--muted); line-height:1.35; }
+  .fluxo .seta2{ align-self:center; color:var(--line-2); font-size:22px; }
   .check{ list-style:none; display:grid; grid-template-columns:1fr 1fr; gap:6px 18px; }
-  .check li{ font-size:clamp(16px, 1.14vw, 20px); color:var(--soft); padding-left:24px; position:relative; }
+  .check li{ font-size:clamp(13px, .95vw, 17px); color:var(--soft); padding-left:24px; position:relative; }
   .check li::before{ content:""; position:absolute; left:2px; top:.25em; width:12px; height:12px; border-radius:3px; border:2px solid var(--cor, #22C55E); }
   /* prancheta com folha pautada */
   .prancheta{ position:relative; background:linear-gradient(160deg, #7A5232, #5C3B22); border-radius:16px;
@@ -252,7 +252,7 @@
                      box-shadow:0 2px 0 #E9E3D2, 0 4px 0 #DCD5C2; }
   .prancheta .papel .rot{ display:block; color:#7C5A3A; padding-bottom:6px; border-bottom:1px solid #BFD3EC; }
   .prancheta .check{ gap:0 18px; }
-  .prancheta .check li{ color:#2B3440; line-height:1.9em; font-size:clamp(16px, 1.14vw, 20px); border-bottom:1px solid #BFD3EC; }
+  .prancheta .check li{ color:#2B3440; line-height:1.9em; font-size:clamp(13px, .95vw, 17px); border-bottom:1px solid #BFD3EC; }
   .prancheta .check li::before{ border-color:#3B7D52; background:#FFFFFF; top:.55em; }
   /* tratamento do incidente: o ticket do ITSM */
   .ticket{ display:grid; grid-template-columns:minmax(260px, 27%) 1fr; gap:1.6vw; align-items:start; }
@@ -281,7 +281,70 @@
   .mitiga .acoes span.pend{ background:#33270F; color:#F5D08A; }
   .legenda{ display:flex; gap:18px; font-size:clamp(14px, 1vw, 18px); color:var(--muted); }
   .legenda b{ color:#C9F5D8; } .legenda b.pend{ color:#F5D08A; }
-  .gigante{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(67px, 9vw, 168px); font-weight:800; line-height:.95; letter-spacing:-.03em; }
+  .acoes span.pend::before, .legenda b.pend::before{ content:""; display:inline-block; width:.72em; height:.72em; margin-right:.4em; vertical-align:-.05em;
+    border-radius:50%; border:2px solid currentColor; background:linear-gradient(90deg, currentColor 50%, transparent 50%); box-sizing:border-box; }
+  /* checklist detalhado: um card por item */
+  .vks{ display:grid; gap:1.2vw; align-items:stretch; }
+  .vk{ background:#132233; border:1px solid var(--line); border-top:5px solid var(--cor); border-radius:16px; padding:clamp(14px, 1.2vw, 22px);
+       display:flex; flex-direction:column; gap:10px; min-width:0; }
+  .vk-top{ display:flex; gap:12px; align-items:center; }
+  .vk-n{ flex-shrink:0; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+         font-family:'Sora', system-ui, sans-serif; font-weight:800; font-size:17px; background:var(--cor); color:#0B1520; }
+  .vk h4{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(18px, 1.35vw, 25px); font-weight:800; line-height:1.15; }
+  .vk .pq{ font-size:clamp(14px, 1vw, 18px); line-height:1.4; color:var(--soft); font-weight:500; }
+  .vk .pq b{ color:var(--text); }
+  .vk-cmd{ display:flex; flex-direction:column; gap:4px; }
+  .vk-cmd .os{ font-size:clamp(11px, .78vw, 13px); font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-top:4px; }
+  .vk-cmd code{ display:block; font-family:'JetBrains Mono', ui-monospace, monospace; font-weight:600; font-size:clamp(12.5px, .88vw, 16px); line-height:1.4;
+                background:#08111A; border:1px solid #1F3346; color:#9FF0E1; border-radius:8px; padding:6px 10px; white-space:pre-wrap; word-break:break-word; }
+  .vk-cmd code::before{ content:"$ "; color:#4B6580; }
+  .vk-cmd code.txt{ color:var(--soft); font-family:'DM Sans', system-ui, sans-serif; font-weight:600; }
+  .vk-cmd code.txt::before{ content:"▸ "; }
+  .vk .ok, .vk .x{ font-size:clamp(14px, .98vw, 18px); line-height:1.4; border-radius:8px; padding:8px 12px; font-weight:500; }
+  .vk .ok{ background:#132E20; color:#C9F5D8; margin-top:auto; }
+  .vk .x{ background:#2E2410; color:#F5D08A; }
+  .vk .ok b, .vk .x b{ color:inherit; font-weight:800; }
+  /* links para o ambiente real */
+  #mapa .host.link{ cursor:pointer; }
+  #mapa .host.link:hover rect{ stroke:#7DD3FC; }
+  .amb{ display:flex; flex-wrap:wrap; gap:8px; }
+  .amb-link{ display:inline-flex; gap:8px; align-items:baseline; text-decoration:none; font-weight:700; font-size:16px; color:#0B1520;
+             background:#7DD3FC; padding:8px 14px; border-radius:10px; }
+  .amb-link:hover{ background:#BAE6FD; }
+  .amb-link small{ font-family:'JetBrains Mono', monospace; font-weight:600; font-size:.78em; opacity:.75; }
+  /* regras do Wazuh */
+  .wz-fluxo{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .wz-fluxo .nodo{ background:#132233; border:1px solid var(--line); border-top:4px solid var(--cor); border-radius:12px; padding:10px 16px;
+                   font-family:'Sora', system-ui, sans-serif; font-weight:700; font-size:clamp(15px, 1.1vw, 20px); }
+  .wz-fluxo .nodo small{ display:block; font-family:'DM Sans', system-ui, sans-serif; font-weight:500; font-size:.72em; color:var(--muted); margin-top:2px; }
+  .wz-fluxo .seta3{ color:var(--soc); font-size:22px; font-weight:800; }
+  .regras{ width:100%; border-collapse:separate; border-spacing:0 4px; }
+  .regras th{ text-align:left; font-size:clamp(12px, .85vw, 15px); font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); padding:2px 10px; }
+  .regras td{ background:#132233; padding:clamp(5px, .45vw, 9px) 10px; font-size:clamp(13px, .95vw, 17px); line-height:1.3; color:var(--soft); font-weight:500; vertical-align:middle; }
+  .regras td:first-child{ border-radius:8px 0 0 8px; font-family:'JetBrains Mono', monospace; font-weight:600; color:#7DD3FC; }
+  .regras td:last-child{ border-radius:0 8px 8px 0; white-space:nowrap; }
+  .regras td.det{ color:var(--text); font-weight:700; }
+  .regras tr.corr td{ background:#1E2A18; }
+  .niv{ display:inline-flex; align-items:center; justify-content:center; min-width:2.2em; padding:2px 8px; border-radius:999px; font-weight:800; color:#0B1520; }
+  .trat{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:.9em; font-weight:700; }
+  .trat.L{ background:#1C2F42; color:var(--soft); } .trat.C{ background:#3A2A10; color:#FCD34D; }
+  .trat.X{ background:#3A1C21; color:#FCA5A5; } .trat.A{ background:#12304A; color:#7DD3FC; }
+  .tag-corr{ display:inline-block; margin-left:8px; padding:1px 8px; border-radius:999px; background:#1F4D2C; color:#86EFAC; font-size:.78em; font-weight:800; letter-spacing:.04em; vertical-align:1px; }
+  /* firewall e demos */
+  .vk-cmd code.cmt{ color:#7F95AA; font-weight:500; }
+  .vk-cmd code.cmt::before{ content:""; }
+  .demo .vk-n{ font-size:19px; }
+  .cadeia{ display:flex; flex-direction:column; gap:6px; }
+  .conclusao{ background:#132E20; border:1px solid #2C6B45; border-radius:12px; padding:12px 16px; font-size:clamp(15px, 1.05vw, 19px); color:#C9F5D8; font-weight:500; }
+  .conclusao b{ color:#fff; }
+  .roteiro{ counter-reset:r; display:flex; flex-direction:column; gap:6px; }
+  .roteiro li{ list-style:none; counter-increment:r; display:flex; gap:12px; align-items:flex-start; background:#132233; border:1px solid var(--line); border-radius:10px;
+               padding:clamp(7px, .6vw, 11px) 14px; font-size:clamp(15px, 1.05vw, 19px); line-height:1.4; color:var(--soft); font-weight:500; }
+  .roteiro li::before{ content:counter(r); flex-shrink:0; width:28px; height:28px; border-radius:50%; background:var(--soc); color:#0B1520; font-weight:800;
+                       display:flex; align-items:center; justify-content:center; font-size:15px; }
+  .roteiro li b{ color:var(--text); }
+  .status-chip{ align-self:flex-start; font-size:clamp(13px, .9vw, 16px); font-weight:700; padding:5px 12px; border-radius:999px; background:#33270F; color:#F5D08A; }
+  .gigante{ font-family:'Sora', system-ui, sans-serif; font-size:clamp(56px, 7.5vw, 140px); font-weight:800; line-height:.95; letter-spacing:-.03em; }
 
   /* ---------- rodapé de navegação ---------- */
   #rodape{
@@ -289,25 +352,25 @@
     display:flex; align-items:center; gap:20px; padding:0 24px;
   }
   #rodape button{ background:#1A2B3C; color:var(--text); border:1px solid var(--line-2); border-radius:10px;
-                  font:600 18px 'DM Sans', system-ui, sans-serif; padding:9px 16px; cursor:pointer; }
+                  font:600 15px 'DM Sans', system-ui, sans-serif; padding:9px 16px; cursor:pointer; }
   #rodape button:hover{ background:#22384D; }
   #rodape button:focus-visible{ outline:2px solid var(--brand); outline-offset:2px; }
   #pontos{ flex:1; display:flex; gap:6px; align-items:center; overflow:hidden; }
   #pontos button{ flex:1; min-width:6px; height:8px; padding:0; border-radius:4px; border:none; background:#22384D; }
   #pontos button.feito{ background:#3D5F82; }
   #pontos button.atual{ background:var(--brand); height:12px; }
-  #contador{ font-size:18px; color:var(--muted); min-width:64px; text-align:right; }
-  #dica{ font-size:16px; color:#5F7790; }
+  #contador{ font-size:15px; color:var(--muted); min-width:64px; text-align:right; }
+  #dica{ font-size:13px; color:#5F7790; }
 
   @media (max-height:820px){
     #painel .topo{ padding-top:20px; gap:6px; }
-    #painel h1{ font-size:32px; }
+    #painel h1{ font-size:27px; }
     #conteudo{ padding:14px 32px 20px; gap:11px; }
-    #conteudo p{ font-size:19px; line-height:1.45; }
-    #conteudo li{ font-size:18px; line-height:1.4; }
+    #conteudo p{ font-size:15.5px; line-height:1.45; }
+    #conteudo li{ font-size:15px; line-height:1.4; }
     #conteudo ul{ gap:6px; }
     #conteudo h3{ margin-top:2px; }
-    .chip{ font-size:16px; padding:4px 10px; }
+    .chip{ font-size:13px; padding:4px 10px; }
   }
   @media (max-height:820px){
     #sala{ padding:4vh 5vw 3vh; gap:2.2vh; }
@@ -317,8 +380,8 @@
     .escada .bloco:nth-child(4){ margin-bottom:4.2vh; } .escada .bloco:nth-child(5){ margin-bottom:5.6vh; }
   }
   @media (max-width:1100px){
-    :root{ --panel-w:480px; }
-    #painel h1{ font-size:31px; }
+    :root{ --panel-w:420px; }
+    #painel h1{ font-size:26px; }
   }
   @media (max-width:760px){
     #stage{ inset:0 0 55vh 0; }
@@ -331,6 +394,17 @@
   @media (prefers-reduced-motion: reduce){
     .pulso{ animation:none; }
   }
+  /* ---------- projetor: letras mais grossas sobre o fundo escuro ---------- */
+  body{ font-weight:500; }
+  #conteudo p, #conteudo li, #conteudo td, .passo, .s-txt, .s-sub, #painel .sub, .bloco p, .etapa p, .membro p, .org .chefe p,
+  .marcos p, .tk-ev p, .imp, .doc p, .card .l, .chip, .chips2 span, .acoes span, .check li, .fluxo .passo2 span, #notas{ font-weight:500; }
+  #conteudo th, .rto .trilho span{ font-weight:700; }
+  .mono, #mapa .t-mono{ font-weight:600; }
+  #mapa .t-muted{ font-weight:600; fill:var(--soft); }
+  #mapa text:not([font-weight]):not(.t-title){ font-weight:500; }
+  #painel h1, .s-titulo, .bloco h4, .etapa h4{ font-weight:800; }
+  #rodape button{ font-weight:700; }
+  #dica, #contador{ font-weight:600; color:var(--muted); }
 </style>
 </head>
 <body>
@@ -380,18 +454,37 @@ const COR = { net:'#14B8A6', iam:'#8B5CF6', soc:'#F59E0B', end:'#22C55E', grc:'#
 const VLANS = [
   { n:10, uso:'Gerência',   rede:'10.10.10.0/24', cor:COR.brand, hosts:[['Workstation 01','gerência · 10.10.10.x'],['Workstation 02','gerência · 10.10.10.x'],['Workstation 03','gerência · 10.10.10.x']] },
   { n:20, uso:'Servidores', rede:'10.10.20.0/24', cor:COR.iam,   hosts:[['NT-001 · AD-01','10.10.20.10'],['NT-002 · AD-02','10.10.20.11']] },
-  { n:30, uso:'DMZ',        rede:'10.10.30.0/24', cor:COR.danger, hosts:[['Reverse Proxy','10.10.30.3']] },
+  { n:30, uso:'DMZ',        rede:'10.10.30.0/27', cor:COR.danger, hosts:[['Firefly · firesrv','10.10.30.3']] },
   { n:40, uso:'Usuários',   rede:'10.10.40.0/24', cor:COR.end,   hosts:[['Workstation','10.10.40.x'],['Workstation','10.10.40.x'],['Workstation','10.10.40.x']] },
-  { n:50, uso:'Segurança / SOC', rede:'10.10.50.0/24', cor:COR.soc, hosts:[['Wazuh Manager','10.10.50.21'],['Zabbix + Grafana','10.10.50.15'],['OpenVAS','10.10.50.7'],['CyberFin IA','10.10.50.19'],['ITSM','10.10.50.x']] },
+  { n:50, uso:'Segurança / SOC', rede:'10.10.50.0/27', cor:COR.soc, hosts:[['Wazuh Manager','10.10.50.21'],['Zabbix + Grafana','10.10.50.15'],['OpenVAS','10.10.50.7'],['CyberFin IA','10.10.50.19'],['ITSM · Zammad','10.10.50.17']] },
   { n:60, uso:'Backup',     rede:'10.10.60.0/24', cor:COR.grc,   hosts:[['NT-003 · Backup','10.10.60.143']] }
 ];
+/* ---------- links para o ambiente real ----------
+   Clicar no servidor do mapa (ou no botão do painel) abre a ferramenta numa aba nova.
+   Só funciona no computador conectado à rede do laboratório. Endereço vazio = sem link. */
+const AMBIENTE = {
+  'Wazuh Manager':    [['Wazuh', 'https://10.10.50.21']],
+  'Zabbix + Grafana': [['Zabbix', 'http://10.10.50.15/zabbix'], ['Grafana', 'http://10.10.50.15:3000']],
+  'OpenVAS':          [['OpenVAS', 'https://10.10.50.7:9392']],
+  'CyberFin IA':      [['CyberFin IA', '']],
+  'ITSM · Zammad':    [['Zammad', 'http://10.10.50.17']],
+  'Firefly · firesrv': [['Firefly', 'http://10.0.50.2:8080']]
+};
+const linksDe = nome => (AMBIENTE[nome] || []).filter(([, url]) => url);
+function botoesAmbiente(...nomes){
+  const l = nomes.flatMap(linksDe);
+  return l.length ? `<div class="amb">${l.map(([rot, url]) =>
+    `<a class="amb-link" href="${url}" target="_blank" rel="noopener">Abrir ${rot} ↗ <small>${url.replace(/^https?:\/\//, '')}</small></a>`).join('')}</div>` : '';
+}
 const COL_W = 236;
 const COL_X = i => 30 + i * 258;            // canto esquerdo da coluna
 const COL_CX = i => COL_X(i) + COL_W / 2;   // centro da coluna
 const HOST_Y = j => 500 + j * 70;           // topo do host
+const ULT = VLANS.length - 1;
+const LANE = i => COL_X(i) + COL_W - 5;     // corredor à direita da coluna (por onde o pacote sobe)
+const colDe = x => Math.max(0, Math.min(ULT, Math.floor((x - 30) / 258)));
 const hostCentro = (i, j) => ({ x: COL_CX(i), y: HOST_Y(j) + 29 });
 const BUS_Y = 360;
-const ULT = VLANS.length - 1;
 
 /* ---------- desenho ---------- */
 function el(tag, attrs = {}, pai = svg){
@@ -421,8 +514,8 @@ defs.innerHTML = `
 el('rect', { x:-2000, y:-2000, width:5600, height:4920, fill:'url(#grade)' });
 
 // rótulos de camada
-texto(svg, 30, 30, 'PERÍMETRO', { class:'t-mono', 'font-size':16, 'letter-spacing':2 });
-texto(svg, 30, 395, 'VLANs · TRUNK 802.1Q', { class:'t-mono', 'font-size':16, 'letter-spacing':2 });
+texto(svg, 30, 30, 'PERÍMETRO', { class:'t-mono', 'font-size':13, 'letter-spacing':2 });
+texto(svg, 30, 395, 'VLANs · TRUNK 802.1Q', { class:'t-mono', 'font-size':13, 'letter-spacing':2 });
 
 // ligações do perímetro (desenhadas antes das caixas)
 const gLig = grupo('ligacoes');
@@ -436,7 +529,7 @@ el('path', { d:`M820 225 V${BUS_Y}`, class:'lig' }, gLig);
   const g = grupo('sdwan');
   el('rect', { x:30, y:120, width:180, height:100, rx:50, fill:'#12263A', stroke:COR.net, 'stroke-width':2 }, g);
   texto(g, 120, 164, 'SD-WAN', { 'text-anchor':'middle', class:'t-title', 'font-size':22 });
-  texto(g, 120, 188, 'entrada da internet', { 'text-anchor':'middle', class:'t-muted', 'font-size':16 });
+  texto(g, 120, 188, 'entrada da internet', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
 })();
 
 // UniFi: dois gateways formando o SD-WAN
@@ -447,10 +540,10 @@ el('path', { d:`M820 225 V${BUS_Y}`, class:'lig' }, gLig);
   [344, 486].forEach(x => {
     el('rect', { x, y:146, width:90, height:52, rx:10, fill:'#16354C', stroke:'#2BD4C0', 'stroke-width':1.5 }, g);
     texto(g, x + 45, 170, 'U', { 'text-anchor':'middle', class:'t-title', 'font-size':20, fill:'#5EEAD4' });
-    texto(g, x + 45, 189, 'gateway', { 'text-anchor':'middle', class:'t-mono', 'font-size':13 });
+    texto(g, x + 45, 189, 'gateway', { 'text-anchor':'middle', class:'t-mono', 'font-size':11 });
   });
   el('path', { d:'M434 172 H486', fill:'none', stroke:'#2BD4C0', 'stroke-width':2, 'stroke-dasharray':'5 5' }, g);
-  texto(g, 460, 228, 'SD-WAN · firewall · VLANs', { 'text-anchor':'middle', class:'t-muted', 'font-size':16 });
+  texto(g, 460, 228, 'SD-WAN · firewall · VLANs', { 'text-anchor':'middle', class:'t-muted', 'font-size':14 });
 })();
 
 // Cisco 2960
@@ -458,26 +551,26 @@ el('path', { d:`M820 225 V${BUS_Y}`, class:'lig' }, gLig);
   const g = grupo('cisco');
   el('rect', { x:700, y:115, width:240, height:110, rx:16, fill:'#10283A', stroke:COR.net, 'stroke-width':2.5 }, g);
   texto(g, 722, 153, 'Cisco 2960', { class:'t-title', 'font-size':22 });
-  texto(g, 722, 180, 'Layer 2 · VLANs', { class:'t-muted', 'font-size':18 });
-  texto(g, 722, 204, 'Trunks 802.1Q', { class:'t-muted', 'font-size':18 });
+  texto(g, 722, 180, 'Layer 2 · VLANs', { class:'t-muted', 'font-size':15 });
+  texto(g, 722, 204, 'Trunks 802.1Q', { class:'t-muted', 'font-size':15 });
 })();
 
 // Ambiente externo (VLAN 200): fora do escopo do projeto
 (() => {
   const g = grupo('externo');
   el('rect', { x:1030, y:60, width:540, height:240, rx:18, fill:'#101B27', stroke:'#5B7389', 'stroke-width':2, 'stroke-dasharray':'8 6' }, g);
-  texto(g, 1052, 94, 'Ambiente externo · VLAN 200', { class:'t-title', 'font-size':22 });
-  texto(g, 1052, 118, 'fora do escopo do projeto, administrado externamente', { class:'t-muted', 'font-size':15 });
+  texto(g, 1052, 94, 'Ambiente externo · VLAN 200', { class:'t-title', 'font-size':20 });
+  texto(g, 1052, 118, 'fora do escopo do projeto, administrado externamente', { class:'t-muted', 'font-size':13 });
   [['Hosts ESXi', 1052, 140], ['vCenter', 1306, 140], ['Jump Server', 1052, 214], ['Storage / TrueNAS', 1306, 214]].forEach(([n, x, y]) => {
     el('rect', { x, y, width:242, height:60, rx:10, fill:'#15222F', stroke:'#33475A', 'stroke-width':1.5 }, g);
-    texto(g, x + 18, y + 37, n, { 'font-size':19, 'font-weight':700, fill:'#AFC1D2' });
+    texto(g, x + 18, y + 37, n, { 'font-size':16, 'font-weight':700, fill:'#AFC1D2' });
   });
 })();
 
 // Barramento (trunk) e colunas de VLAN
 const gBus = grupo('barramento');
-el('path', { d:`M${COL_CX(0)} ${BUS_Y} H${COL_CX(ULT)}`, class:'barramento' }, gBus);
-VLANS.forEach((v, i) => el('path', { d:`M${COL_CX(i)} ${BUS_Y} V400`, class:'lig' }, gBus));
+el('path', { d:`M${LANE(0)} ${BUS_Y} H${LANE(ULT)}`, class:'barramento' }, gBus);
+VLANS.forEach((v, i) => el('path', { d:`M${LANE(i)} ${BUS_Y} V400`, class:'lig' }, gBus));
 
 const hostEls = {};   // "col-indice" -> <g>
 VLANS.forEach((v, i) => {
@@ -485,15 +578,22 @@ VLANS.forEach((v, i) => {
   const x = COL_X(i);
   el('rect', { x, y:400, width:COL_W, height:500, rx:14, fill:'#0F1D2B', stroke:v.cor, 'stroke-width':2, 'stroke-opacity':.75 }, g);
   el('rect', { x, y:400, width:COL_W, height:6, rx:3, fill:v.cor }, g);
-  texto(g, x + 16, 444, String(v.n), { class:'t-title', 'font-size':34, fill:v.cor });
-  texto(g, x + 16, 468, v.uso, { 'font-size':18, 'font-weight':700 });
-  texto(g, x + 16, 489, v.rede, { class:'t-mono', 'font-size':14 });
+  texto(g, x + 16, 444, String(v.n), { class:'t-title', 'font-size':30, fill:v.cor });
+  texto(g, x + 16, 466, v.uso, { 'font-size':15, 'font-weight':700 });
+  texto(g, x + 16, 485, v.rede, { class:'t-mono', 'font-size':12 });
   v.hosts.forEach(([nome, ip], j) => {
     const h = el('g', { class:'host', 'data-host': `${i}-${j}` }, g);
     el('rect', { x:x + 10, y:HOST_Y(j), width:COL_W - 20, height:58, rx:9, fill:'#16283A', stroke:'#2C4560', 'stroke-width':1.5 }, h);
-    texto(h, x + 22, HOST_Y(j) + 26, nome, { 'font-size':18, 'font-weight':700 });
-    texto(h, x + 22, HOST_Y(j) + 48, ip, { class:'t-mono', 'font-size':14 });
+    texto(h, x + 22, HOST_Y(j) + 25, nome, { 'font-size':15, 'font-weight':700 });
+    texto(h, x + 22, HOST_Y(j) + 45, ip, { class:'t-mono', 'font-size':12 });
     hostEls[`${i}-${j}`] = h;
+    const lk = linksDe(nome);
+    if(lk.length){
+      h.classList.add('link');
+      texto(h, x + COL_W - 22, HOST_Y(j) + 25, '↗', { 'text-anchor':'end', 'font-size':16, 'font-weight':700, fill:'#7DD3FC' });
+      el('title', {}, h).textContent = 'Abrir ' + lk[0][0];
+      h.addEventListener('click', () => window.open(lk[0][1], '_blank', 'noopener'));
+    }
   });
 });
 
@@ -509,9 +609,11 @@ function limparAnimacoes(){
   camada.innerHTML = '';
 }
 // caminho em "L" passando pelo barramento: host -> trunk -> host
+// sai do host pelo corredor lateral da coluna, passa pelo trunk e desce pelo corredor da coluna de destino
 function viaBus(a, b){
-  if(a.x === b.x) return [a, b];
-  return [a, { x:a.x, y:BUS_Y }, { x:b.x, y:BUS_Y }, b];
+  const la = LANE(colDe(a.x)), lb = LANE(colDe(b.x));
+  if(la === lb) return [a, { x:la, y:a.y }, { x:la, y:b.y }, b];
+  return [a, { x:la, y:a.y }, { x:la, y:BUS_Y }, { x:lb, y:BUS_Y }, { x:lb, y:b.y }, b];
 }
 function pacote(pontos, cor, dur = 1600, raio = 7){
   const minha = geracao;
@@ -573,20 +675,59 @@ function focar(ids){
 /* ---------- incidente: a workstation da VLAN 40 que recebe o phishing ---------- */
 const WS = hostEls['3-0'];
 const ITSM = hostEls['4-4'];
-function selo(host, txt, cor, linha = 1){
+function selo(host, txt, cor, linha = 2){
   host.querySelector('.selo')?.remove();
   const r = host.querySelector('rect');
   const x = +r.getAttribute('x') + (+r.getAttribute('width')) - 12, y = +r.getAttribute('y') + (linha === 1 ? 22 : 47);
-  const s = el('text', { x, y, 'text-anchor':'end', class:'selo pulso', 'font-size':14, 'font-weight':700, 'letter-spacing':1.5, fill:cor }, host);
+  const s = el('text', { x, y, 'text-anchor':'end', class:'selo pulso', 'font-size':12, 'font-weight':700, 'letter-spacing':1.5, fill:cor }, host);
   s.textContent = txt;
 }
 function resetIncidente(){
   Object.values(hostEls).forEach(h => { h.classList.remove('alerta', 'ok'); h.querySelector('.selo')?.remove(); });
+  svg.querySelector('.selo-ext')?.remove();
 }
 // lista de passos: os já feitos ficam só com o rótulo, o atual mostra o texto todo
 function passos(lista, atual, cor){
   return `<div class="passos" style="--cp:${cor}">${lista.map(([rot, txt], k) =>
     `<div class="passo ${k < atual ? 'feito' : k === atual ? 'ativo' : ''}"><span><b>${rot}</b>${k === atual ? ' ' + txt : ''}</span></div>`).join('')}</div>`;
+}
+/* checklist pós-restauração, item por item (mesmo conteúdo do DRP, seção 10) */
+const CHECK = [{"n": 1, "t": "Sistema operacional inicializa", "pq": "Prova que a restauração não corrompeu o boot nem o sistema.", "cmd": [["Windows", ["Get-Service | Where-Object {$_.StartType -eq \"Automatic\" -and $_.Status -ne \"Running\"}"]], ["Linux", ["systemctl --failed", "journalctl -b -p err"]]], "ok": "Chega à tela de login pela console da VM e nenhum serviço automático fica parado.", "falha": "Restaurar de novo pela Recovery Media; se o erro se repetir, usar o ponto de restauração anterior."}, {"n": 2, "t": "Discos e partições corretos", "pq": "Um disco faltando ou menor que o original quebra o banco e a aplicação.", "cmd": [["Windows", ["Get-Disk", "Get-Volume"]], ["Linux", ["lsblk", "df -h"]]], "ok": "Mesmos discos, tamanhos e pontos de montagem do inventário, com espaço livre coerente.", "falha": "Conferir se a VM tem disco igual ou maior que o original e refazer o restore mapeando cada disco."}, {"n": 3, "t": "IP, gateway e VLAN corretos", "pq": "A VM nova pode subir com outra placa de rede e perder o IP fixo.", "cmd": [["Windows", ["ipconfig /all", "Test-NetConnection 10.10.20.1"]], ["Linux", ["ip a ; ip r", "ping -c 3 10.10.50.1"]]], "ok": "IP do inventário (ex.: NT-001 = 10.10.20.10) e o gateway .1 da VLAN respondendo.", "falha": "Reconfigurar o IP na placa nova. Se o gateway não responde, o Network confere a VLAN da porta virtual."}, {"n": 4, "t": "DNS e NTP funcionam", "pq": "Sem DNS nada encontra o AD; com o relógio errado o Kerberos recusa o login (tolerância de 5 min).", "cmd": [["Windows", ["nslookup cyberappfin.local", "w32tm /query /status"]], ["Linux", ["dig cyberappfin.local", "timedatectl"]]], "ok": "O domínio resolve para 10.10.20.10 e 10.10.20.11; hora sincronizada, diferença menor que 5 min.", "falha": "Apontar o DNS para NT-001 e NT-002 e ressincronizar a hora (w32tm /resync no Windows, reiniciar o serviço de hora no Linux)."}, {"n": 5, "t": "Autenticação no AD funciona", "pq": "Um servidor restaurado de um ponto antigo pode perder a senha de máquina com o domínio.", "cmd": [["Servidor Windows", ["Test-ComputerSecureChannel", "gpresult /r"]], ["Nos controladores", ["dcdiag", "repadmin /replsummary"]]], "ok": "Canal seguro True, GPOs aplicadas, replicação sem falhas e login com um usuário de teste.", "falha": "Reparar o canal com Test-ComputerSecureChannel -Repair -Credential (administrador do domínio)."}, {"n": 6, "t": "Banco de dados íntegro", "pq": "Um banco restaurado no meio de uma escrita pode voltar inconsistente.", "cmd": [["MySQL / MariaDB", ["systemctl status mariadb", "mysqlcheck --all-databases --check"]], ["Indexador do Wazuh", ["curl -k -u admin https://localhost:9200/_cluster/health"]]], "ok": "Serviço do banco no ar, verificação sem erros e o indexador com status green.", "falha": "Não liberar. Restaurar o banco de um ponto anterior ou de um dump; nunca reparar sem antes copiar os arquivos."}, {"n": 7, "t": "Aplicação responde", "pq": "O serviço pode estar no ar e a aplicação não atender pelo caminho normal.", "cmd": [["No servidor", ["ss -tlnp", "curl -kI https://10.10.50.21"]], ["A partir do proxy 10.0.50.2 (Firefly)", ["curl -I http://10.10.30.3:8080"]]], "ok": "Mesmas portas do baseline, resposta HTTP 200 ou 302 e login na interface funcionando.", "falha": "Ler o log do serviço (journalctl -u nome-do-serviço) e conferir a publicação no proxy 10.0.50.2."}, {"n": 8, "t": "Dados críticos conferidos", "pq": "É aqui que se mede quanto dado foi perdido de verdade: o RPO real.", "cmd": [["Área de negócio", ["Último lançamento presente x hora do restore point", "Amostra de registros e totais do dia"]], ["Arquivos (contra a lista de hashes do kit)", ["sha256sum arquivo", "Get-FileHash arquivo"]]], "ok": "Dados presentes até o restore point; perda dentro do RPO da BIA (Crédito: 15 min).", "falha": "Perda maior que o RPO vai para o RCI; a área relança os registros a partir dos documentos de origem."}, {"n": 9, "t": "Wazuh recebe eventos", "pq": "Servidor que não manda log é um ponto cego para o SOC.", "cmd": [["No Wazuh Manager", ["/var/ossec/bin/agent_control -l"]], ["No servidor", ["systemctl status wazuh-agent", "Get-Service WazuhSvc"]]], "ok": "Agente como Active; um login errado de teste aparece no dashboard em segundos.", "falha": "O agente restaurado pode conflitar com a chave antiga: remover e registrar de novo (agent-auth -m 10.10.50.21) e conferir as portas 1514 e 1515."}, {"n": 10, "t": "Zabbix monitora o host", "pq": "Sem monitoramento, uma nova queda passa despercebida.", "cmd": [["No Zabbix Server", ["zabbix_get -s 10.10.20.10 -k agent.ping"]], ["No servidor", ["systemctl status zabbix-agent", "Get-Service \"Zabbix Agent*\""]]], "ok": "agent.ping retorna 1, o ícone ZBX fica verde e os gráficos mostram dados novos.", "falha": "Conferir o Server= no zabbix_agentd.conf e a porta 10050 no firewall do host."}, {"n": 11, "t": "Firewall e hardening preservados", "pq": "Restaurar não pode reabrir uma porta que estava fechada.", "cmd": [["Linux", ["ufw status verbose", "systemctl status clamav-daemon"]], ["Windows", ["Get-NetFirewallProfile | Select Name,Enabled"]]], "ok": "Entrada bloqueada por padrão, SSH restrito, ClamAV no ar e OpenVAS sem porta nova em relação ao baseline.", "falha": "Reaplicar as regras do hardening e investigar: mudança inesperada pode indicar um ponto de restauração antigo ou com problema."}, {"n": 12, "t": "Novo backup pós-DR executado", "pq": "O servidor restaurado precisa de uma base nova: os próximos backups partem do ambiente recuperado.", "cmd": [["No Veeam (NT-003)", ["Executar o job do servidor (Active Full)", "Conferir o status Success no histórico"]], ["No servidor", ["Get-Service Veeam*", "systemctl status veeamservice"]]], "ok": "Job com Success e um ponto de restauração novo no repositório.", "falha": "Conferir o agente do Veeam, a rota até 10.10.60.143 e as credenciais do job."}];
+const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const ehComando = l => !/^[A-ZÚÁ]/.test(l) || /^(Get-|Test-)/.test(l);
+function telaCheck(nums, cor, quem){
+  const itens = nums.map(n => CHECK[n - 1]);
+  return `<div class="s-corpo" style="justify-content:center">
+      <div class="vks" style="grid-template-columns:repeat(${itens.length}, 1fr)">${itens.map(c => `
+        <div class="vk" style="--cor:${cor}">
+          <div class="vk-top"><span class="vk-n">${c.n}</span><h4>${c.t}</h4></div>
+          <p class="pq"><b>Por quê:</b> ${c.pq}</p>
+          <div class="vk-cmd">${c.cmd.map(([os, linhas]) => `<span class="os">${os}</span>${linhas.map(l => `<code class="${ehComando(l) ? '' : 'txt'}">${esc(l)}</code>`).join('')}`).join('')}</div>
+          <p class="ok"><b>✓ Esperado:</b> ${c.ok}</p>
+          <p class="x"><b>Se falhar:</b> ${c.falha}</p>
+        </div>`).join('')}
+      </div>
+      <p class="s-txt">Quem confere: <b>${quem}</b> · o servidor só é liberado com os 12 itens marcados.</p>
+    </div>`;
+}
+/* regras customizadas do Wazuh (local_rules.xml) */
+const REGRAS = [{"id": "100001", "n": 5, "cat": "SSH", "det": "Falha de autenticação SSH", "fun": "Registra tentativa de autenticação SSH malsucedida.", "tr": "L", "corr": false}, {"id": "100110", "n": 10, "cat": "Firefly Web", "det": "Recurso sensível/suspeito", "fun": "Tentativa de acesso a recurso web sensível ou suspeito.", "tr": "C", "corr": false}, {"id": "100111", "n": 3, "cat": "Firefly Web", "det": "HTTP 404", "fun": "Recurso inexistente; contexto para enumeração correlacionada.", "tr": "L", "corr": false}, {"id": "100112", "n": 6, "cat": "Autenticação", "det": "Falha de autenticação", "fun": "Tentativa de autenticação malsucedida no Firefly.", "tr": "L", "corr": false}, {"id": "100113", "n": 10, "cat": "Autenticação", "det": "Possível brute force", "fun": "5 falhas de autenticação em 120 s.", "tr": "C", "corr": true}, {"id": "100114", "n": 12, "cat": "Ataque Web", "det": "Path Traversal / LFI", "fun": "Tentativa compatível com Path Traversal ou LFI.", "tr": "C", "corr": false}, {"id": "100115", "n": 12, "cat": "Ataque Web", "det": "SQL Injection", "fun": "Payload compatível com SQL Injection.", "tr": "C", "corr": false}, {"id": "100116", "n": 12, "cat": "Ataque Web", "det": "Command Injection / RCE", "fun": "Payload compatível com Command Injection ou RCE.", "tr": "C", "corr": false}, {"id": "100117", "n": 10, "cat": "Reconhecimento", "det": "Scan / enumeração Web", "fun": "15 recursos inexistentes em 60 s.", "tr": "C", "corr": true}, {"id": "100118", "n": 10, "cat": "Reconhecimento", "det": "Scanner / Pentest", "fun": "Ferramenta automatizada de scan ou pentest.", "tr": "C", "corr": false}, {"id": "100119", "n": 12, "cat": "Ataque Web", "det": "XSS", "fun": "Payload compatível com Cross-Site Scripting.", "tr": "C", "corr": false}, {"id": "100120", "n": 10, "cat": "HTTP", "det": "TRACE / CONNECT", "fun": "Métodos HTTP TRACE ou CONNECT.", "tr": "C", "corr": false}, {"id": "100121", "n": 3, "cat": "HTTP", "det": "HTTP 401/403", "fun": "Requisição negada; isolada, serve como contexto.", "tr": "L", "corr": false}, {"id": "100122", "n": 10, "cat": "Reconhecimento", "det": "Múltiplos 401/403", "fun": "10 respostas 401/403 em 60 s.", "tr": "C", "corr": true}, {"id": "100123", "n": 12, "cat": "Active Response", "det": "Bloqueio aplicado", "fun": "Bloqueio público temporário de 60 s.", "tr": "A", "corr": false}, {"id": "100124", "n": 5, "cat": "Active Response", "det": "Bloqueio removido", "fun": "Remoção do bloqueio após 60 s.", "tr": "A", "corr": false}, {"id": "100125", "n": 15, "cat": "Crítico", "det": "Recurso sensível HTTP 200", "fun": "Possível exposição; HTTP 200 não prova comprometimento.", "tr": "X", "corr": false}, {"id": "100126", "n": 12, "cat": "Web", "det": "Recurso sensível 301/302", "fun": "Redirecionamento em recurso sensível; investigar exposição.", "tr": "C", "corr": false}, {"id": "100130", "n": 13, "cat": "Correlação", "det": "Alta atividade ofensiva", "fun": "4 ocorrências em 120 s: ataque automatizado ou coordenado.", "tr": "X", "corr": true}, {"id": "100140", "n": 13, "cat": "Integridade", "det": "docker-compose modificado", "fun": "Alteração do docker-compose da aplicação.", "tr": "X", "corr": false}, {"id": "100141", "n": 13, "cat": "Integridade", "det": "Controle de segurança modificado", "fun": "Possível adulteração ou desativação de controle.", "tr": "X", "corr": false}, {"id": "100142", "n": 14, "cat": "Integridade", "det": "Arquivo com secrets modificado", "fun": "Alteração de arquivo que contém secrets.", "tr": "X", "corr": false}, {"id": "100143", "n": 13, "cat": "Integridade", "det": "Arquivo crítico criado/recriado", "fun": "Criação ou recriação de arquivo crítico.", "tr": "X", "corr": false}, {"id": "100144", "n": 15, "cat": "Integridade", "det": "Arquivo crítico removido", "fun": "Remoção de arquivo crítico: possível sabotagem.", "tr": "X", "corr": false}, {"id": "100150", "n": 15, "cat": "Defesa", "det": "Mecanismo de defesa modificado", "fun": "Possível tentativa de desativar Wazuh ou Active Response.", "tr": "X", "corr": false}, {"id": "100160", "n": 10, "cat": "Honeypot", "det": "Arquivo/repositório sensível", "fun": "Acesso a arquivo ou repositório sensível.", "tr": "C", "corr": false}, {"id": "100161", "n": 8, "cat": "Honeypot", "det": "Endpoint WordPress", "fun": "Scanner procurando endpoint WordPress.", "tr": "L", "corr": false}, {"id": "100162", "n": 8, "cat": "Honeypot", "det": "phpMyAdmin", "fun": "Scanner procurando phpMyAdmin.", "tr": "L", "corr": false}, {"id": "100163", "n": 8, "cat": "Honeypot", "det": "Apache administrativo", "fun": "Enumeração de endpoint administrativo Apache.", "tr": "L", "corr": false}, {"id": "100164", "n": 8, "cat": "Honeypot", "det": "Apache server-info", "fun": "Enumeração do endpoint server-info.", "tr": "L", "corr": false}];
+const TRAT = { L:'Ledger / correlação', C:'Case + Zammad', X:'Case + Zammad crítico', A:'Atualiza o ticket' };
+const corNivel = n => n >= 13 ? '#F87171' : n >= 10 ? '#FB923C' : n >= 6 ? '#FACC15' : '#94A3B8';
+function tabelaRegras(lista){
+  return `<table class="regras"><tr><th>ID</th><th>Nível</th><th>Categoria</th><th>Detecção</th><th>O que significa</th><th>Tratamento</th></tr>${lista.map(r => `
+    <tr class="${r.corr ? 'corr' : ''}"><td>${r.id}</td><td><span class="niv" style="background:${corNivel(r.n)}">${r.n}</span></td><td>${r.cat}</td>
+      <td class="det">${r.det}${r.corr ? '<span class="tag-corr">CORRELAÇÃO</span>' : ''}</td><td>${r.fun}</td><td><span class="trat ${r.tr}">${TRAT[r.tr]}</span></td></tr>`).join('')}</table>`;
+}
+const LINK_REGRAS = `<a class="doc-link" href="regras-wazuh.html" target="_blank" rel="noopener" style="background:#7DD3FC">Catálogo completo das regras ↗ <small>local_rules.xml</small></a>`;
+const LINK_RUNBOOK = `<a class="doc-link" href="runbook-tecnico.html" target="_blank" rel="noopener" style="background:#C4B5FD">Runbook técnico ↗ <small>roteiro e evidências</small></a>`;
+// pacote barrado pelo firewall: para no topo da coluna de destino e mostra um ✗
+async function barrado(pontos){
+  const fim = pontos[pontos.length - 1];
+  if(!await pacote(pontos, COR.danger, 1500, 7)) return;
+  const t = el('text', { x:fim.x - 10, y:fim.y - 8, 'text-anchor':'end', 'font-size':15, 'font-weight':800, 'letter-spacing':1, fill:COR.danger }, camada);
+  t.textContent = '✗ BLOQUEADO';
+  setTimeout(() => t.remove(), 1300);
 }
 const LINK_DRP = `<a class="doc-link" href="drp.html" target="_blank" rel="noopener">Abrir o documento do DRP ↗ <small>GRC-DRP-001</small></a>`;
 
@@ -594,32 +735,43 @@ const LINK_DRP = `<a class="doc-link" href="drp.html" target="_blank" rel="noope
 const DR = { ad:['1-0', '1-1'], soc:['4-0', '4-1', '4-2', '4-3', '4-4'], dmz:['2-0'], bk:'5-0' };
 const SERVIDORES = [...DR.ad, ...DR.soc, ...DR.dmz];
 const centroDe = k => { const [i, j] = k.split('-').map(Number); return hostCentro(i, j); };
-function cifrado(k){ const h = hostEls[k]; h.classList.remove('ok'); h.classList.add('alerta'); selo(h, 'CIFRADO', COR.danger, 2); }
+function perdida(k){ const h = hostEls[k]; h.classList.remove('ok'); h.classList.add('alerta'); selo(h, 'PERDIDA', COR.danger, 2); }
+// etiqueta no TrueNAS (ambiente externo), onde fica o repositório de backup
+const TRUENAS = { x:1427, y:244 };
+function seloTrueNAS(txt, cor){
+  svg.querySelector('.selo-ext')?.remove();
+  const t = el('text', { x:1536, y:266, 'text-anchor':'end', class:'selo-ext', 'font-size':12, 'font-weight':700, 'letter-spacing':1.5, fill:cor }, svg.querySelector('[data-id="externo"]'));
+  t.textContent = txt;
+}
+// caminho do TrueNAS até o NT-003: sai do ambiente externo, passa pelo Cisco e desce pelo corredor da VLAN 60
+const rotaTrueNAS = () => { const nt = hostCentro(5, 0); return [{x:1427,y:274},{x:1427,y:290},{x:1040,y:290},{x:1040,y:170},{x:820,y:170},{x:820,y:BUS_Y},{x:LANE(5),y:BUS_Y},{x:LANE(5),y:nt.y},nt]; };
 function restaurado(k){ const h = hostEls[k]; h.classList.remove('alerta'); h.classList.add('ok'); selo(h, '✓ OK', '#4ADE80', 2); h.querySelector('.selo').classList.remove('pulso'); }
+const TODAS = [DR.bk, ...SERVIDORES];
 async function rodarDR(passo){
   const minha = geracao;
   const vivo = () => minha === geracao;
   const bk = centroDe(DR.bk);
-  // estado de partida: o que já voltou nas fases anteriores
-  const fases = [[], [], DR.ad, DR.soc, DR.dmz];
-  const prontos = passo >= 5 ? SERVIDORES : fases.slice(0, passo).flat();
-  SERVIDORES.forEach(k => prontos.includes(k) ? restaurado(k) : cifrado(k));
-  hostEls[DR.bk].classList.add('ok'); selo(hostEls[DR.bk], 'ÍNTEGRO', '#4ADE80', 2);
+  const espera = ms => new Promise(r => setTimeout(r, ms));
+  // estado de partida: o que já voltou nas fases anteriores (o NT-003 volta na fase 1)
+  const fases = [[], [DR.bk], DR.ad, DR.soc, DR.dmz];
+  const prontos = passo >= 5 ? TODAS : fases.slice(0, passo).flat();
+  TODAS.forEach(k => prontos.includes(k) ? restaurado(k) : perdida(k));
+  seloTrueNAS('ÍNTEGRO', '#4ADE80');
   if(passo === 0){
-    // o ransomware se espalha a partir de uma estação da VLAN 40
-    SERVIDORES.forEach(k => { hostEls[k].classList.remove('alerta'); hostEls[k].querySelector('.selo')?.remove(); });
-    const origem = hostCentro(3, 0);
-    hostEls['3-0'].classList.add('alerta');
-    for(const k of SERVIDORES){
+    // as VMs caem uma a uma; a rede e o TrueNAS continuam de pé
+    TODAS.forEach(k => { hostEls[k].classList.remove('alerta'); hostEls[k].querySelector('.selo')?.remove(); });
+    for(const k of TODAS){
       if(!vivo()) return;
-      pacote(viaBus(origem, centroDe(k)), COR.danger, 1300, 6).then(ok => { if(ok && vivo()) cifrado(k); });
-      await new Promise(r => setTimeout(r, 260));
+      perdida(k);
+      await espera(240);
     }
     return;
   }
   if(passo === 1){
-    // rede conferida VLAN por VLAN e backup íntegro
-    emLoop(() => VLANS.forEach((v, i) => setTimeout(() => pacote([{x:820,y:225},{x:820,y:BUS_Y},{x:COL_CX(i),y:BUS_Y},{x:COL_CX(i),y:400}], COR.net, 1500, 6), i * 140)), 3200);
+    // rede conferida VLAN por VLAN; depois o NT-003 volta, ligado ao repositório no TrueNAS
+    VLANS.forEach((v, i) => setTimeout(() => pacote([{x:820,y:225},{x:820,y:BUS_Y},{x:LANE(i),y:BUS_Y},{x:LANE(i),y:400}], COR.net, 1500, 6), i * 140));
+    await espera(2400);
+    if(vivo() && await pacote(rotaTrueNAS(), COR.grc, 2200, 8) && vivo()) restaurado(DR.bk);
     return;
   }
   // fases 2 a 4: cada servidor sai do NT-003, um depois do outro
@@ -703,15 +855,15 @@ const PARADAS = [
     notas:'O UniFi é o porteiro da rede: decide o que pode passar de uma VLAN para outra. Na resposta a incidentes, é aqui que o Network bloqueia domínios e URLs maliciosos.'
   },
   {
-    quem:P2N, cor:COR.net, titulo:'Cisco 2960 e as VLANs', sub:'Trunks 802.1Q · rede 10.10.X.0/24',
+    quem:P2N, cor:COR.net, titulo:'Cisco 2960 e as VLANs', sub:'Trunks 802.1Q · rede 10.10.X.0',
     cam:[0, 100, 1600, 560], foco:['cisco', 'barramento', 'ligacoes', ...VLANS.map(v => 'vlan' + v.n)],
-    anim(){ emLoop(() => VLANS.forEach((v, i) => setTimeout(() => pacote([{x:820,y:225},{x:820,y:BUS_Y},{x:COL_CX(i),y:BUS_Y},{x:COL_CX(i),y:400}], v.cor, 1600, 6), i * 160)), 3000); },
+    anim(){ emLoop(() => VLANS.forEach((v, i) => setTimeout(() => pacote([{x:820,y:225},{x:820,y:BUS_Y},{x:LANE(i),y:BUS_Y},{x:LANE(i),y:400}], v.cor, 1600, 6), i * 160)), 3000); },
     html:`<table><tr><th>VLAN</th><th>Uso</th><th>Sub-rede</th></tr>
       <tr><td>10</td><td>Gerência</td><td class="mono">10.10.10.0/24</td></tr>
       <tr><td>20</td><td>Servidores</td><td class="mono">10.10.20.0/24</td></tr>
-      <tr><td>30</td><td>DMZ</td><td class="mono">10.10.30.0/24</td></tr>
+      <tr><td>30</td><td>DMZ</td><td class="mono">10.10.30.0/27</td></tr>
       <tr><td>40</td><td>Usuários</td><td class="mono">10.10.40.0/24</td></tr>
-      <tr class="dest"><td>50</td><td>Segurança / SOC</td><td class="mono">10.10.50.0/24</td></tr>
+      <tr class="dest"><td>50</td><td>Segurança / SOC</td><td class="mono">10.10.50.0/27</td></tr>
       <tr><td>60</td><td>Backup</td><td class="mono">10.10.60.0/24</td></tr></table>
       <p>Gateway de cada VLAN no <b>.1</b>. VLANs e trunks em <b>100%</b>, DMZ em <b>100%</b>.</p>
       <p>A infraestrutura de virtualização fica na <b>VLAN 200</b>, em ambiente externo (próxima parada).</p>`,
@@ -749,9 +901,10 @@ const PARADAS = [
       <tr><td>Zabbix + Grafana</td><td class="mono">.50.15</td><td>Disponibilidade e painéis</td></tr>
       <tr><td>OpenVAS</td><td class="mono">.50.7</td><td>Varredura de vulnerabilidades</td></tr>
       <tr><td>CyberFin IA</td><td class="mono">.50.19</td><td>Classifica os alertas; o analista decide</td></tr>
-      <tr><td>ITSM</td><td class="mono">.50.x</td><td>Registro e acompanhamento dos incidentes</td></tr></table>
+      <tr><td>ITSM (Zammad)</td><td class="mono">.50.17</td><td>Registro e acompanhamento dos incidentes</td></tr></table>
       <ul><li style="--cor:${COR.soc}">Wazuh instalado direto em servidor Linux (standalone)</li>
-      <li style="--cor:${COR.soc}">Agentes reportam pelas portas 1514 e 1515</li></ul>`,
+      <li style="--cor:${COR.soc}">Agentes reportam pelas portas 1514 e 1515</li></ul>
+      ${botoesAmbiente('Wazuh Manager', 'Zabbix + Grafana', 'OpenVAS', 'CyberFin IA', 'ITSM · Zammad')}`,
     notas:'Toda a stack do SOC é open source e fica isolada na VLAN 50. A IA ajuda na triagem dos logs, mas não executa nenhuma ação: a decisão é sempre do analista. O ITSM registra cada incidente com um ticket.'
   },
   {
@@ -765,13 +918,130 @@ const PARADAS = [
     html:`<table><tr><th>Agente</th><th>IP</th><th>Host</th></tr>
       <tr><td>NT-001</td><td class="mono">10.10.20.10</td><td>AD-01</td></tr>
       <tr><td>NT-002</td><td class="mono">10.10.20.11</td><td>AD-02</td></tr>
-      <tr><td>FIREFLY</td><td class="mono">10.10.30.3</td><td>Reverse Proxy</td></tr>
+      <tr><td>FIREFLY</td><td class="mono">10.10.30.3</td><td>Firefly (firesrv)</td></tr>
       <tr><td>zabbixgrafana</td><td class="mono">10.10.50.15</td><td>Zabbix + Grafana</td></tr>
       <tr><td>openvaz</td><td class="mono">10.10.50.7</td><td>OpenVAS</td></tr></table>
       <ul><li style="--cor:${COR.soc}">Coleta do auth.log de todos os servidores Linux</li>
       <li style="--cor:${COR.soc}">Regras ajustadas para reduzir falsos positivos</li>
-      <li style="--cor:${COR.soc}">Dashboard "Cyber": eventos por agente, severidade e logons</li></ul>`,
+      <li style="--cor:${COR.soc}">Dashboard "Cyber": eventos por agente, severidade e logons</li></ul>
+      ${botoesAmbiente('Wazuh Manager')}`,
     notas:'Os pacotes laranja são logs indo para o Wazuh. Falar das regras de forma geral: cada ajuste foi feito para diminuir alertas que não eram incidente.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Wazuh: as regras customizadas', sub:'local_rules.xml · 30 regras escritas pelo SOC para o ambiente da Cyberappfin',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="bloco" style="--cor:${COR.soc}"><span class="grande">30</span><p>regras customizadas, de 100001 a 100164</p></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="grande">3 a 15</span><p>níveis de severidade usados</p></div>
+          <div class="bloco" style="--cor:#F87171"><span class="grande">3</span><p>regras no nível máximo (15)</p></div>
+          <div class="bloco" style="--cor:#4ADE80"><span class="grande">4</span><p>regras de correlação: contam eventos numa janela de tempo</p></div>
+        </div>
+        <p class="s-rot">Fluxo de um alerta · arquitetura proposta</p>
+        <div class="wz-fluxo">
+          <span class="nodo" style="--cor:${COR.soc}">Wazuh<small>regra dispara</small></span><span class="seta3">→</span>
+          <span class="nodo" style="--cor:${COR.soc}">CyberFin IA<small>enriquece, sem bloquear</small></span><span class="seta3">→</span>
+          <span class="nodo" style="--cor:#4ADE80">Deduplicação e correlação<small>junta eventos repetidos</small></span><span class="seta3">→</span>
+          <span class="nodo" style="--cor:#FB923C">Case e política<small>decide se vira ticket</small></span><span class="seta3">→</span>
+          <span class="nodo" style="--cor:${COR.brand}">Zammad<small>ticket do incidente</small></span><span class="seta3">→</span>
+          <span class="nodo" style="--cor:#F87171">SOC<small>analista decide</small></span>
+        </div>
+        <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Ledger / correlação</span><p>Evento informativo: fica registrado e entra na correlação, sem abrir ticket.</p></div>
+          <div class="bloco" style="--cor:#FCD34D"><span class="rot">Case + Zammad</span><p>Evento relevante: abre ou atualiza um Case e, pela política, um ticket.</p></div>
+          <div class="bloco" style="--cor:#F87171"><span class="rot">Case + Zammad crítico</span><p>Integridade, defesa ou exposição: ticket crítico para investigar já.</p></div>
+          <div class="bloco" style="--cor:#7DD3FC"><span class="rot">Atualiza o ticket</span><p>Active Response (bloqueio de 60 s) entra no incidente que já existe, sem duplicar.</p></div>
+        </div>
+        <div class="amb" style="gap:14px">${LINK_REGRAS}${botoesAmbiente('Wazuh Manager')}</div>
+      </div>`,
+    notas:'As regras padrão do Wazuh não conhecem a nossa aplicação; por isso o SOC escreveu 30 regras próprias, no local_rules.xml. Elas cobrem a aplicação web, ataques web, integridade de arquivos, honeypot e o Active Response. Destacar o fluxo: a IA enriquece o alerta em paralelo e não atrasa a abertura do incidente; a deduplicação evita abrir um ticket para cada evento repetido. Se pedirem, abrir o Wazuh e mostrar as regras e os dashboards.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Regras de correlação', sub:'Um evento isolado é contexto; vários na mesma janela de tempo viram alerta',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="bloco" style="--cor:#FB923C"><span class="rot">Regra 100113 · nível 10</span><h4>Possível brute force</h4><span class="grande" style="font-size:clamp(30px, 2.8vw, 50px)">5 em 120 s</span><p>Falhas de autenticação seguidas no Firefly (base: regra 100112).</p><div class="rodape">Case + Zammad</div></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="rot">Regra 100117 · nível 10</span><h4>Scan / enumeração Web</h4><span class="grande" style="font-size:clamp(30px, 2.8vw, 50px)">15 em 60 s</span><p>Recursos inexistentes (HTTP 404) em sequência: alguém varrendo a aplicação (base: 100111).</p><div class="rodape">Case + Zammad</div></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="rot">Regra 100122 · nível 10</span><h4>Múltiplos 401/403</h4><span class="grande" style="font-size:clamp(30px, 2.8vw, 50px)">10 em 60 s</span><p>Respostas 401/403 em sequência: enumeração automatizada (base: 100121).</p><div class="rodape">Case + Zammad</div></div>
+          <div class="bloco" style="--cor:#F87171"><span class="rot">Regra 100130 · nível 13</span><h4>Alta atividade ofensiva</h4><span class="grande" style="font-size:clamp(30px, 2.8vw, 50px)">4 em 120 s</span><p>Várias detecções ofensivas da mesma origem: ataque automatizado ou coordenado.</p><div class="rodape">Case + Zammad crítico</div></div>
+        </div>
+        <p class="s-txt">Sozinho, um 404 ou um 401 é <b>ruído</b> e fica só no ledger. A correlação transforma a <b>repetição</b> em sinal. É assim que o SOC reduz falsos positivos sem perder o ataque.</p>
+      </div>`,
+    notas:'Este é o ponto que mostra engenharia de detecção: as regras de nível baixo (404, 401, falha de login) não abrem ticket, mas alimentam as regras de correlação, que contam ocorrências numa janela de tempo. Cinco falhas de login em dois minutos é brute force; quinze 404 em um minuto é varredura. A 100130 junta tudo: quatro detecções ofensivas em dois minutos indicam um ataque coordenado.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Regras 1/3: SSH, autenticação e ataques web', sub:'Catálogo do local_rules.xml · linhas verdes são correlação',
+    sala:`<div class="s-corpo">${tabelaRegras(REGRAS.slice(0, 10))}</div>`,
+    notas:'Primeira parte: o que protege o Firefly, a aplicação web publicada pelo reverse proxy. Os ataques clássicos (SQL Injection, Path Traversal, Command Injection) têm nível 12 e abrem ticket direto. Os eventos de nível 3 a 6 só registram e servem de base para a correlação.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Regras 2/3: HTTP, resposta e exposição', sub:'Catálogo do local_rules.xml · linhas verdes são correlação',
+    sala:`<div class="s-corpo">${tabelaRegras(REGRAS.slice(10, 20))}</div>`,
+    notas:'As regras 100123 e 100124 são o ciclo do Active Response: o Wazuh bloqueia o IP por 60 segundos e depois libera, e os dois eventos atualizam o mesmo ticket. A 100125 é nível 15 porque um recurso sensível respondeu 200: não prova invasão, mas exige investigar já.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Regras 3/3: integridade, defesa e honeypot', sub:'Catálogo do local_rules.xml · monitoramento de arquivos e armadilhas para scanners',
+    sala:`<div class="s-corpo">${tabelaRegras(REGRAS.slice(20))}<div class="amb" style="gap:14px; margin-top:4px">${LINK_REGRAS}${botoesAmbiente('Wazuh Manager')}</div></div>`,
+    notas:'As de integridade avisam se alguém mexe em arquivos com secrets, em arquivos críticos ou nos próprios controles de segurança. A 100150, nível 15, dispara se alguém tentar desligar o Wazuh ou o Active Response. O honeypot pega scanners procurando WordPress e phpMyAdmin, que não existem no ambiente: quem procura, está varrendo.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Demo ao vivo: o Wazuh no ambiente', sub:'Evento → regra → correlação → incidente → tratamento',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="linha" style="grid-template-columns:1fr 1fr; align-items:start">
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <p class="s-rot">Roteiro de tela</p>
+            <ol class="roteiro">
+              <li><span>Abrir o <b>dashboard</b> e mostrar os agentes conectados.</span></li>
+              <li><span>Mostrar os <b>eventos recentes</b> e os níveis de severidade.</span></li>
+              <li><span>Abrir as <b>regras customizadas</b> do Firefly.</span></li>
+              <li><span>Destacar 100160 (honeypot), 100113 (brute force), 100114 (LFI), 100115 (SQLi), 100116 (RCE) e as de integridade.</span></li>
+              <li><span>Mostrar que eventos de nível baixo alimentam a <b>correlação</b> sem abrir ticket.</span></li>
+              <li><span>Seguir um incidente até o <b>CyberFin</b> e o <b>Zammad</b>.</span></li>
+            </ol>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <p class="s-rot">Caso homologado no ambiente: GET /.env</p>
+            <div class="cadeia">
+              <div class="tk-ev" style="--cor:#F87171"><span class="h">1</span><span class="f">Tentativa</span><p>Alguém pede <b>/.env</b> ao Firefly: o arquivo que guarda segredos de configuração.</p></div>
+              <div class="tk-ev" style="--cor:#4ADE80"><span class="h">2</span><span class="f">Resposta</span><p>O Firefly nega: <b>HTTP 403</b>.</p></div>
+              <div class="tk-ev" style="--cor:${COR.soc}"><span class="h">3</span><span class="f">Detecção</span><p>O Wazuh dispara a regra <b>100160</b> (honeypot, nível 10).</p></div>
+              <div class="tk-ev" style="--cor:#FB923C"><span class="h">4</span><span class="f">Correlação</span><p>O <b>CyberFin</b> processa o alerta; o tratamento da regra é Case + Zammad.</p></div>
+            </div>
+            <div class="conclusao"><b>Conclusão correta:</b> tentativa confirmada e requisição negada. <b>Não</b> é host comprometido.</div>
+          </div>
+        </div>
+        <div class="amb" style="gap:14px">${botoesAmbiente('Wazuh Manager', 'ITSM · Zammad')}${LINK_RUNBOOK}</div>
+      </div>`,
+    notas:'Aqui saímos da apresentação e entramos no Wazuh, seguindo o roteiro da esquerda. O objetivo não é só abrir o dashboard: é ligar um evento a uma regra, a correlação, ao incidente e ao tratamento. O caso da direita aconteceu de verdade no ambiente: alguém tentou baixar o /.env do Firefly, a aplicação negou com 403, o Wazuh detectou pela regra 100160 e o CyberFin processou. A conclusão certa é "tentativa negada", não "servidor invadido": saber dizer isso é maturidade de SOC.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'CyberFin IA: apoio ao analista', sub:'cyberfinia · 10.10.50.19 · a IA sugere, o analista decide',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="linha" style="grid-template-columns:repeat(3, 1fr)">
+          <div class="bloco" style="--cor:${COR.brand}"><span class="rot">Recebe</span><h4>Contexto estruturado</h4><p>O alerta já normalizado e correlacionado: regra, ativo, origem, severidade e histórico.</p></div>
+          <div class="bloco" style="--cor:#4ADE80"><span class="rot">Devolve</span><h4>Classificação e resumo</h4><p>Classificação, resumo, nível de confiança e recomendação, que enriquecem o ticket no Zammad.</p></div>
+          <div class="bloco" style="--cor:#F87171"><span class="rot">Não faz</span><h4>Nenhuma ação sozinha</h4><p>Não executa comandos no ambiente. Se o modelo cair, o SOC segue operando: o incidente abre do mesmo jeito.</p></div>
+        </div>
+        <div class="linha" style="grid-template-columns:1.1fr 1fr; align-items:start">
+          <div class="vk" style="--cor:${COR.soc}">
+            <div class="vk-top"><span class="vk-n">$</span><h4>Demo via SSH</h4></div>
+            <div class="vk-cmd"><code>ssh administrador@10.10.50.19</code><code>cd /opt/cyberfin</code>
+              <code class="cmt"># consultar serviços e logs com os comandos já homologados</code>
+              <code class="cmt"># nunca abrir /etc/cyberfin/cyberfin.env (tokens e credenciais)</code></div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px">
+            <p class="s-rot">O que mostrar na tela</p>
+            <div class="wz-fluxo">
+              <span class="nodo" style="--cor:${COR.soc}">Evento</span><span class="seta3">→</span>
+              <span class="nodo" style="--cor:#4ADE80">Correlação</span><span class="seta3">→</span>
+              <span class="nodo" style="--cor:#FB923C">Case</span><span class="seta3">→</span>
+              <span class="nodo" style="--cor:${COR.brand}">Job de IA</span><span class="seta3">→</span>
+              <span class="nodo" style="--cor:#7DD3FC">Ticket enriquecido</span>
+            </div>
+            <span class="status-chip">Em evolução: tirar a IA do caminho crítico do Wazuh</span>
+          </div>
+        </div>
+      </div>`,
+    notas:'A IA é apoio, não piloto. Ela recebe o alerta já organizado, devolve classificação, resumo, confiança e uma recomendação, e isso entra no ticket. Ela não executa nada no ambiente. Na demo, entrar por SSH no cyberfinia e mostrar um evento passando pela correlação, virando Case, gerando o job de IA e enriquecendo o ticket. Cuidado: não abrir o arquivo cyberfin.env, que tem tokens. Ser honesto sobre o que está em evolução: a meta é a IA rodar em paralelo, sem nunca atrasar a abertura do incidente.'
   },
   {
     quem:P3E, cor:COR.end, titulo:'VLAN 40: as workstations', sub:'Endpoint: onde a maioria dos ataques começa',
@@ -789,27 +1059,88 @@ const PARADAS = [
     cam:[0, 330, 1600, 570], foco:['vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
     anim(){
       const ov = hostCentro(4, 2);
-      emLoop(() => [0,1,2,3,5].forEach((i, k) => setTimeout(() => pacote(viaBus(ov, { x:COL_CX(i), y:420 }), '#FB923C', 1600, 5), k * 300)), 3400);
+      emLoop(() => [0,1,2,3,5].forEach((i, k) => setTimeout(() => pacote(viaBus(ov, { x:LANE(i), y:420 }), '#FB923C', 1600, 5), k * 300)), 3400);
     },
     html:`<h3>Regra 1 · Varredura por VLAN</h3>
-      <p>Uma tarefa por sub-rede: o alvo é a <b>VLAN inteira (/24)</b>, para descobrir qualquer máquina ou serviço que apareça.</p>
+      <p>Uma tarefa por sub-rede: o alvo é a <b>sub-rede inteira da VLAN</b>, para descobrir qualquer máquina ou serviço que apareça.</p>
       <div class="chips"><span class="chip">VLAN 10</span><span class="chip">VLAN 20</span><span class="chip">VLAN 30</span><span class="chip">VLAN 40</span><span class="chip">VLAN 50</span><span class="chip">VLAN 60</span></div>
       <h3>Regra 2 · Baseline por servidor</h3>
       <p>Uma tarefa por ativo crítico, para comparar o mesmo servidor ao longo do tempo.</p>
-      <div class="chips"><span class="chip">NT-001</span><span class="chip">NT-002</span><span class="chip">NT-003</span><span class="chip">Wazuh</span><span class="chip">Zabbix + Grafana</span><span class="chip">OpenVAS</span><span class="chip">Reverse Proxy</span></div>
+      <div class="chips"><span class="chip">NT-001</span><span class="chip">NT-002</span><span class="chip">NT-003</span><span class="chip">Wazuh</span><span class="chip">Zabbix + Grafana</span><span class="chip">OpenVAS</span><span class="chip">Firefly</span></div>
       <h3>Como a varredura é feita</h3>
       <ul><li style="--cor:${COR.soc}"><b>Sem credenciais:</b> enxerga a rede como um visitante enxergaria</li>
       <li style="--cor:${COR.soc}">Verifica portas abertas, serviços e versões e a configuração dos serviços web</li>
-      <li style="--cor:${COR.soc}">Atenção especial às portas de administração remota: <b>3389</b> (RDP), <b>5985</b> (WinRM) e <b>22</b> (SSH)</li></ul>`,
+      <li style="--cor:${COR.soc}">Atenção especial às portas de administração remota: <b>3389</b> (RDP), <b>5985</b> (WinRM) e <b>22</b> (SSH)</li></ul>
+      ${botoesAmbiente('OpenVAS')}`,
     notas:'Mostrar como o OpenVAS está configurado, não os resultados. São dois tipos de tarefa: uma por VLAN, que pega qualquer coisa nova na rede, e uma por servidor, que serve de linha de base para comparar depois. Tudo sem credenciais. Se pedirem para ver, abrir o OpenVAS e mostrar as tarefas e os targets.'
   },
   {
     quem:P3, cor:COR.danger, titulo:'VLAN 30: DMZ', sub:'A única parte exposta para fora',
     cam:[440, 330, 520, 570], foco:['vlan30', 'barramento'],
-    html:`<p><b>Reverse Proxy</b> (10.10.30.3, agente FIREFLY): publica a aplicação sem abrir acesso direto à rede interna.</p>
-      <ul><li style="--cor:${COR.danger}">DMZ em <b>100%</b></li>
-      <li style="--cor:${COR.danger}">Monitorada pelo Wazuh como qualquer servidor interno</li></ul>`,
-    notas:'A DMZ é a única parte que conversa com a internet, por isso fica separada das demais VLANs.'
+    html:`<p><b>Firefly</b> (firesrv, 10.10.30.3): a aplicação financeira da Cyberappfin. Fica na DMZ e é publicada pelo <b>reverse proxy 10.0.50.2</b>, o único que fala com ela na porta da aplicação (TCP 8080).</p>
+      <ul><li style="--cor:${COR.danger}">DMZ em <b>100%</b>, sub-rede 10.10.30.0/27</li>
+      <li style="--cor:${COR.danger}">Monitorada pelo Wazuh (agente FIREFLY) e pelo Zabbix</li>
+      <li style="--cor:${COR.danger}">Backup dedicado de banco, arquivos e configuração, com SHA-256 validado</li></ul>
+      ${botoesAmbiente('Firefly · firesrv')}`,
+    notas:'A DMZ é a única parte que conversa com a internet, por isso fica separada das demais VLANs. O Firefly não é acessado direto: quem fala com ele é o reverse proxy 10.0.50.2, na porta 8080. Na próxima tela, as regras de firewall que garantem isso.'
+  },
+
+  /* =================== MAPA + SALA: regras de firewall e teste ao vivo =================== */
+  {
+    quem:P2N, cor:COR.net, titulo:'Firewall: quem pode falar com o Firefly', sub:'Regras do UFW no firesrv · origem → destino → porta',
+    cam:[520, 300, 1070, 610], foco:['vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
+    anim(){
+      const ff = hostCentro(2, 0), topo = { x:LANE(2), y:400 };
+      emLoop(() => {
+        pacote(viaBus(hostCentro(4, 1), ff), '#4ADE80', 1600, 7);
+        setTimeout(() => pacote(viaBus(hostCentro(5, 0), ff), '#4ADE80', 1600, 7), 700);
+        setTimeout(() => barrado(viaBus(hostCentro(3, 0), topo)), 1400);
+      }, 3800);
+    },
+    html:`<table><tr><th>Origem</th><th>Serviço</th><th>Regra</th></tr>
+      <tr><td>VPN administrativa <span class="mono">192.168.4.0/24</span></td><td>SSH 22</td><td style="color:#4ADE80; white-space:nowrap">✓ permitido</td></tr>
+      <tr><td>JumpServer <span class="mono">10.128.10.135</span></td><td>SSH 22</td><td style="color:#4ADE80; white-space:nowrap">✓ permitido</td></tr>
+      <tr><td>Reverse proxy <span class="mono">10.0.50.2</span></td><td>App 8080</td><td style="color:#4ADE80; white-space:nowrap">✓ permitido</td></tr>
+      <tr><td>Zabbix <span class="mono">10.10.50.15</span></td><td>Agente 10050</td><td style="color:#4ADE80; white-space:nowrap">✓ permitido</td></tr>
+      <tr><td>NT-003 <span class="mono">10.10.60.143</span></td><td>SSH 22</td><td style="color:#4ADE80; white-space:nowrap">✓ permitido</td></tr>
+      <tr class="perigo"><td>Qualquer outra origem</td><td>qualquer</td><td style="white-space:nowrap">✗ bloqueado</td></tr></table>
+      <p>Segmentar não é deixar uma VLAN acessar outra inteira: cada liberação é <b>origem → destino → porta</b>, no menor privilégio. O resto cai no bloqueio padrão do UFW.</p>
+      <p style="font-size:15px; color:var(--muted)">No mapa: <b style="color:#4ADE80">verde</b> passa (Zabbix e NT-003); <b style="color:#F87171">vermelho</b> é uma workstation da VLAN 40 tentando SSH.</p>`,
+    notas:'Estas são as regras reais do firewall de host (UFW) no servidor do Firefly. Só cinco origens entram, cada uma numa porta. Tudo o mais é bloqueado por padrão. Os pacotes verdes são o Zabbix (porta 10050) e o NT-003 (SSH para o backup); o vermelho é uma estação da VLAN 40 tentando SSH, e para no firewall. Na próxima tela, a gente prova isso ao vivo.'
+  },
+  {
+    quem:P2N, cor:COR.net, titulo:'Demo ao vivo: testando o firewall', sub:'Um teste que passa, um que é barrado, e o log que comprova · não alterar regras durante a demo',
+    sala:`<div class="s-corpo demo" style="justify-content:center">
+        <div class="vks" style="grid-template-columns:repeat(4, 1fr)">
+          <div class="vk" style="--cor:#4ADE80">
+            <div class="vk-top"><span class="vk-n">✓</span><h4>Do Zabbix para o Firefly</h4></div>
+            <p class="pq"><b>Regra:</b> Zabbix 10.10.50.15 → Firefly, TCP 10050 (permitida).</p>
+            <div class="vk-cmd"><span class="os">No zabbix-grafana (Linux)</span><code>ip -br addr</code><code>nc -vz -w3 10.10.30.3 10050</code></div>
+            <p class="ok"><b>✓ Esperado:</b> succeeded: a porta responde.</p>
+          </div>
+          <div class="vk" style="--cor:#4ADE80">
+            <div class="vk-top"><span class="vk-n">✓</span><h4>Do NT-003 para o Firefly</h4></div>
+            <p class="pq"><b>Regra:</b> NT-003 10.10.60.143 → Firefly, SSH 22 (permitida, para o backup).</p>
+            <div class="vk-cmd"><span class="os">No NT-003 (Windows)</span><code>ipconfig</code><code>Test-NetConnection 10.10.30.3 -Port 22</code></div>
+            <p class="ok"><b>✓ Esperado:</b> TcpTestSucceeded: True.</p>
+          </div>
+          <div class="vk" style="--cor:#F87171">
+            <div class="vk-top"><span class="vk-n">✗</span><h4>De uma workstation da VLAN 40</h4></div>
+            <p class="pq"><b>Regra:</b> SSH no Firefly só para VPN, JumpServer e NT-003. A VLAN 40 não está na lista.</p>
+            <div class="vk-cmd"><span class="os">Na workstation (Windows)</span><code>ipconfig</code><code>Test-NetConnection 10.10.30.3 -Port 22</code></div>
+            <p class="x"><b>✗ Esperado:</b> TcpTestSucceeded: False: o firewall barrou.</p>
+          </div>
+          <div class="vk" style="--cor:${COR.net}">
+            <div class="vk-top"><span class="vk-n">🔎</span><h4>A evidência no log</h4></div>
+            <p class="pq"><b>No firesrv:</b> mostrar a regra e a linha do bloqueio, com origem, destino, porta e horário.</p>
+            <div class="vk-cmd"><span class="os">No firesrv (Linux)</span><code>sudo ufw status numbered</code><code>sudo grep "UFW BLOCK" /var/log/ufw.log | tail -5</code></div>
+            <p class="ok"><b>✓ Esperado:</b> SRC=10.10.40.x DST=10.10.30.3 DPT=22.</p>
+          </div>
+        </div>
+        <p class="s-txt"><b>Ping</b> só testa ICMP: se falhar, não prova bloqueio. Por isso o teste é na <b>porta do serviço</b>. Qualquer pessoa da sala pode escolher a origem.</p>
+        <div class="amb" style="gap:14px">${LINK_RUNBOOK}</div>
+      </div>`,
+    notas:'Roteiro: primeiro mostrar de onde o teste sai (ipconfig ou ip -br addr). Depois o teste que deve passar, depois o que deve ser barrado, e por fim o log. Se alguém da plateia pedir outra combinação, a tabela da tela anterior diz o resultado esperado. Antes da apresentação: conferir que o log do UFW está ligado (sudo ufw status verbose mostra Logging: on). Se o UniFi bloquear antes de o pacote chegar ao Firefly, a evidência está no log do UniFi, não no do UFW.'
   },
 
   /* =================== MAPA: simulação de incidente (PB-010, 4 passos) =================== */
@@ -909,11 +1240,34 @@ const PARADAS = [
     notas:'Ler da esquerda para a direita, subindo. O alerta nasce no Wazuh e a IA classifica, mas quem confirma é o analista. O coordenador decide o nível e autoriza a contenção. Nível 3 ou 4 aciona o CSIRT; nível 4, dados de clientes ou pagamento indevido sobem à Diretoria, que é quem pode declarar o desastre e disparar o DRP. No nosso phishing: o analista confirmou, o coordenador classificou como nível 3 e o CSIRT foi acionado.'
   },
   {
-    quem:P3, cor:COR.soc, titulo:'Tratamento do incidente: o ticket do início ao fim', sub:'ITSM · cenário simulado do PB-010 · cada ação fica registrada no ticket',
+    quem:P3, cor:COR.soc, titulo:'Zammad: como o SOC trata um incidente', sub:'zammadsrv · 10.10.50.17 · o CyberFin dá o contexto, o ticket registra a decisão humana',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="linha" style="grid-template-columns:repeat(6, 1fr)">
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">1 · Detecção</span><p>Alerta do Wazuh ou do Zabbix, com a evidência original.</p></div>
+          <div class="bloco" style="--cor:#FB923C"><span class="rot">2 · Triagem</span><p>Severidade, ativo, origem, regra, contexto e prioridade.</p></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="rot">3 · Investigação</span><p>Logs, correlações, histórico e o enriquecimento da IA.</p></div>
+          <div class="bloco" style="--cor:#F87171"><span class="rot">4 · Contenção</span><p>Ação autorizada, como o Active Response temporário.</p></div>
+          <div class="bloco" style="--cor:#4ADE80"><span class="rot">5 · Monitoramento</span><p>Confirmar que não voltou e o estado do ativo.</p></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="rot">6 · Encerramento</span><p>Classificar e registrar conclusão e evidências.</p></div>
+        </div>
+        <div class="linha" style="grid-template-columns:1fr 1fr">
+          <div class="bloco" style="--cor:${COR.soc}"><span class="rot">Grupos no Zammad</span>
+            <div class="chips2"><span>SOC-N1</span><span>SOC-N2</span><span>SOC-N3</span></div>
+            <div class="chips2"><span>Network</span><span>Infrastructure</span><span>Systems</span><span>Applications</span><span>Security Engineering</span><span>Endpoint</span></div></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="rot">Como um ticket fecha</span>
+            <div class="chips2"><span style="background:#3A1C21; color:#FCA5A5">Incidente real</span><span style="background:#1C2F42">Falso positivo</span><span style="background:#33270F; color:#F5D08A">Inconclusivo</span></div>
+            <p>Sempre com a conclusão e as evidências registradas. É do histórico do ticket que saem os tempos de detecção e resposta.</p></div>
+        </div>
+        <div class="amb">${botoesAmbiente('ITSM · Zammad')}</div>
+      </div>`,
+    notas:'O Zammad é a camada operacional do SOC. O CyberFin normaliza, correlaciona e dá contexto; o ticket registra quem é o responsável, o que foi investigado e o que foi decidido. São seis fases, e os grupos SOC-N1, N2 e N3 definem quem trata em cada nível, com os grupos dos times técnicos acionados quando precisa. Todo ticket fecha com uma classificação: incidente real, falso positivo ou inconclusivo. Se der, abrir o Zammad e mostrar um ticket de verdade.'
+  },
+  {
+    quem:P3, cor:COR.soc, titulo:'Tratamento do incidente: o ticket do início ao fim', sub:'Zammad (ITSM) · cenário simulado do PB-010 · cada ação fica registrada no ticket',
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="ticket">
           <div class="tk-cab">
-            <span class="cod">INC-0001 · ITSM</span>
+            <span class="cod">INC-0001 · Zammad (ITSM)</span>
             <h4>Phishing em Contas a Pagar</h4>
             <dl><dt>Nível</dt><dd>3 · Alta</dd><dt>Playbook</dt><dd>PB-010</dd><dt>Origem</dt><dd>Wazuh + CyberFin IA</dd>
                 <dt>Responsável</dt><dd>Analista do SOC</dd><dt>Contenção</dt><dd>Coordenador do SOC</dd><dt>Situação</dt><dd style="color:#4ADE80">Encerrado</dd></dl>
@@ -930,6 +1284,7 @@ const PARADAS = [
             <div class="tk-ev" style="--cor:${COR.grc}"><span class="h">D+5 úteis</span><span class="f">Pós-incidente</span><p>RCI entregue; nova regra no Wazuh para o domínio e treinamento de phishing em Contas a Pagar. Ticket encerrado.</p></div>
           </div>
         </div>
+        ${botoesAmbiente('ITSM · Zammad')}
       </div>`,
     notas:'Este é o mesmo phishing da simulação, agora visto pelo ticket do ITSM. Cada fase do ciclo de resposta vira uma entrada com hora e responsável. É do ticket que saem os tempos: 4 minutos do clique ao alerta e 22 do alerta à contenção, dentro das metas da POL-GI-001. O tratamento só termina no pós-incidente, com o RCI em 5 dias úteis e a lição aprendida virando regra no Wazuh. Horários do cenário simulado.'
   },
@@ -950,15 +1305,23 @@ const PARADAS = [
   /* =================== MAPA: backup =================== */
   {
     quem:P4, cor:COR.grc, titulo:'VLAN 60: Backup', sub:'Onde ficam as cópias dos dados',
-    cam:[300, 330, 1290, 570], foco:['vlan60', 'vlan20', 'barramento'],
-    anim(){ emLoop(() => { pacote(viaBus(hostCentro(1, 0), hostCentro(5, 0)), COR.grc, 2000); setTimeout(() => pacote(viaBus(hostCentro(1, 1), hostCentro(5, 0)), COR.grc, 2000), 500); }, 3000); },
-    html:`<div class="cards"><div class="card" style="--cor:${COR.grc}"><span class="n">NT-003</span><span class="l mono">Backup Server · 10.10.60.143</span></div>
-      <div class="card" style="--cor:${COR.grc}"><span class="n">Veeam</span><span class="l">software de backup</span></div></div>
-      <ul><li style="--cor:${COR.grc}">Backup por agente nos servidores Windows e Linux, com cópia em repositório</li>
-      <li style="--cor:${COR.grc}">Backups <b>criptografados</b></li>
-      <li style="--cor:${COR.grc}">VLAN isolada: um ataque à produção não alcança as cópias</li></ul>
-      <p class="aviso">Cópia offsite (3-2-1) e teste de restauração ainda em validação.</p>`,
-    notas:'As bolinhas amarelas são as cópias saindo dos servidores para o NT-003. Ser honesto: o backup roda e é criptografado, mas a cópia fora do ambiente e o teste de restauração ainda estão sendo validados.'
+    cam:[260, 30, 1340, 880], foco:['vlan60', 'vlan20', 'vlan30', 'barramento', 'externo', 'cisco', 'ligacoes'],
+    anim(){
+      const nt = hostCentro(5, 0);
+      emLoop(async () => {
+        pacote(viaBus(hostCentro(1, 0), nt), COR.grc, 1800);
+        setTimeout(() => pacote(viaBus(hostCentro(2, 0), nt), COR.grc, 1800), 400);
+        await new Promise(r => setTimeout(r, 2100));
+        pacote([...rotaTrueNAS()].reverse(), COR.grc, 2000, 7);
+      }, 4600);
+    },
+    html:`<div class="cards"><div class="card" style="--cor:${COR.grc}"><span class="n">NT-003</span><span class="l mono">Veeam · 10.10.60.143</span></div>
+      <div class="card" style="--cor:${COR.grc}"><span class="n">TrueNAS</span><span class="l">repositório central, no ambiente externo</span></div></div>
+      <ul><li style="--cor:${COR.grc}"><b>Veeam:</b> imagem completa das VMs; full aos domingos e incrementais nos dias úteis</li>
+      <li style="--cor:${COR.grc}"><b>Firefly:</b> backup dedicado às 00h e 12h (banco, arquivos e configuração); cópia e SHA-256 já validados</li>
+      <li style="--cor:${COR.grc}">Backups <b>criptografados</b>, em VLAN isolada</li></ul>
+      <p class="aviso">Restore real pelo Veeam e cópia offsite (3-2-1) ainda em validação.</p>`,
+    notas:'As bolinhas amarelas são as cópias: saem dos servidores para o NT-003, onde roda o Veeam, e de lá vão para o repositório no TrueNAS, no ambiente externo. Por isso, se as VMs forem perdidas, os backups continuam lá. O Firefly tem um backup próprio, duas vezes por dia, já validado com SHA-256. Ser honesto: o restore real pelo Veeam e a cópia fora do ambiente ainda estão sendo validados.'
   },
 
   /* =================== SALA: continuidade, GRC, riscos, plano, aplicação =================== */
@@ -1031,62 +1394,87 @@ const PARADAS = [
         <div class="mitiga">
           <span class="cab">Pilar</span><span class="cab">Impacto</span><span class="cab">Como mitigamos</span>
           <span class="pil">Segurança física</span><span class="imp">Infraestrutura em ambiente externo: reconstruir depende de acesso e de hardware.</span>
-          <span class="acoes"><span>✓ Backup em VLAN isolada (NT-003)</span><span>✓ Kit de emergência fora dos servidores</span><span class="pend">◐ Cópia offsite 3-2-1</span></span>
+          <span class="acoes"><span>✓ Backup em VLAN isolada (NT-003)</span><span>✓ Kit de emergência fora dos servidores</span><span class="pend">Cópia offsite 3-2-1</span></span>
           <span class="pil">Financeiro</span><span class="imp">Param o faturamento e o crédito operado.</span>
           <span class="acoes"><span>✓ RTO e RPO por serviço</span><span>✓ Recuperação na ordem do MTPD: Crédito primeiro</span><span>✓ Pagamento só com token do cliente</span></span>
           <span class="pil">Legislação e regulação</span><span class="imp">SCD regulada: BACEN, LGPD e sigilo bancário.</span>
           <span class="acoes"><span>✓ Backups criptografados</span><span>✓ Trilha de auditoria no Wazuh</span><span>✓ Rito de notificação: GRC, DPO e Jurídico</span></span>
           <span class="pil">Operação</span><span class="imp">Param BPO, crédito e Folha; o monitoramento do SOC cai junto.</span>
-          <span class="acoes"><span>✓ Dois ADs com replicação</span><span>✓ SD-WAN com dois gateways</span><span>✓ VLANs limitam a propagação</span><span>✓ DRP com ordem de restauração</span><span class="pend">◐ Teste de restauração</span></span>
+          <span class="acoes"><span>✓ Dois ADs com replicação</span><span>✓ SD-WAN com dois gateways</span><span>✓ VLANs limitam a propagação</span><span>✓ DRP com ordem de restauração</span><span class="pend">Teste de restauração</span></span>
           <span class="pil">Reputação</span><span class="imp">Um desastre atinge a Cyberappfin e a holding.</span>
           <span class="acoes"><span>✓ Só a Diretoria fala com o público</span><span>✓ Atualizações a cada 15 min na crise</span><span>✓ Canal alternativo se e-mail e AD caírem</span></span>
         </div>
-        <div class="legenda"><span><b>✓</b> implantado</span><span><b class="pend">◐</b> em validação</span></div>
+        <div class="legenda"><span><b>✓</b> implantado</span><span><b class="pend"></b> em validação</span></div>
       </div>`,
     notas:'A BIA não termina no impacto: para cada pilar, o que já reduz esse impacto hoje e o que ainda falta. O verde já está no ambiente; o amarelo está em validação. Destacar a operação: dois ADs, SD-WAN redundante e as VLANs evitam que uma falha derrube tudo, e o DRP, que vem a seguir, é a resposta para quando mesmo assim tudo cair.'
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:'Impacto e mitigação por ativo', sub:'Se este ativo parar, o que acontece e o que já reduz o impacto',
+    sala:`<div class="s-corpo" style="justify-content:center">
+        <div class="mitiga">
+          <span class="cab">Ativo</span><span class="cab">Se parar</span><span class="cab">Como mitigamos</span>
+          <span class="pil">NT-003 · Veeam</span><span class="imp">Sem ele não há restauração de nenhum servidor.</span>
+          <span class="acoes"><span>✓ Conta local, fora do domínio</span><span>✓ Backups no TrueNAS, fora da VM</span><span>✓ Primeiro a voltar no DRP</span></span>
+          <span class="pil">AD / DNS</span><span class="imp">Falha de login e de resolução de nomes em tudo que depende do domínio.</span>
+          <span class="acoes"><span>✓ Dois controladores com replicação</span><span>✓ Backup</span><span>✓ Logo após o NT-003 na recuperação</span></span>
+          <span class="pil">Firewall / rede</span><span class="imp">Segmentos e serviços sem comunicação.</span>
+          <span class="acoes"><span>✓ SD-WAN com dois gateways</span><span>✓ Matriz de regras</span><span>✓ Backup de configuração</span></span>
+          <span class="pil">Wazuh</span><span class="imp">Perda da detecção e da centralização dos eventos.</span>
+          <span class="acoes"><span>✓ Backup completo</span><span>✓ Primeiro serviço do SOC a voltar</span><span>✓ Validação dos agentes</span></span>
+          <span class="pil">Firefly</span><span class="imp">Aplicação financeira e seus dados indisponíveis.</span>
+          <span class="acoes"><span>✓ Backup dedicado às 00h e 12h</span><span>✓ SHA-256 validado no TrueNAS</span><span class="pend">Teste de restauração</span></span>
+          <span class="pil">Zabbix / Grafana</span><span class="imp">Menos visibilidade e sem alerta de disponibilidade.</span>
+          <span class="acoes"><span>✓ Backup da VM e da configuração</span><span>✓ Volta após os serviços-base</span></span>
+          <span class="pil">CyberFin</span><span class="imp">Sem correlação, automação e enriquecimento.</span>
+          <span class="acoes"><span>✓ Fontes e Zammad desacoplados: o SOC segue operando</span><span>✓ Backup</span></span>
+          <span class="pil">Zammad</span><span class="imp">Fluxo de tratamento e registro dos incidentes afetados.</span>
+          <span class="acoes"><span>✓ Backup</span><span class="pend">Validação do histórico após restore</span></span>
+        </div>
+      </div>`,
+    notas:'A tela anterior olhou o impacto no negócio; esta olha cada ativo técnico. Para cada um: o que para se ele cair, e o que já reduz esse impacto. Destacar o NT-003: sem ele, nada volta, por isso tem conta local, os backups ficam no TrueNAS, fora da VM, e ele é o primeiro a voltar no DRP. E o CyberFin: se ele cair, o SOC segue operando, porque o Wazuh e o Zammad não dependem dele.'
   },
   {
     quem:P4, cor:COR.grc, titulo:'Em que ordem recuperar', sub:'Runbook de recuperação · camada por camada, sem pular etapas',
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="linha ordem" style="grid-template-columns:repeat(4, 1fr)">
-          <div class="bloco" style="--cor:#9FB1C3"><span class="num">0</span><div><h4>Declarar e conter</h4><p>Diretoria declara, por recomendação do CSIRT. Isolar as VLANs, preservar evidências e escolher o ponto limpo.</p></div></div>
-          <div class="bloco" style="--cor:#9FB1C3"><span class="num">1</span><div><h4>Infraestrutura</h4><p>VMs novas e limpas no ambiente externo (VLAN 200).</p></div></div>
+          <div class="bloco" style="--cor:#9FB1C3"><span class="num">0</span><div><h4>Declarar o desastre</h4><p>Diretoria declara, por recomendação do CSIRT. Registrar horário, escopo e ativos afetados; suspender outras mudanças.</p></div></div>
+          <div class="bloco" style="--cor:#9FB1C3"><span class="num">1</span><div><h4>Infraestrutura</h4><p>Virtualização e TrueNAS no ambiente externo (VLAN 200); VMs novas.</p></div></div>
           <div class="bloco" style="--cor:${COR.net}"><span class="num">2</span><div><h4>Rede</h4><p>SD-WAN, firewall e VLANs no UniFi e no Cisco 2960; gateways .1.</p></div></div>
-          <div class="bloco" style="--cor:${COR.grc}"><span class="num">3</span><div><h4>Backup</h4><p>NT-003 com Veeam, por conta local: repositório íntegro e ponto limpo escolhido.</p></div></div>
-          <div class="bloco" style="--cor:${COR.iam}"><span class="num">4</span><div><h4>Identidade</h4><p>NT-001 restaurado do backup; NT-002 reconstruído e replicado. Troca de senhas.</p></div></div>
-          <div class="bloco" style="--cor:${COR.soc}"><span class="num">5</span><div><h4>Serviços do SOC</h4><p>Wazuh primeiro; depois Zabbix + Grafana, OpenVAS, CyberFin IA e ITSM.</p></div></div>
-          <div class="bloco" style="--cor:${COR.danger}"><span class="num">6</span><div><h4>Aplicação</h4><p>Reverse Proxy na DMZ e serviços na ordem dos MTPD: Crédito, BPO, Folha, Valuation.</p></div></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="num">3</span><div><h4>Backup: NT-003</h4><p>Primeiro servidor a voltar: Veeam com conta local, ligado ao repositório no TrueNAS.</p></div></div>
+          <div class="bloco" style="--cor:${COR.iam}"><span class="num">4</span><div><h4>Identidade</h4><p>NT-001 restaurado do backup; NT-002 reconstruído e replicado a partir dele.</p></div></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="num">5</span><div><h4>Serviços do SOC</h4><p>Wazuh primeiro; depois Zabbix + Grafana, OpenVAS, CyberFin IA e Zammad.</p></div></div>
+          <div class="bloco" style="--cor:${COR.danger}"><span class="num">6</span><div><h4>Aplicação</h4><p>Firefly na DMZ, publicado pelo proxy 10.0.50.2; serviços na ordem dos MTPD.</p></div></div>
           <div class="bloco" style="--cor:${COR.brand}"><span class="num">7</span><div><h4>Volta à operação</h4><p>Agentes, varredura contra o baseline, backup novo e só então a internet.</p></div></div>
         </div>
-        <p class="s-txt"><b>Por que o backup vem antes do AD:</b> é do backup que sai o AD. Por isso o NT-003 tem uma conta local de emergência, fora do domínio.</p>
-        ${LINK_DRP}
+        <p class="s-txt"><b>Por que o NT-003 vem antes do AD:</b> é nele que roda o Veeam, e é do Veeam que sai o AD. Por isso o NT-003 tem uma conta local de emergência, fora do domínio.</p>
+        <div class="amb" style="gap:14px">${LINK_DRP}${LINK_RUNBOOK}</div>
       </div>`,
-    notas:'A ordem vem do runbook de recuperação, em camadas: cada uma depende da anterior. Primeiro conter e preparar a base (infraestrutura e rede). Depois o backup, porque é dele que sai todo o resto, inclusive o AD; por isso o NT-003 entra com conta local. Com AD e DNS de pé, os serviços do SOC (o Wazuh primeiro, para enxergar o ambiente voltando) e por último as aplicações, na ordem da BIA. Nenhuma fase começa sem a anterior passar no critério de saída. O documento completo do DRP está no link; na próxima tela, essa ordem acontecendo no mapa.'
+    notas:'A ordem vem do runbook de recuperação, em camadas: cada uma depende da anterior. Primeiro a base: infraestrutura, com o TrueNAS onde estão os backups, e a rede. Depois o NT-003, o primeiro servidor a voltar, porque é nele que roda o Veeam, e é dele que sai todo o resto, inclusive o AD; por isso ele entra com conta local. Com AD e DNS de pé, os serviços do SOC (o Wazuh primeiro, para enxergar o ambiente voltando) e por último as aplicações, na ordem da BIA. Nenhuma fase começa sem a anterior passar no critério de saída. O documento completo do DRP está no link; na próxima tela, essa ordem acontecendo no mapa.',
   },
   ...[0, 1, 2, 3, 4, 5].map(passo => ({
-    quem:P4, cor:COR.grc, titulo:'DR na prática: restaurando o ambiente', sub:'Cenário: ransomware nos servidores · tudo volta a partir do NT-003',
+    quem:P4, cor:COR.grc, titulo:'DR na prática: restaurando o ambiente', sub:'Cenário: perda das VMs · tudo volta a partir do backup',
     cam:[0, 20, 1600, 900], dr:passo,
-    foco: [['vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
+    foco: [['externo', 'vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
            ['unifi', 'cisco', 'externo', 'ligacoes', 'barramento', 'vlan60'],
            ['vlan20', 'vlan60', 'barramento'],
            ['vlan20', 'vlan50', 'vlan60', 'barramento'],
            ['vlan20', 'vlan30', 'vlan50', 'vlan60', 'barramento'],
            ['vlan20', 'vlan30', 'vlan50', 'vlan60', 'barramento']][passo],
     html: passos([
-      ['Desastre:', 'um ransomware criptografa os servidores das VLANs 20, 30 e 50. A Diretoria declara o desastre, o Network isola as VLANs no UniFi e as máquinas criptografadas ficam guardadas para perícia. O <b>NT-003</b>, na VLAN 60 isolada, está íntegro.'],
-      ['Base:', 'o ambiente externo entrega VMs novas e limpas e o Network confere SD-WAN, firewall e VLANs. No NT-003, com <b>conta local</b>, o Veeam confere o repositório e escolhe o último ponto limpo, anterior à infecção.'],
-      ['Identidade:', 'o NT-001 volta pela restauração completa do Veeam; o NT-002 é reconstruído e <b>replica a partir dele</b>. IAM troca as senhas privilegiadas e a da conta krbtgt.'],
-      ['SOC:', '<b>Wazuh primeiro</b>, para enxergar o ambiente enquanto ele volta; depois Zabbix + Grafana, OpenVAS, CyberFin IA e ITSM.'],
-      ['Aplicação:', 'Reverse Proxy na DMZ e serviços de negócio na ordem do MTPD: Crédito, BPO, Folha, Valuation. Cada servidor só é liberado depois do checklist.'],
-      ['Volta à operação:', 'agentes reportando ao Wazuh, OpenVAS comparando com o baseline, <b>backup novo</b> no NT-003 e só então a internet é liberada. RPO e RTO reais vão para o registro.']
+      ['Desastre:', 'as VMs do ambiente são perdidas: NT-001, NT-002, NT-003, o Firefly e a stack do SOC. A Diretoria declara o desastre e o relógio do RTO começa. A rede e o <b>repositório de backup no TrueNAS</b>, no ambiente externo, continuam íntegros.'],
+      ['Base e NT-003:', 'o ambiente externo entrega VMs novas e o Network confere SD-WAN, firewall e VLANs. O <b>primeiro servidor a voltar é o NT-003</b>: o Veeam é reinstalado com conta local, fora do domínio, ligado ao repositório no TrueNAS, e escolhe o último ponto íntegro de cada VM.'],
+      ['Identidade:', 'o NT-001 volta pela restauração completa do Veeam; o NT-002 é reconstruído e <b>replica a partir dele</b>.'],
+      ['SOC:', '<b>Wazuh primeiro</b>, para enxergar o ambiente enquanto ele volta; depois Zabbix + Grafana, OpenVAS, CyberFin IA e Zammad.'],
+      ['Aplicação:', 'o <b>Firefly</b> volta na DMZ pelo backup dedicado (banco, arquivos e configuração) e é publicado de novo pelo proxy 10.0.50.2. Depois, os serviços de negócio na ordem do MTPD. Cada servidor só é liberado depois do checklist.'],
+      ['Volta à operação:', 'agentes reportando ao Wazuh, OpenVAS comparando com o baseline, um evento de teste chegando até o Zammad e <b>backup novo</b> no NT-003. Só então a internet é liberada; RPO e RTO reais vão para o registro.']
     ], passo, COR.grc) + LINK_DRP,
     notas: [
-      'Escolhemos um desastre concreto: ransomware, nível 4 na matriz. Os pacotes vermelhos saem de uma estação e criptografam os servidores. O que salva é o NT-003: está numa VLAN isolada e os backups são criptografados. Antes de restaurar, conter e preservar as evidências.',
-      'Fases 1 a 3: infraestrutura, rede e backup. O ponto de restauração escolhido é o último anterior à infecção; restaurar um ponto infectado traria o ransomware de volta. Por isso a fase 0 descobre quando a infecção começou.',
-      'Fase 4: o AD sai do backup. Só um controlador volta do backup; o outro é reconstruído e replica, para não termos dois ADs inconsistentes. Como o ataque pode ter roubado senhas, todas as privilegiadas são trocadas.',
-      'Fase 5: o Wazuh vem primeiro porque, enquanto o ambiente volta, o SOC precisa enxergar se a ameaça reaparece.',
-      'Fase 6: as aplicações por último, na ordem da BIA. Nada é liberado sem o checklist que mostramos a seguir.',
-      'Fase 7: o ambiente só reabre monitorado, varrido e com backup novo. Os tempos reais são comparados com a BIA. Tudo isso está no documento do DRP, no link do painel.'
+      'Escolhemos um desastre concreto: a perda das VMs. A infraestrutura de virtualização continua ou é reconstruída pelo ambiente externo, mas todos os servidores precisam voltar a partir do backup. O que salva é o repositório no TrueNAS, fora das VMs perdidas.',
+      'Fases 1 a 3: infraestrutura, rede e backup. O detalhe que importa: o NT-003 é o primeiro servidor a voltar, porque é nele que roda o Veeam, e é do Veeam que saem todos os outros, inclusive o AD. Por isso ele tem conta local, fora do domínio.',
+      'Fase 4: o AD sai do backup. Só um controlador volta do backup; o outro é reconstruído e replica, para não termos dois ADs inconsistentes.',
+      'Fase 5: o Wazuh vem primeiro porque, enquanto o ambiente volta, o SOC precisa enxergar o que acontece.',
+      'Fase 6: as aplicações por último, na ordem da BIA. O Firefly tem um backup próprio, de banco, arquivos e configuração, já validado com SHA-256. Nada é liberado sem o checklist que mostramos a seguir.',
+      'Fase 7: o ambiente só reabre monitorado, varrido, com um evento de teste percorrendo Wazuh, CyberFin e Zammad, e com backup novo. Os tempos reais são comparados com a BIA. Tudo isso está no documento do DRP, no link do painel.'
     ][passo]
   })),
   {
@@ -1094,7 +1482,7 @@ const PARADAS = [
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="fluxo"><div class="passo2"><b>1. Restore point</b><span>Confirmar o ponto de backup que será usado</span></div><span class="seta2">→</span><div class="passo2"><b>2. Máquina de destino</b><span>Preparar a VM que vai receber o servidor</span></div><span class="seta2">→</span><div class="passo2"><b>3. Recovery Media</b><span>Iniciar a máquina pela mídia de recuperação do Veeam</span></div><span class="seta2">→</span><div class="passo2"><b>4. Entire Machine Restore</b><span>Restaurar o servidor inteiro a partir do NT-003</span></div><span class="seta2">→</span><div class="passo2"><b>5. Boot e validação</b><span>Ligar e passar pelo checklist abaixo</span></div></div>
         <div class="linha" style="grid-template-columns:1.35fr 1fr">
-          <div class="prancheta"><div class="clip"></div><div class="papel"><span class="rot">Checklist depois da restauração</span><ul class="check"><li>Sistema operacional inicializa</li><li>Discos e partições corretos</li><li>IP, gateway e VLAN corretos</li><li>DNS e NTP funcionam</li><li>Autenticação no AD funciona</li><li>Banco de dados íntegro</li><li>Aplicação responde</li><li>Dados críticos conferidos</li><li>Wazuh recebe eventos</li><li>Zabbix monitora o host</li><li>Firewall e hardening preservados</li><li>Novo backup pós-DR executado</li></ul></div></div>
+          <div class="prancheta"><div class="clip"></div><div class="papel"><span class="rot">Checklist depois da restauração · cada item detalhado a seguir</span><ul class="check"><li>Sistema operacional inicializa</li><li>Discos e partições corretos</li><li>IP, gateway e VLAN corretos</li><li>DNS e NTP funcionam</li><li>Autenticação no AD funciona</li><li>Banco de dados íntegro</li><li>Aplicação responde</li><li>Dados críticos conferidos</li><li>Wazuh recebe eventos</li><li>Zabbix monitora o host</li><li>Firewall e hardening preservados</li><li>Novo backup pós-DR executado</li></ul></div></div>
           <div class="bloco" style="--cor:${COR.grc}"><span class="rot">O que se registra ao final</span>
             <p><b>Restore point</b> usado (data e hora do backup restaurado)</p>
             <p><b>RPO real</b>: do último dado recuperado até a falha</p>
@@ -1105,6 +1493,31 @@ const PARADAS = [
         <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap">${LINK_DRP}<p class="s-aviso">Teste obrigatório ainda não realizado: primeiro em rede isolada, depois um teste destrutivo controlado.</p></div>
       </div>`,
     notas:'Esta é a parte prática do DRP: como se recupera um servidor perdido usando o Veeam no NT-003. Depois de restaurar, nada é liberado sem passar pelo checklist, que inclui voltar a mandar logs para o Wazuh e a ser monitorado pelo Zabbix. Ao final se registram o RPO e o RTO reais, que são comparados com as metas da BIA. A documentação e os scripts ficam numa pasta de emergência fora dos servidores. Ser honesto: o teste real ainda vai ser feito, primeiro em rede isolada.'
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:"Checklist 1/5: a máquina voltou?", sub:'Checklist pós-restauração · o que conferir, como e o que fazer se falhar',
+    sala: telaCheck([1, 2, 3], '#9FB1C3', "GRC e o time dono do servidor"),
+    notas:"Antes de qualquer coisa, a máquina em si: ligou, tem os discos certos e está na rede certa. Os comandos são os mesmos para qualquer servidor; o que muda é o valor esperado, que vem do inventário no anexo do DRP."
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:"Checklist 2/5: ela conversa com o domínio?", sub:'Checklist pós-restauração · o que conferir, como e o que fazer se falhar',
+    sala: telaCheck([4, 5], '#8B5CF6', "IAM"),
+    notas:"Sem DNS e sem hora certa, nada autentica. O Kerberos recusa login quando o relógio difere mais de 5 minutos. E um servidor restaurado de um ponto antigo pode ter perdido a senha de máquina com o domínio: o canal seguro mostra isso e se repara com um comando."
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:"Checklist 3/5: o serviço e os dados estão certos?", sub:'Checklist pós-restauração · o que conferir, como e o que fazer se falhar',
+    sala: telaCheck([6, 7, 8], '#F87171', "Dono do serviço e área de negócio"),
+    notas:"Aqui entra a área de negócio. Não basta o servidor ligar: o banco tem que estar íntegro, a aplicação tem que responder pelo caminho normal e alguém da área confere os últimos dados. É nesse item que medimos o RPO real e comparamos com a BIA."
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:"Checklist 4/5: o SOC enxerga de novo?", sub:'Checklist pós-restauração · o que conferir, como e o que fazer se falhar',
+    sala: telaCheck([9, 10], '#F59E0B', "SOC"),
+    notas:"Servidor restaurado sem agente é ponto cego. Um cuidado prático: o agente do Wazuh que volta do backup pode conflitar com a chave registrada no manager; nesse caso se remove e registra de novo."
+  },
+  {
+    quem:P4, cor:COR.grc, titulo:"Checklist 5/5: protegida e com backup novo?", sub:'Checklist pós-restauração · o que conferir, como e o que fazer se falhar',
+    sala: telaCheck([11, 12], '#22C55E', "Endpoint, SOC e GRC"),
+    notas:"Último bloco: a máquina não pode voltar mais aberta do que era, e precisa de um backup novo, que passa a ser a base dos próximos. Só com os 12 itens marcados o servidor é liberado e entra no registro de RPO e RTO reais."
   },
   {
     quem:P4, cor:COR.grc, titulo:'GRC: políticas e conformidade', sub:'Uma financeira regulada precisa provar que é segura',
@@ -1173,13 +1586,13 @@ async function rodarIncidente(passo){
   resetIncidente();
   if(passo === 0){
     // e-mail de phishing: SD-WAN -> UniFi -> Cisco -> workstation da VLAN 40
-    await pacote([{x:120,y:170},{x:300,y:170},{x:460,y:172},{x:700,y:170},{x:820,y:170},{x:820,y:BUS_Y},{x:ws.x,y:BUS_Y},ws], COR.danger, 3200, 9);
+    await pacote([{x:120,y:170},{x:300,y:170},{x:460,y:172},{x:700,y:170},{x:820,y:170},{x:820,y:BUS_Y},{x:LANE(3),y:BUS_Y},{x:LANE(3),y:ws.y},ws], COR.danger, 3200, 9);
     if(minha === geracao){ WS.classList.add('alerta'); selo(WS, 'CLICOU', COR.danger); }
     return;
   }
   if(passo >= 4){
     selo(ITSM, passo === 4 ? 'INC ABERTO' : 'RESOLVIDO', passo === 4 ? '#FCD34D' : '#4ADE80');
-    WS.classList.add('ok'); selo(WS, passo === 4 ? 'VERIFICANDO' : 'RECUPERADA', '#4ADE80');
+    WS.classList.add('ok'); selo(WS, passo === 4 ? 'VARREDURA' : 'RECUPERADA', '#4ADE80');
     const wz = hostCentro(4, 0);
     if(passo === 4){
       // busca do domínio malicioso nos logs de todos os agentes
@@ -1195,17 +1608,17 @@ async function rodarIncidente(passo){
   selo(WS, 'SUSPEITA', COR.danger);
   if(passo === 1){
     // detecção no Wazuh e classificação pela CyberFin IA
-    emLoop(async () => { if(await pacote(viaBus(ws, wz), COR.danger, 1500, 7)) pacote([wz, ia], '#FCA5A5', 900, 6); }, 3000);
+    emLoop(async () => { if(await pacote(viaBus(ws, wz), COR.danger, 1500, 7)) pacote(viaBus(wz, ia), '#FCA5A5', 900, 6); }, 3000);
   }
   if(passo === 2){
     // analista confirma: ticket no ITSM
-    emLoop(async () => { if(await pacote([ia, it], '#FCD34D', 900, 7) && minha === geracao) selo(ITSM, 'INC ABERTO', '#FCD34D'); }, 2400);
+    emLoop(async () => { if(await pacote(viaBus(ia, it), '#FCD34D', 900, 7) && minha === geracao) selo(ITSM, 'INC ABERTO', '#FCD34D'); }, 2400);
   }
   if(passo === 3){
     // contenção: Network bloqueia no UniFi, IAM reseta a credencial, Endpoint verifica a estação
     selo(ITSM, 'INC ABERTO', '#FCD34D');
     emLoop(() => {
-      pacote([it, {x:it.x,y:BUS_Y}, {x:820,y:BUS_Y}, {x:820,y:170}, {x:620,y:170}, {x:460,y:172}], COR.net, 2000, 7);
+      pacote([it, {x:LANE(4),y:it.y}, {x:LANE(4),y:BUS_Y}, {x:820,y:BUS_Y}, {x:820,y:170}, {x:620,y:170}, {x:460,y:172}], COR.net, 2000, 7);
       setTimeout(() => pacote(viaBus(it, ad), COR.iam, 1800, 7), 400);
       setTimeout(() => pacote(viaBus(it, ws), COR.end, 1600, 7), 800);
     }, 3400);
