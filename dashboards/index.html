@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grafana do SOC CyberFin</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: palco de uma parada por vez; print do dashboard à esquerda com holofote nas áreas numeradas, leitura guiada à direita; mesmo visual da jornada */
+:root {
+  --bg: #0B1520; --bg-2: #101E2C; --panel: #13212F; --line: #26384A; --line-2: #344B61;
+  --text: #EEF3F8; --muted: #9FB1C3; --soft: #C7D4E1;
+  --soc: #F59E0B; --soc-ink: #1a1205; --net: #14B8A6; --iam: #8B5CF6; --end: #22C55E; --brand: #4C8DF6; --danger: #F87171;
+  --display: "Sora", "Segoe UI", system-ui, sans-serif;
+  --body: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0; background: radial-gradient(1200px 700px at 70% -10%, var(--bg-2), var(--bg)); background-color: var(--bg);
+  color: var(--text); font-family: var(--body); font-size: 16px; line-height: 1.5; overflow: hidden;
+}
+body.preto #palco, body.preto footer { visibility: hidden; }
+#palco {
+  height: 100%; display: flex; flex-direction: column; gap: 16px;
+  padding-left: max(28px, env(safe-area-inset-left, 0px)); padding-right: max(28px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 72px;
+}
+.topo { display: flex; justify-content: space-between; align-items: center; gap: 12px; font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+.topo b { color: var(--soc); font-weight: 600; }
+.cena { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(300px, 1fr); gap: 28px; align-items: center; }
+.cena.capa, .cena.fim { grid-template-columns: 1fr; justify-items: start; }
+
+/* print com holofote */
+.tela { position: relative; overflow: hidden; border-radius: 12px; border: 1px solid var(--line-2); background: var(--tela);
+  box-shadow: 0 24px 70px rgba(0,0,0,.5); justify-self: center; width: 100%; max-width: 1568px; }
+.tela img { display: block; width: 100%; height: auto; max-height: calc(100vh - 160px); object-fit: contain; }
+.marca { position: absolute; z-index: 2; border-radius: 10px; border: 1.5px solid rgba(245, 158, 11, .55);
+  background: rgba(245, 158, 11, .04); transition: border-color .3s, box-shadow .3s, background .3s, opacity .3s;
+  animation: entra .5s ease both; animation-delay: calc(var(--i) * 120ms + 150ms); cursor: pointer; }
+.tela.foco .marca { opacity: .35; }
+.tela.foco .marca.ativa { opacity: 1; }
+.marca.ativa { border: 2px solid var(--soc); background: transparent;
+  box-shadow: 0 0 0 1px rgba(0,0,0,.5), 0 0 0 6px rgba(245, 158, 11, .18), 0 0 36px rgba(245, 158, 11, .35); z-index: 3; }
+.marca.ativa::before { content: ""; position: absolute; inset: 0; border-radius: inherit; box-shadow: 0 0 0 0 rgba(245,158,11,.5); animation: pulso 1.8s ease-out infinite; }
+/* holofote: a sombra gigante da área ativa escurece o resto do print e deixa só ela acesa */
+.tela.foco .marca.ativa { box-shadow: 0 0 0 6px rgba(245, 158, 11, .22), 0 0 40px rgba(245, 158, 11, .35), 0 0 0 9999px var(--holofote); }
+.selo { position: absolute; top: -13px; left: -13px; display: flex; align-items: center; gap: 0; z-index: 4; }
+.selo b { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--soc); color: var(--soc-ink);
+  font: 700 12.5px var(--mono); box-shadow: 0 0 0 3px var(--sombra-selo), 0 4px 12px rgba(0,0,0,.5); }
+.selo em { font: 600 12px var(--body); font-style: normal; color: var(--soc-ink); background: var(--soc); padding: 3px 10px 3px 8px; margin-left: -4px;
+  border-radius: 0 999px 999px 0; white-space: nowrap; max-width: 0; overflow: hidden; opacity: 0; transition: max-width .35s ease, opacity .25s; }
+.marca.ativa .selo em { max-width: 260px; opacity: 1; }
+@keyframes entra { from { opacity: 0; transform: scale(.97); } to { opacity: 1; transform: none; } }
+@keyframes pulso { 0% { box-shadow: 0 0 0 0 rgba(245,158,11,.45); } 100% { box-shadow: 0 0 0 14px rgba(245,158,11,0); } }
+
+.leitura { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.area { font-family: var(--mono); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; display: flex; gap: 10px; align-items: center; color: var(--muted); }
+.area i { width: 10px; height: 10px; border-radius: 2px; background: var(--c, var(--soc)); display: inline-block; }
+h1 { font-family: var(--display); font-weight: 700; font-size: clamp(24px, 2.5vw, 36px); line-height: 1.1; margin: 0; text-wrap: balance; }
+.lead { color: var(--soft); margin: 0; max-width: 46ch; }
+.pontos { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.pontos li { display: grid; grid-template-columns: 28px 1fr; gap: 12px; padding: 10px 12px; background: var(--panel); border: 1px solid var(--line);
+  border-radius: 10px; cursor: pointer; transition: border-color .25s, background .25s, opacity .25s; }
+.pontos.guiado li { opacity: .5; }
+.pontos li.ativa { border-color: var(--soc); background: var(--ativo); opacity: 1; }
+.pontos li > span { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--line-2); color: var(--text); font: 700 12px var(--mono); transition: background .25s, color .25s; }
+.pontos li.ativa > span { background: var(--soc); color: var(--soc-ink); }
+.pontos b { font-weight: 700; }
+.pontos p { margin: 2px 0 0; color: var(--muted); font-size: 14.5px; }
+.numeros { display: flex; flex-wrap: wrap; gap: 10px; }
+.num { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px; display: flex; flex-direction: column; min-width: 110px; }
+.num strong { font-family: var(--display); font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.num small { font-family: var(--mono); font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.num.alerta strong { color: var(--danger); } .num.ok strong { color: var(--end); } .num.aviso strong { color: var(--soc); }
+.passo { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+.link { display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px 12px; background: var(--link-bg); border: 1px solid var(--line); border-radius: 10px; min-width: 0; }
+.link code { flex: 1; min-width: 0; font: 400 12.5px var(--mono); color: var(--soft); overflow-x: auto; white-space: nowrap; scrollbar-width: thin; }
+.link code::before { content: "GRAFANA "; color: var(--soc); font-weight: 600; letter-spacing: .06em; }
+.link a, .link button { flex: none; font: 600 12px var(--mono); color: var(--text); background: var(--panel); border: 1px solid var(--line-2); border-radius: 7px; padding: 5px 10px; cursor: pointer; text-decoration: none; }
+.link a:hover, .link button:hover { border-color: var(--soc); color: var(--soc); }
+
+/* capa e fim */
+.capa h1, .fim h1 { font-size: clamp(34px, 5vw, 64px); max-width: 16ch; }
+.capa .lead, .fim .lead { font-size: 19px; max-width: 56ch; }
+.mosaico { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; width: min(1150px, 100%); }
+.mosaico img { width: 100%; aspect-ratio: 16 / 7; object-fit: cover; object-position: top; border: 1px solid var(--line); border-radius: 6px; opacity: .9; }
+.trilha { display: flex; flex-wrap: wrap; gap: 8px; }
+.trilha span { font-family: var(--mono); font-size: 12px; padding: 4px 10px; border: 1px solid var(--line-2); border-radius: 999px; color: var(--soft); }
+.prox { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; width: min(1000px, 100%); }
+.prox div { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--c); border-radius: 10px; padding: 14px 16px; }
+.prox b { font-family: var(--display); display: block; margin-bottom: 4px; }
+.prox p { margin: 0; color: var(--muted); font-size: 14.5px; }
+
+/* rodapé */
+footer { position: fixed; left: 0; right: 0; bottom: 0; display: flex; align-items: center; gap: 16px; z-index: 10;
+  padding: 12px max(28px, env(safe-area-inset-right, 0px)) calc(12px + env(safe-area-inset-bottom, 0px)) max(28px, env(safe-area-inset-left, 0px));
+  background: var(--rodape); border-top: 1px solid var(--line); }
+.pontinhos { display: flex; gap: 6px; flex: 1; min-width: 0; }
+.pontinhos button { flex: 1; height: 6px; border: 0; border-radius: 3px; padding: 0; background: var(--line-2); cursor: pointer; }
+.pontinhos button.feito { background: var(--soc); opacity: .45; }
+.pontinhos button.atual { background: var(--soc); }
+.nav { display: flex; gap: 6px; }
+.nav button { font: 600 13px var(--mono); background: var(--panel); color: var(--text); border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+.nav button:hover { border-color: var(--soc); }
+#dica { font-family: var(--mono); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+#notas { display: none; position: fixed; left: max(28px, env(safe-area-inset-left, 0px)); bottom: 70px; width: min(760px, 60vw); z-index: 20;
+  padding: 14px 16px; background: var(--notas-bg); border: 1px solid var(--soc); border-radius: 10px; color: var(--soft); font-size: 15px; }
+#notas::before { content: "Notas de fala"; display: block; font: 600 11px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--soc); margin-bottom: 6px; }
+body.com-notas #notas { display: block; }
+.data { font-family: var(--mono); font-size: 11.5px; color: var(--muted); }
+button:focus-visible, .pontos li:focus-visible { outline: 2px solid var(--soc); outline-offset: 2px; }
+@media (max-width: 900px) {
+  body { overflow: auto; }
+  #palco { height: auto; min-height: 100%; }
+  .cena { grid-template-columns: 1fr; }
+  .tela img { max-height: none; }
+  .selo em { display: none; }
+  .mosaico { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #dica { display: none; }
+  #notas { width: auto; right: max(16px, env(safe-area-inset-right, 0px)); left: max(16px, env(safe-area-inset-left, 0px)); }
+}
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+/* Regras do projetor (Design System CyberFin SOC): texto corrido 20 px ou mais, rótulos 16 px ou mais */
+:root { --tela: #05090e; --ativo: #1a2a3a; --link-bg: #0e1a26; --rodape: rgba(11, 21, 32, .92); --notas-bg: rgba(19, 33, 47, .97);
+  --sombra-selo: rgba(11, 21, 32, .9); --holofote: rgba(4, 9, 15, .66); }
+/* Tema Projetor: fundo claro e cores escurecidas, para sala clara ou projetor que lava o preto */
+:root[data-tema="projetor"] {
+  --bg: #FFFFFF; --bg-2: #EEF2F7; --panel: #FFFFFF; --line: #C5CED9; --line-2: #7D8B9C;
+  --text: #0B1520; --soft: #22303F; --muted: #3D4B5C;
+  --soc: #B45309; --soc-ink: #FFFFFF; --net: #0F766E; --iam: #6D28D9; --end: #15803D; --brand: #1D4ED8; --danger: #B91C1C;
+  --tela: #FFFFFF; --ativo: #FFF4E0; --link-bg: #F3F6FA; --rodape: rgba(255, 255, 255, .96); --notas-bg: rgba(255, 255, 255, .98);
+  --sombra-selo: rgba(255, 255, 255, .95); --holofote: rgba(11, 21, 32, .55);
+  color-scheme: light;
+}
+:root[data-tema="projetor"] .marca.ativa { border-color: #B45309; }
+:root[data-tema="projetor"] .pontos li > span { color: var(--text); }
+body { font-size: 20px; }
+.topo { font-size: 16px; }
+.cena { grid-template-columns: minmax(0, 1.55fr) minmax(400px, 1fr); }
+.area { font-size: 16px; }
+h1 { font-size: clamp(30px, 3vw, 46px); }
+.lead { font-size: 22px; }
+.pontos li { grid-template-columns: 34px 1fr; padding: 12px 14px; }
+.pontos li > span { width: 32px; height: 32px; font-size: 16px; }
+.pontos b { font-size: 22px; }
+.pontos p { font-size: 20px; line-height: 1.4; }
+.num { min-width: 130px; }
+.num strong { font-size: 32px; }
+.num small { font-size: 16px; }
+.passo { font-size: 16px; }
+.link code { font-size: 16px; }
+.link a, .link button { font-size: 16px; }
+.selo { top: -16px; left: -16px; }
+.selo b { width: 32px; height: 32px; font-size: 16px; }
+.selo em { font-size: 16px; padding: 4px 12px 4px 10px; }
+.capa .lead, .fim .lead { font-size: 24px; }
+.trilha span { font-size: 16px; }
+.prox b { font-size: 22px; }
+.prox p { font-size: 20px; }
+.nav button, .tema { font: 600 16px var(--mono); background: var(--panel); color: var(--text); border: 1px solid var(--line-2); border-radius: 8px; padding: 6px 12px; cursor: pointer; white-space: nowrap; }
+.tema:hover { border-color: var(--soc); }
+#dica { font-size: 16px; }
+#notas { font-size: 20px; }
+#notas::before { font-size: 16px; }
+.data { font-size: 16px; }
+@media (max-width: 900px) { .cena { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<div id="palco">
+  <div class="topo"><span><b>CyberFin</b> · SOC · Grafana</span><span id="contador"></span></div>
+  <div id="cena" class="cena"></div>
+</div>
+<div id="notas" aria-live="polite"></div>
+<footer>
+  <div class="nav"><button id="ant" type="button" aria-label="Anterior">←</button><button id="prox" type="button" aria-label="Próxima">→</button></div>
+  <div class="pontinhos" id="pontinhos"></div>
+  <button id="tema" class="tema" type="button">Tema: escuro</button>
+  <span id="dica">→ avança · N notas · T tema · F tela cheia · B tela preta</span>
+</footer>
+
+<script>
+const C = { soc: 'var(--soc)', net: 'var(--net)', iam: 'var(--iam)', end: 'var(--end)', brand: 'var(--brand)' };
+// marcas: [x, y, largura, altura] em % da imagem; uma por ponto, na mesma ordem
+const P = [
+  { tipo: 'capa',
+    titulo: 'Como o SOC enxerga o ambiente',
+    lead: 'O Grafana reúne o que o Wazuh, o Zabbix e o Zammad registram. São 28 dashboards; nesta visita passamos pelos 11 que contam a operação do SOC, da entrada do alerta até os indicadores.',
+    notas: 'Abrir dizendo que tudo que vamos ver é dado do laboratório, coletado pelas ferramentas da VLAN 50. A ordem segue o caminho de um alerta: entra pelo Command Center, é investigado nos painéis especializados e termina nos KPIs.' },
+  { img: 'command-center', area: 'Ponto de partida', c: 'soc',
+    titulo: 'SOC Command Center',
+    lead: 'A porta de entrada do turno. Organiza o trabalho em seis etapas e leva para o painel certo de cada assunto.',
+    marcas: [[0.6, 25.5, 98.8, 31.5], [0.6, 58, 98.8, 41.5]],
+    pontos: [['Fluxo operacional', 'Detecção, Investigação, Decisão, Mitigação, Evidência e Validação.'], ['Atalhos para os painéis', 'Cada bloco abre o painel especializado: visão geral, infraestrutura, vulnerabilidades, Windows, Linux, DMZ.']],
+    notas: 'É a porta de entrada do SOC. O analista começa aqui, entende em que etapa está e vai para o painel específico. Não é um painel de números; é um mapa da operação.' },
+  { img: 'soc-overview', area: 'Visão do turno', c: 'soc',
+    titulo: 'SOC Overview',
+    lead: 'O resumo das últimas 24 horas: quanto chegou, o que é crítico e de onde vem.',
+    marcas: [[0.4, 27.8, 99.2, 18.6], [0.4, 47.3, 32.7, 43], [33.4, 47.3, 32.7, 43]],
+    pontos: [['Indicadores do turno', 'Volume total de alertas, severidade crítica e falhas de autenticação.'], ['Táticas MITRE', 'Defense Evasion e Privilege Escalation lideram no período.'], ['Ativos com mais alertas', 'NT-001, FIREFLY e NT-002 concentram o volume.']],
+    numeros: [['34 mil', 'alertas em 24 h', ''], ['145', 'críticos (12 a 15)', 'alerta'], ['201', 'falhas de autenticação', 'aviso']],
+    notas: 'Visão do turno: o volume, o que é crítico e quais ativos mais geram alerta. Os dois controladores de domínio e o Firefly concentram quase tudo, o que faz sentido: são os ativos mais expostos e mais usados.' },
+  { img: 'windows', area: 'Identidade', c: 'iam',
+    titulo: 'Windows Security & Identity',
+    lead: 'O que acontece no Active Directory: quem autentica, onde, e quem usa privilégio.',
+    marcas: [[0.4, 27.8, 99.2, 18.6], [0.4, 57, 32.7, 28.5], [66.4, 57, 32.6, 28.5]],
+    pontos: [['Autenticações e privilégios', 'Logons, sessões encerradas e logons com privilégio especial (evento 4672).'], ['Eventos mais frequentes', 'Os IDs de evento do Windows mais vistos, como 4624 e 4634.'], ['Identidades mais ativas', 'Contas de máquina dos DCs e o Administrator aparecem no topo.']],
+    numeros: [['7 mil', 'logons bem-sucedidos', ''], ['2 mil', 'logons privilegiados', 'aviso'], ['1', 'falha de autenticação', 'ok']],
+    notas: 'Monitoramos o AD: quem autentica, onde, e quem usa privilégio. Uso de privilégio é o que mais interessa ao SOC, porque é o caminho de quem já entrou e quer subir de nível.' },
+  { img: 'web-dmz', area: 'DMZ', c: 'net',
+    titulo: 'Web/DMZ Security',
+    lead: 'A aplicação publicada na DMZ sendo sondada pela internet, em tempo real.',
+    marcas: [[0.4, 27.8, 99.2, 18.6], [0.4, 47.3, 32.7, 38.2], [33.4, 47.3, 32.7, 38.2]],
+    pontos: [['Eventos web e exploração', 'Reconhecimento, tentativas de exploração e acesso a recursos sensíveis.'], ['Origens', 'Os IPs externos que mais tentaram no período.'], ['URLs procuradas', '/.git/config, /.env: robôs atrás de arquivos de configuração expostos.']],
+    numeros: [['282', 'eventos web', ''], ['50', 'tentativas de exploração', 'alerta'], ['65', 'recursos sensíveis', 'alerta']],
+    notas: 'É a DMZ sendo atacada de verdade. Esses acessos a /.git e /.env são varreduras automáticas da internet procurando segredos esquecidos no servidor. O Wazuh detecta e classifica cada tentativa.' },
+  { img: 'mitre', area: 'Cobertura', c: 'soc',
+    titulo: 'MITRE ATT&CK',
+    lead: 'Cada detecção classificada no framework MITRE, nos últimos 30 dias.',
+    marcas: [[0.4, 27.8, 99.2, 18.6], [33.4, 57, 32.7, 33.2], [66.4, 57, 32.6, 33.2]],
+    pontos: [['Detecções por tática', 'Initial Access, Privilege Escalation, Lateral Movement e as demais.'], ['Técnicas mais vistas', 'Valid Accounts lidera com folga.'], ['Ativos envolvidos', 'NT-001, NT-002 e OpenVAS aparecem no topo.']],
+    numeros: [['522 mil', 'detecções em 30 dias', ''], ['335 mil', 'valid accounts', 'aviso']],
+    notas: 'O MITRE dá uma linguagem comum: em vez de falar de regra 60137, falamos de Valid Accounts. Isso mostra onde a nossa detecção está forte e onde ainda falta cobertura.' },
+  { img: 'detection', area: 'Engenharia de detecção', c: 'soc',
+    titulo: 'Detection Engineering',
+    lead: 'As regras que o próprio SOC escreveu, além das regras padrão do Wazuh.',
+    marcas: [[0.4, 27.8, 99.2, 18.6], [0.4, 57, 99.2, 33.2]],
+    pontos: [['Detecções das regras CyberFin', 'SQL Injection, correlação ofensiva, honeypot e secrets.'], ['Regras, ativos e origens', 'Quais regras próprias dispararam, em quais ativos e de quais IPs.']],
+    numeros: [['2 mil', 'detecções próprias', ''], ['149', 'SQL injection', 'alerta'], ['250', 'honeypot e secrets', 'alerta']],
+    notas: 'Aqui mostramos o trabalho autoral do SOC: regras escritas para o cenário da CyberFin, como as da faixa 100110 a 100130 para o Firefly. O honeypot é uma isca; qualquer acesso a ele já é suspeito por definição.' },
+  { img: 'vulnerabilidades', area: 'Risco', c: 'brand',
+    titulo: 'Vulnerability Management',
+    lead: 'A postura de risco: onde estão as vulnerabilidades e o que corrigir primeiro.',
+    marcas: [[0.4, 27.8, 99.2, 18.6], [0.4, 47.3, 57.6, 47.6], [58.2, 47.3, 41.2, 47.6]],
+    pontos: [['Exposição total', 'Exposições ativas, críticas e CVEs únicas.'], ['Risco por ativo', 'OpenVAS, Nginx e FIREFLY concentram mais vulnerabilidades altas.'], ['Risco por severidade', 'A maior parte é alta e média; as críticas são a fila de correção.']],
+    numeros: [['1 mil', 'críticas', 'alerta'], ['12 mil', 'altas', 'aviso'], ['8 mil', 'CVEs únicas', '']],
+    notas: 'É a postura de risco. O ranking por ativo vira a fila de correção: começa pelos servidores expostos, como o proxy e a aplicação da DMZ.' },
+  { img: 'infra', area: 'Disponibilidade', c: 'end',
+    titulo: 'Infrastructure Health',
+    lead: 'A saúde da infraestrutura vista pelo Zabbix: o que está degradado e há quanto tempo.',
+    marcas: [[1.6, 32.6, 97.6, 23.8], [1.6, 57.2, 97.6, 41.2]],
+    pontos: [['Risco operacional', 'Problemas ativos, severidade alta e serviços críticos com falha.'], ['Fila de problemas', 'Cada item com host, severidade, idade e se já foi reconhecido.']],
+    numeros: [['12', 'problemas ativos', 'aviso'], ['1', 'alto', 'alerta'], ['8', 'serviços com falha', 'aviso']],
+    notas: 'Segurança também é disponibilidade. O Zabbix mostra serviços parados, como agentes e antivírus, e há quanto tempo estão assim. Um agente parado é um ponto cego para o SOC.' },
+  { img: 'visao-geral', area: 'Servidores do SOC', c: 'end',
+    titulo: 'CyberFin Visão Geral',
+    lead: 'CPU, memória e tempo no ar dos servidores que sustentam o SOC.',
+    marcas: [[0.4, 22.8, 33, 76.5], [33.4, 22.8, 33, 76.5], [66.4, 22.8, 33.2, 76.5]],
+    pontos: [['CPU', 'Uso de processador de cada servidor nos últimos 5 minutos.'], ['Memória', 'O Wazuh é o que mais usa memória, perto da metade.'], ['Tempo no ar', 'CyberFin IA, Wazuh, OpenVAS e Firefly estáveis há mais de 3 dias.']],
+    notas: 'Os servidores do SOC precisam estar de pé para que todo o resto funcione. Aqui vemos que estão estáveis e com folga de recurso.' },
+  { img: 'network-okr2', area: 'Outras áreas', c: 'net',
+    titulo: 'OKR 2 de Rede',
+    lead: 'As outras áreas medem os próprios objetivos com dados reais do Zabbix, Wazuh e Zammad.',
+    marcas: [[0.4, 22.8, 99.2, 23.6], [21, 22.8, 16.4, 23.6], [0.4, 47.3, 99.2, 38.2]],
+    pontos: [['Indicadores do OKR', 'Cobertura de monitoramento, alertas, casos e tickets abertos.'], ['MTTD Wazuh → Zammad', 'O mesmo indicador que o SOC usa: do alerta até a abertura do ticket.'], ['Histórico do dia', 'MTTD, volume de alertas e backlog ao longo das últimas 24 horas.']],
+    numeros: [['100%', 'cobertura', 'ok'], ['19 min', 'MTTD', 'alerta'], ['113', 'tickets abertos', '']],
+    notas: 'Os OKRs não são só do SOC. A área de Rede tem painel próprio, e o MTTD aparece aqui também, medido do mesmo jeito. O gráfico mostra que ele oscilou entre 13 e 20 minutos ao longo do dia.' },
+  { img: 'kpis-soc', area: 'Indicadores do SOC', c: 'soc',
+    titulo: 'SOC · KPIs e OKRs',
+    lead: 'Os indicadores do SOC com as faixas da política: verde na meta, amarelo entre a meta e o limite, vermelho acima do limite.',
+    marcas: [[1.8, 32.6, 20, 38], [22.2, 32.6, 23.9, 38], [1.8, 76.6, 24, 21.8]],
+    pontos: [['MTTD real', 'Do alerta no Wazuh até o ticket no Zammad. Oscilou entre 14 e 20 minutos hoje, em torno do limite de 15.'], ['Severidade S1 a S3', 'A proporção dos alertas que pedem atenção humana.'], ['Cobertura dos ativos críticos', '8 de 9: o NT-003 está bloqueado pelo firewall nas portas do Wazuh.']],
+    numeros: [['19 min', 'MTTD agora', 'alerta'], ['5 min', 'meta do SOC', ''], ['8 de 9', 'agentes críticos', 'aviso']],
+    notas: 'O MTTD é real e hoje ficou em torno do limite de 15 minutos da política, bem acima da nossa meta de 5. A amostra ainda é pequena e a média fica mais confiável com mais tickets; é o primeiro ponto de melhoria. A cobertura em 8 de 9 é um achado real: o painel mostrou o NT-003 sem eventos e a investigação encontrou o bloqueio de firewall.' },
+  { tipo: 'fim',
+    titulo: 'O que vem a seguir',
+    lead: 'O painel já mostra o que é real e marca o que ainda é simulado. Os próximos passos fecham essa diferença.',
+    notas: 'Fechar mostrando que o trabalho continua: cada pendência tem dono e próximo passo. Abrir para perguntas.' }
+];
+const PROX = [
+  ['soc', 'Reduzir o MTTD', 'Hoje em torno de 15 a 20 minutos; a meta do SOC é 5. Abrir o ticket automaticamente a partir do alerta.'],
+  ['brand', 'Zammad no Grafana', 'Com o token de API, MTTR e RCIs passam a usar os tickets reais.'],
+  ['net', 'Firewall do NT-003', 'Liberar TCP 1514 e 1515 da VLAN 60 até o Wazuh para chegar a 9 de 9.']
+];
+const BASE = 'http://10.10.50.15:3000';
+const URLS = {
+  'command-center': '/d/cyberfin-command-center?kiosk', 'soc-overview': '/d/cyberfin-soc-overview?kiosk',
+  'windows': '/d/cyberfin-windows-security?kiosk', 'web-dmz': '/d/cyberfin-web-dmz-security?kiosk',
+  'mitre': '/d/cyberfin-mitre-attack?kiosk', 'detection': '/d/cyberfin-detection-engineering?kiosk',
+  'vulnerabilidades': '/d/cyberfin-vulnerability-management?kiosk', 'infra': '/d/cyberfin-infrastructure-health?kiosk',
+  'visao-geral': '/d/ad7xfj7?kiosk', 'network-okr2': '/d/cyberfin-network-okr2-security?kiosk',
+  'kpis-soc': '/d/cyberfin-soc-kpis-okrs?kiosk'
+};
+let atual = 0, passo = 0;
+const cena = document.getElementById('cena');
+const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+const total = s => (s.marcas || []).length;
+
+function realce(n) {
+  const tela = cena.querySelector('.tela');
+  if (!tela) return;
+  tela.classList.toggle('foco', n > 0);
+  cena.querySelectorAll('.marca').forEach(m => m.classList.toggle('ativa', +m.dataset.n === n));
+  cena.querySelectorAll('.pontos li').forEach(li => li.classList.toggle('ativa', +li.dataset.n === n));
+  const lista = cena.querySelector('.pontos'); if (lista) lista.classList.toggle('guiado', n > 0);
+  const p = cena.querySelector('.passo'); if (p) p.textContent = n > 0 ? `Marcação ${n} de ${total(P[atual])}` : `${total(P[atual])} marcações · → para percorrer`;
+}
+
+function render() {
+  const s = P[atual];
+  cena.className = 'cena' + (s.tipo ? ' ' + s.tipo : '');
+  if (s.tipo === 'capa') {
+    const imgs = P.filter(p => p.img).map(p => `<img src="img/${p.img}.jpg" alt="">`).join('');
+    cena.innerHTML = `<div class="leitura"><span class="area"><i style="--c:${C.soc}"></i>Faculdade Impacta · Defesa Cibernética</span>
+      <h1>${esc(s.titulo)}</h1><p class="lead">${esc(s.lead)}</p>
+      <div class="trilha">${['Wazuh', 'Zabbix', 'Zammad', 'OpenVAS', 'CyberFin IA'].map(t => `<span>${t}</span>`).join('')}</div>
+      <div class="mosaico">${imgs}</div></div>`;
+  } else if (s.tipo === 'fim') {
+    cena.innerHTML = `<div class="leitura"><span class="area"><i style="--c:${C.soc}"></i>Encerramento</span>
+      <h1>${esc(s.titulo)}</h1><p class="lead">${esc(s.lead)}</p>
+      <div class="prox">${PROX.map(([c, t, d]) => `<div style="--c:${C[c]}"><b>${esc(t)}</b><p>${esc(d)}</p></div>`).join('')}</div>
+      <p class="data">Prints capturados em 03/11/2026. Ao vivo, os números mudam a cada atualização.</p></div>`;
+  } else {
+    const marcas = s.marcas.map(([x, y, w, h], i) => `<div class="marca" data-n="${i + 1}" style="--i:${i};left:${x}%;top:${y}%;width:${w}%;height:${h}%"><span class="selo"><b>${i + 1}</b><em>${esc(s.pontos[i][0])}</em></span></div>`).join('');
+    const pontos = s.pontos.map(([t, d], i) => `<li data-n="${i + 1}" tabindex="0"><span>${i + 1}</span><div><b>${esc(t)}</b><p>${esc(d)}</p></div></li>`).join('');
+    const nums = (s.numeros || []).map(([v, l, k]) => `<div class="num ${k}"><strong>${esc(v)}</strong><small>${esc(l)}</small></div>`).join('');
+    cena.innerHTML = `<div class="tela"><img src="img/${s.img}.jpg" alt="Dashboard ${esc(s.titulo)} no Grafana">${marcas}</div>
+      <div class="leitura"><span class="area"><i style="--c:${C[s.c]}"></i>${esc(s.area)}</span>
+      <h1>${esc(s.titulo)}</h1><p class="lead">${esc(s.lead)}</p>
+      <ul class="pontos">${pontos}</ul>${nums ? `<div class="numeros">${nums}</div>` : ''}
+      <div class="link"><code>${esc(BASE + URLS[s.img])}</code><button type="button" class="copiar">Copiar</button><a href="${esc(BASE + URLS[s.img])}" target="_blank" rel="noopener">Abrir ↗</a></div>
+      <span class="passo"></span></div>`;
+    const cp = cena.querySelector('.copiar');
+    cp.addEventListener('click', () => {
+      const ok = t => { cp.textContent = t; setTimeout(() => cp.textContent = 'Copiar', 1500); };
+      const sel = () => { const r = document.createRange(); r.selectNodeContents(cena.querySelector('.link code')); const g = getSelection(); g.removeAllRanges(); g.addRange(r); ok('Selecionado'); };
+      try { navigator.clipboard.writeText(BASE + URLS[s.img]).then(() => ok('Copiado'), sel); } catch (e) { sel(); }
+    });
+    const escolher = n => { passo = passo === n ? 0 : n; realce(passo); };
+    cena.querySelectorAll('.pontos li').forEach(li => {
+      li.addEventListener('click', () => escolher(+li.dataset.n));
+      li.addEventListener('keydown', e => { if (e.key === 'Enter') escolher(+li.dataset.n); });
+    });
+    cena.querySelectorAll('.marca').forEach(m => m.addEventListener('click', () => escolher(+m.dataset.n)));
+  }
+  document.getElementById('notas').textContent = s.notas || '';
+  document.getElementById('contador').textContent = `${String(atual + 1).padStart(2, '0')} / ${String(P.length).padStart(2, '0')}`;
+  document.querySelectorAll('#pontinhos button').forEach((b, i) => { b.className = i === atual ? 'atual' : i < atual ? 'feito' : ''; });
+  realce(passo);
+  try { history.replaceState(null, '', '#parada-' + (atual + 1)); } catch (e) {}
+}
+function ir(i, ultimo) { atual = Math.max(0, Math.min(P.length - 1, i)); passo = ultimo ? total(P[atual]) : 0; render(); }
+function frente() { if (passo < total(P[atual])) { passo++; realce(passo); } else if (atual < P.length - 1) ir(atual + 1); }
+function tras() { if (passo > 0) { passo--; realce(passo); } else if (atual > 0) ir(atual - 1, true); }
+const pts = document.getElementById('pontinhos');
+P.forEach((s, i) => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-label', 'Ir para ' + s.titulo); b.addEventListener('click', () => ir(i)); pts.appendChild(b); });
+document.getElementById('ant').addEventListener('click', tras);
+document.getElementById('prox').addEventListener('click', frente);
+document.addEventListener('keydown', e => {
+  if (e.target.closest && e.target.closest('.pontos li') && e.key === 'Enter') return;
+  if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); frente(); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); tras(); }
+  else if (e.key === 'ArrowDown') { e.preventDefault(); ir(atual + 1); }
+  else if (e.key === 'ArrowUp') { e.preventDefault(); ir(atual - 1); }
+  else if (e.key === 'Home') ir(0);
+  else if (e.key === 'End') ir(P.length - 1);
+  else if (e.key === 'n' || e.key === 'N') document.body.classList.toggle('com-notas');
+  else if (e.key === 'b' || e.key === 'B') document.body.classList.toggle('preto');
+  else if (e.key === 't' || e.key === 'T') alternarTema();
+  else if (e.key === 'f' || e.key === 'F') {
+    try { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen().catch(() => {}); } catch (err) {}
+  }
+});
+const raiz = document.documentElement, botaoTema = document.getElementById('tema');
+function aplicarTema(t) {
+  if (t === 'projetor') raiz.dataset.tema = 'projetor'; else delete raiz.dataset.tema;
+  botaoTema.textContent = t === 'projetor' ? 'Tema: projetor' : 'Tema: escuro';
+  try { localStorage.setItem('tema-apresentacao', t); } catch (e) {}
+}
+function alternarTema() { aplicarTema(raiz.dataset.tema === 'projetor' ? 'escuro' : 'projetor'); }
+botaoTema.addEventListener('click', alternarTema);
+try { if (localStorage.getItem('tema-apresentacao') === 'projetor') aplicarTema('projetor'); } catch (e) {}
+const m = /^#parada-(\d+)$/.exec(location.hash);
+if (m) atual = Math.max(0, Math.min(P.length - 1, +m[1] - 1));
+render();
+</script>
+
+</body>
+</html>
