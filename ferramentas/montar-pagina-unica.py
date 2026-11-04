@@ -14,6 +14,7 @@ import pathlib, re
 RAIZ = pathlib.Path(__file__).resolve().parent.parent
 base = (RAIZ / 'ferramentas' / 'anatomia-base.html').read_text(encoding='utf-8')
 jornada = (RAIZ / 'jornada.html').read_text(encoding='utf-8')
+dash_html = (RAIZ / 'dashboards' / 'index.html').read_text(encoding='utf-8')
 
 def entre(txt, ini, fim, incluir=False):
     a = txt.index(ini); b = txt.index(fim, a + len(ini))
@@ -45,6 +46,17 @@ for a, b in [("document.body.classList.remove('focando')", "svg.classList.remove
     nucleo = nucleo.replace(a, b)
 incidente = entre(js_j, 'async function rodarIncidente', '\nfunction ir(')
 incidente = 'async function rodarIncidente' + incidente
+# dados dos dashboards do Grafana (dashboards/index.html): marcações, pontos, números e próximos passos
+dash_dados = entre(dash_html, 'const C = {', 'let atual = 0')
+dash_dados = 'const C = {' + dash_dados
+
+motor_dash = f"""
+/* Dados dos dashboards — copiados de dashboards/index.html por ferramentas/montar-pagina-unica.py */
+function dadosDash(){{
+{dash_dados}
+  return {{ C, P, PROX, BASE, URLS }};
+}}
+"""
 
 motor = f"""
 /* =====================================================================
@@ -79,9 +91,10 @@ const CAPS = [
   { id:'organizacao', rot:'02', nome:'Organização', titulo:'Como nos organizamos', partes:[{ salas:[2] }] },
   { id:'topologia', rot:'03', nome:'Topologia', titulo:'A topologia e o fluxo dos pacotes', partes:[{ mapa:[3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20] }] },
   { id:'deteccao', rot:'04', nome:'Detecção', titulo:'Detecção: Wazuh, IA e firewall', partes:[{ salas:[10, 11, 12, 13, 14, 15, 16, 21] }] },
-  { id:'incidente', rot:'05', nome:'Incidente', titulo:'Um incidente, do clique ao ticket', partes:[{ mapa:[22, 23, 24, 25, 26, 27] }, { salas:[28, 29, 30, 31, 32, 33] }] },
-  { id:'continuidade', rot:'06', nome:'Continuidade', titulo:'Backup, BIA e recuperação', partes:[{ salas:[35, 36, 37, 38, 39, 40] }, { mapa:[34, 41, 42, 43, 44, 45, 46] }, { salas:[47, 48, 49, 50, 51, 52] }] },
-  { id:'grc', rot:'07', nome:'GRC', titulo:'Governança e riscos', partes:[{ salas:[53, 54] }] }
+  { id:'dashboards', rot:'05', nome:'Dashboards', titulo:'Como o SOC enxerga o ambiente', partes:[{ dash:true }] },
+  { id:'incidente', rot:'06', nome:'Incidente', titulo:'Um incidente, do clique ao ticket', partes:[{ mapa:[22, 23, 24, 25, 26, 27] }, { salas:[28, 29, 30, 31, 32, 33] }] },
+  { id:'continuidade', rot:'07', nome:'Continuidade', titulo:'Backup, BIA e recuperação', partes:[{ salas:[35, 36, 37, 38, 39, 40] }, { mapa:[34, 41, 42, 43, 44, 45, 46] }, { salas:[47, 48, 49, 50, 51, 52] }] },
+  { id:'grc', rot:'08', nome:'GRC', titulo:'Governança e riscos', partes:[{ salas:[53] }] }
 ];
 
 // as cores do conteúdo foram feitas para fundo escuro: no papel claro, viram tons legíveis
@@ -167,9 +180,113 @@ CAPS.forEach(c => {
   c.partes.forEach(parte => {
     if(parte.salas) parte.salas.forEach(n => sec.appendChild(artigoSala(n)));
     if(parte.mapa) sec.appendChild(blocoMapa(parte.mapa));
+    if(parte.dash) blocoDash(sec);
   });
   capitulos.appendChild(sec);
 });
+
+
+/* ---------- capítulo dos dashboards: o print do Grafana com câmera, holofote e gráficos "se desenhando" ---------- */
+function blocoDash(sec){
+  const D = dadosDash();
+  const capa = D.P.find(p => p.tipo === 'capa');
+  const itens = D.P.filter(p => p.img);
+  const intro = document.createElement('p');
+  intro.className = 'dash-intro'; intro.textContent = capa ? capa.lead : '';
+  sec.appendChild(intro);
+  const unidades = [];                                 // [dashboard, marcação]; marcação 0 = visão inteira
+  itens.forEach((d, i) => { for(let m = 0; m <= d.marcas.length; m++) unidades.push([i, m]); });
+  const N = unidades.length;
+  const b = document.createElement('div');
+  b.className = 'dash-bloco';
+  b.style.height = `calc(${N} * 34vh + 100vh)`;
+  b.dataset.unidades = N;
+  b.innerHTML = `<div class="dash-palco">
+      <div class="dash-moldura"><div class="dash-cam"><img alt=""><div class="dash-marcas"></div><div class="dash-revela" aria-hidden="true"></div></div></div>
+      <aside class="cartao dash-cartao" aria-live="polite">
+        <span class="fase"></span><div class="barra" aria-hidden="true"><i></i></div>
+        <nav class="m-nav" aria-label="Ir para um dashboard"></nav>
+        <span class="quem"></span><h3 class="m-titulo"></h3><p class="m-sub"></p>
+        <ol class="dash-pontos"></ol><div class="dash-nums"></div><div class="dash-link"></div><div class="m-nota"></div>
+      </aside></div>`;
+  sec.appendChild(b);
+  const q = s => b.querySelector(s);
+  const cam = q('.dash-cam'), img = q('.dash-cam img'), moldura = q('.dash-moldura'), nav = q('.m-nav');
+  itens.forEach((d, i) => {
+    const bt = document.createElement('button');
+    bt.textContent = String(i + 1).padStart(2, '0');
+    bt.setAttribute('aria-label', `Dashboard ${i + 1}: ${d.titulo}`);
+    bt.addEventListener('click', () => irUnidade(unidades.findIndex(([x]) => x === i)));
+    nav.appendChild(bt);
+  });
+  let di = -1, mi = -1, visivel = false;
+  const total = () => b.offsetHeight - innerHeight;
+  const irUnidade = u => scrollTo({ top:b.offsetTop + (u + .5) / N * total(), behavior:REDUZIR ? 'auto' : 'smooth' });
+  const reinicia = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
+  // os números de destaque sobem de zero até o valor
+  function contar(el){
+    const m = el.dataset.alvo.match(/^(\d+)(.*)$/);
+    if(!m || REDUZIR){ el.textContent = el.dataset.alvo; return; }
+    const alvo = +m[1], resto = m[2], t0 = performance.now();
+    (function quadro(t){ const k = Math.min(1, (t - t0) / 900); el.textContent = Math.round(alvo * (1 - Math.pow(1 - k, 3))) + resto; if(k < 1) requestAnimationFrame(quadro); })(t0);
+  }
+  function mostrarDash(i){
+    const d = itens[i];
+    moldura.style.aspectRatio = d.img === 'command-center' ? '1493 / 736' : '1568 / 659';
+    img.src = `dashboards/img/${d.img}.jpg`;
+    img.alt = `Dashboard ${d.titulo} no Grafana`;
+    q('.dash-marcas').innerHTML = d.marcas.map(([x, y, w, h], k) =>
+      `<div class="dmarca" data-n="${k + 1}" style="left:${x}%;top:${y}%;width:${w}%;height:${h}%"><i class="drev"></i><span class="dselo">${k + 1}</span></div>`).join('');
+    const quem = q('.quem'); quem.textContent = d.area; quem.style.background = D.C[d.c];
+    q('.m-titulo').textContent = d.titulo;
+    q('.m-sub').textContent = d.lead;
+    const ol = q('.dash-pontos');
+    ol.innerHTML = d.pontos.map(([t, txt], k) => `<li data-n="${k + 1}" tabindex="0"><span>${k + 1}</span><div><b>${t}</b><p>${txt}</p></div></li>`).join('');
+    ol.querySelectorAll('li').forEach(li => {
+      const ir = () => irUnidade(unidades.findIndex(([x, m]) => x === i && m === +li.dataset.n));
+      li.addEventListener('click', ir);
+      li.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); ir(); } });
+    });
+    q('.dash-nums').innerHTML = (d.numeros || []).map(([v, l, k]) => `<div class="dnum ${k}"><strong data-alvo="${v}">${v}</strong><small>${l}</small></div>`).join('');
+    q('.dash-nums').querySelectorAll('strong').forEach(contar);
+    const url = D.BASE + D.URLS[d.img];
+    q('.dash-link').innerHTML = `<a class="amb-link" href="${url}" target="_blank" rel="noopener">Abrir no Grafana ↗ <small>${url.replace(/^https?:\/\//, '')}</small></a>`;
+    q('.m-nota').innerHTML = nota(d.notas);
+    [...nav.children].forEach((x, k) => x.classList.toggle('ativo', k === i));
+    reinicia(cam, 'entrando');                          // o print "carrega" de cima para baixo
+  }
+  function mostrarMarca(m){
+    const d = itens[di];
+    cam.classList.toggle('foco', m > 0);
+    b.querySelectorAll('.dmarca').forEach(el => {
+      const on = +el.dataset.n === m;
+      el.classList.toggle('ativa', on);
+      if(on) reinicia(el, 'desenha');                   // a área se desenha da esquerda para a direita
+    });
+    b.querySelectorAll('.dash-pontos li').forEach(li => li.classList.toggle('ativa', +li.dataset.n === m));
+    // câmera: aproxima até a área marcada, sem deixar o print sair da moldura
+    if(m === 0){ cam.style.transform = 'none'; }
+    else {
+      const [x, y, w, h] = d.marcas[m - 1];
+      const s = Math.max(1, Math.min(2.2, .86 / Math.max(w / 100, h / 100)));
+      const lim = v => Math.max(100 - 100 * s, Math.min(0, v));
+      cam.style.transform = `translate(${lim(50 - (x + w / 2) * s)}%, ${lim(50 - (y + h / 2) * s)}%) scale(${s})`;
+    }
+    q('.fase').textContent = `Dashboard ${di + 1} de ${itens.length}` + (m ? ` · marcação ${m} de ${d.marcas.length}` : ' · visão geral');
+  }
+  function render(){
+    if(!visivel) return;
+    const p = Math.min(1, Math.max(0, (scrollY - b.offsetTop) / total()));
+    q('.barra i').style.width = (p * 100).toFixed(1) + '%';
+    const [i, m] = unidades[Math.min(N - 1, Math.floor(p * N))];
+    if(i !== di){ di = i; mi = -1; mostrarDash(i); }
+    if(m !== mi){ mi = m; mostrarMarca(m); }
+  }
+  new IntersectionObserver(([e]) => { visivel = e.isIntersecting; if(visivel) render(); else { di = -1; mi = -1; } }).observe(b);
+  blocos.push(render);
+}
+
+
 
 let pedidoMapa = false;
 addEventListener('scroll', () => { if(!pedidoMapa){ pedidoMapa = true; requestAnimationFrame(() => { blocos.forEach(f => f()); pedidoMapa = false; }); } }, { passive:true });
@@ -403,6 +520,74 @@ css_pagina = r"""
   .amb-link:hover, .doc-link:hover, .amb-link:focus-visible, .doc-link:focus-visible{ transform:translate(2px, 2px); box-shadow:2px 2px 0 0 var(--tinta); outline:none; }
   .demo .vk-n{ font-size:19px; }
 
+
+  /* ---------- capítulo dos dashboards ---------- */
+  .dash-intro{ max-width:60ch; font-size:clamp(18px, 1.35vw, 24px); line-height:1.45; font-weight:500; margin:-2vh 0 6vh; }
+  .dash-bloco{ position:relative; margin:0 -5vw 10vh; }
+  .dash-palco{ position:sticky; top:var(--topo); height:calc(100vh - var(--topo)); display:grid; grid-template-columns:minmax(0, 1.75fr) minmax(330px, 1fr);
+               gap:2vw; padding:2.5vh 3vw; align-items:center; }
+  .dash-moldura{ position:relative; width:100%; max-height:calc(100vh - var(--topo) - 5vh); aspect-ratio:1568 / 659; border:var(--borda); background:#fff; box-shadow:var(--sombra); overflow:hidden; }
+  .dash-cam{ position:absolute; inset:0; transform-origin:0 0; transition:transform .9s cubic-bezier(.65, 0, .35, 1); }
+  .dash-cam img{ position:absolute; inset:0; width:100%; height:100%; object-fit:fill; display:block; }
+  .dash-marcas{ position:absolute; inset:0; }
+  .dmarca{ position:absolute; border:2px solid #11111155; transition:opacity .35s, border-color .35s; overflow:visible; }
+  .dash-cam.foco .dmarca{ opacity:.35; }
+  .dash-cam.foco .dmarca.ativa{ opacity:1; border:3px solid var(--tinta); box-shadow:0 0 0 9999px rgba(250, 248, 242, .74); z-index:2; }
+  .dselo{ position:absolute; top:-1px; left:-1px; min-width:22px; height:22px; padding:0 5px; display:flex; align-items:center; justify-content:center;
+          background:var(--tinta); color:#fff; font:800 12px 'JetBrains Mono', monospace; }
+  .dmarca.ativa .dselo{ background:var(--soc); color:var(--tinta); }
+  /* a área ativa "se desenha": uma máscara de papel recua para a direita e uma linha de varredura acompanha a borda */
+  .drev{ position:absolute; inset:0; background:var(--papel); transform-origin:right center; transform:scaleX(0); pointer-events:none; }
+  .dmarca.desenha .drev{ animation:dDesenha 1.25s cubic-bezier(.6, 0, .3, 1) .35s both; }
+  .dmarca.desenha::after{ content:""; position:absolute; top:0; bottom:0; width:3px; background:var(--soc); box-shadow:0 0 0 1px var(--tinta); animation:dVarre 1.25s cubic-bezier(.6, 0, .3, 1) .35s both; }
+  @keyframes dDesenha{ from{ transform:scaleX(1); } to{ transform:scaleX(0); } }
+  @keyframes dVarre{ from{ left:0; opacity:1; } 92%{ opacity:1; } to{ left:calc(100% - 3px); opacity:0; } }
+  /* ao trocar de dashboard, o print "carrega" de cima para baixo */
+  .dash-revela{ position:absolute; inset:0; background:var(--papel); transform-origin:bottom center; transform:scaleY(0); pointer-events:none; z-index:3; }
+  .dash-cam.entrando .dash-revela{ animation:dCarrega .9s cubic-bezier(.6, 0, .3, 1) both; }
+  .dash-cam.entrando::after{ content:""; position:absolute; left:0; right:0; height:3px; background:var(--soc); box-shadow:0 0 0 1px var(--tinta); z-index:4; animation:dVarreY .9s cubic-bezier(.6, 0, .3, 1) both; }
+  @keyframes dCarrega{ from{ transform:scaleY(1); } to{ transform:scaleY(0); } }
+  @keyframes dVarreY{ from{ top:0; opacity:1; } 92%{ opacity:1; } to{ top:calc(100% - 3px); opacity:0; } }
+  .dash-cartao{ max-height:calc(100vh - var(--topo) - 5vh); }
+  .dash-pontos{ list-style:none; display:flex; flex-direction:column; gap:6px; }
+  .dash-pontos li{ display:grid; grid-template-columns:28px 1fr; gap:10px; border:2px solid var(--tinta); background:#fff; padding:8px 10px; cursor:pointer; opacity:.6; transition:opacity .25s, background .25s; }
+  .dash-pontos li.ativa{ opacity:1; background:#FEF3C7; }
+  .dash-pontos li:hover, .dash-pontos li:focus-visible{ opacity:1; outline:none; }
+  .dash-pontos li > span{ width:26px; height:26px; display:flex; align-items:center; justify-content:center; background:var(--tinta); color:#fff; font:800 12px 'JetBrains Mono', monospace; }
+  .dash-pontos li.ativa > span{ background:var(--soc); color:var(--tinta); }
+  .dash-pontos b{ font-size:15px; } .dash-pontos p{ font-size:14px; line-height:1.35; color:#333; }
+  .dash-nums{ display:flex; flex-wrap:wrap; gap:8px; }
+  .dnum{ border:var(--borda); background:#fff; padding:6px 12px; display:flex; flex-direction:column; min-width:104px; box-shadow:3px 3px 0 0 var(--tinta); }
+  .dnum strong{ font:700 24px/1.1 'Space Grotesk', sans-serif; font-variant-numeric:tabular-nums; }
+  .dnum small{ font:700 11px 'JetBrains Mono', monospace; text-transform:uppercase; letter-spacing:.04em; color:var(--cinza); }
+  .dnum.alerta{ background:#FEE2E2; } .dnum.aviso{ background:#FEF3C7; } .dnum.ok{ background:#DCFCE7; }
+
+  /* ---------- encerramento ---------- */
+  .fim{ border-top:var(--borda); }
+  .fim > .fig{ align-self:flex-start; }
+  .fim-lead{ font-size:clamp(18px, 1.35vw, 24px); line-height:1.45; font-weight:500; max-width:60ch; }
+  .prox{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:18px; }
+  .prox div{ border:var(--borda); border-top:12px solid var(--c); background:#fff; box-shadow:var(--sombra); padding:18px; display:flex; flex-direction:column; gap:8px; }
+  .prox .pn{ font:800 13px 'JetBrains Mono', monospace; color:var(--cinza); } .prox b{ font-size:clamp(20px, 1.6vw, 28px); line-height:1.1; } .prox p{ font-size:16px; line-height:1.45; font-weight:500; }
+  .docs{ display:grid; grid-template-columns:repeat(4, minmax(0, 1fr)); gap:16px; }
+  .docs a{ font:500 16px 'Space Grotesk', sans-serif; text-transform:none; letter-spacing:0; display:flex; flex-direction:column; gap:6px; text-decoration:none; color:var(--tinta); border:var(--borda); background:#fff; padding:16px; box-shadow:6px 6px 0 0 var(--tinta); transition:transform .12s, box-shadow .12s; }
+  .docs a:hover, .docs a:focus-visible{ transform:translate(3px, 3px); box-shadow:3px 3px 0 0 var(--tinta); outline:none; }
+  .docs a b{ font-size:20px; line-height:1.1; } .docs a span{ font-size:14px; color:#333; line-height:1.4; } .docs a em{ font:800 12px 'JetBrains Mono', monospace; font-style:normal; margin-top:auto; }
+  .docs a.amarelo{ background:var(--grc); }
+  .obrigado{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-top:8vh; padding-top:5vh; border-top:var(--borda); }
+  .obrigado h2{ font-size:clamp(60px, 9vw, 170px); line-height:.85; letter-spacing:-.05em; text-transform:uppercase; }
+  .obrigado p{ font:700 clamp(22px, 2vw, 36px) 'Space Grotesk', sans-serif; }
+  .obrigado a{ font:800 15px 'JetBrains Mono', monospace; text-transform:uppercase; color:var(--tinta); }
+  @media (max-width:900px){
+    .dash-palco{ grid-template-columns:1fr; grid-template-rows:auto 1fr; }
+    .dash-cartao{ max-height:52vh; }
+    .prox, .docs{ grid-template-columns:1fr; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    .dash-cam{ transition:none; }
+    .dmarca.desenha .drev, .dmarca.desenha::after, .dash-cam.entrando .dash-revela, .dash-cam.entrando::after{ animation:none; display:none; }
+  }
+
   @media (max-width:900px){
     .mapa-palco{ grid-template-columns:1fr; grid-template-rows:46vh auto; }
     .mapa-moldura{ height:46vh; }
@@ -417,21 +602,20 @@ css_pagina = r"""
 nav = """<nav class="topo-nav" aria-label="Capítulos">
   <a class="marca" href="#inicio">Cyberappfin</a>
   <a href="#anatomia">Anatomia</a><a href="#organizacao">Organização</a><a href="#topologia">Topologia</a>
-  <a href="#deteccao">Detecção</a><a href="#incidente">Incidente</a><a href="#continuidade">Continuidade</a>
+  <a href="#deteccao">Detecção</a><a href="#dashboards">Dashboards</a><a href="#incidente">Incidente</a><a href="#continuidade">Continuidade</a>
   <a href="#grc">GRC</a><a href="#fim">Documentos</a>
 </nav>"""
 
 fim = """<section class="fim" id="fim">
   <span class="fig">FIG_FIM · documentos completos (abrem em outra aba)</span>
   <h2>Quer o detalhe? Está tudo aqui.</h2>
-  <div class="links">
-    <a class="amarelo" href="drp.html" target="_blank" rel="noopener">Plano de recuperação (DRP) ↗</a>
-    <a href="regras-wazuh.html" target="_blank" rel="noopener">Catálogo de regras do Wazuh ↗</a>
-    <a href="runbook-tecnico.html" target="_blank" rel="noopener">Runbook técnico ↗</a>
-    <a href="dashboards/" target="_blank" rel="noopener">Dashboards do Grafana ↗</a>
-    <a href="jornada.html" target="_blank" rel="noopener">Versão em slides (projetor) ↗</a>
+  <div class="docs">
+    <a class="amarelo" href="drp.html" target="_blank" rel="noopener"><b>Plano de recuperação (DRP)</b><span>Cenário, papéis, as 8 fases da restauração e o checklist, item a item.</span><em>drp.html ↗</em></a>
+    <a href="regras-wazuh.html" target="_blank" rel="noopener"><b>Regras do Wazuh</b><span>O catálogo completo das regras customizadas do local_rules.xml.</span><em>regras-wazuh.html ↗</em></a>
+    <a href="runbook-tecnico.html" target="_blank" rel="noopener"><b>Runbook técnico</b><span>Roteiro, evidências e o que ainda precisa ser comprovado.</span><em>runbook-tecnico.html ↗</em></a>
+    <a href="jornada.html" target="_blank" rel="noopener"><b>Versão em slides</b><span>A mesma história, feita para o projetor: setas, notas e tela preta.</span><em>jornada.html ↗</em></a>
   </div>
-  <p class="mono" style="font-weight:700"><a href="#inicio" style="box-shadow:none; border:none; padding:0; background:none; text-decoration:underline">↑ Voltar ao início</a></p>
+  <div class="obrigado"><div><h2>Obrigado!</h2><p>Perguntas?</p></div><a href="#inicio">↑ Voltar ao início</a></div>
 </section>"""
 
 head = entre(base, '<!doctype html>', '<style>', True)
@@ -451,6 +635,7 @@ html = f"""{head}{css_base}{css_pagina}</style>
 {js_base}
 </script>
 <script>
+{motor_dash}
 {motor}
 {pagina_js}
 </script>
