@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anatomia da Cyberappfin</title>
+<meta name="description" content="As sete camadas do ambiente da Cyberappfin, desmontadas, e o caminho de um pacote por elas.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --papel:#FAF8F2; --tinta:#111111; --cinza:#55575C;
+    --net:#14B8A6; --iam:#8B5CF6; --soc:#F59E0B; --end:#22C55E; --grc:#EAB308; --brand:#4C8DF6; --dmz:#F87171;
+    --borda:3px solid var(--tinta); --sombra:8px 8px 0 0 var(--tinta);
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{ background:var(--papel); color:var(--tinta); font-family:'Space Grotesk', system-ui, sans-serif; }
+  .mono{ font-family:'JetBrains Mono', ui-monospace, monospace; }
+  /* grade de papel milimetrado */
+  body::before{ content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image:linear-gradient(#11111110 1px, transparent 1px), linear-gradient(90deg, #11111110 1px, transparent 1px);
+    background-size:32px 32px; }
+
+  /* ---------- abertura ---------- */
+  .abre{ min-height:100vh; display:grid; grid-template-columns:1.1fr .9fr; gap:4vw; align-items:center; padding:6vh 6vw; }
+  .fig{ font-family:'JetBrains Mono', monospace; font-weight:800; font-size:14px; letter-spacing:.14em; text-transform:uppercase;
+        display:inline-block; border:var(--borda); padding:6px 12px; background:#fff; box-shadow:4px 4px 0 0 var(--tinta); }
+  .abre h1{ font-size:clamp(56px, 8.4vw, 150px); line-height:.86; letter-spacing:-.04em; margin:3vh 0 2.4vh; text-transform:uppercase; }
+  .abre h1 span{ display:block; }
+  .abre h1 .rec{ background:var(--soc); padding:0 .12em; border:var(--borda); box-shadow:var(--sombra); display:inline-block; margin-top:.08em; }
+  .abre p{ font-size:clamp(20px, 1.6vw, 28px); line-height:1.35; max-width:30ch; font-weight:500; }
+  .legenda{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
+  .legenda div{ display:flex; gap:12px; align-items:center; border:var(--borda); background:#fff; padding:12px 14px; box-shadow:5px 5px 0 0 var(--tinta);
+                font-family:'JetBrains Mono', monospace; font-weight:700; font-size:clamp(14px, 1.05vw, 18px); text-transform:uppercase; letter-spacing:.06em; }
+  .legenda i{ width:26px; height:26px; border:var(--borda); flex-shrink:0; }
+  .rola{ margin-top:4vh; font-family:'JetBrains Mono', monospace; font-weight:800; letter-spacing:.14em; text-transform:uppercase; font-size:15px; }
+  .rola b{ display:inline-block; animation:desce 1.4s ease-in-out infinite; }
+  @keyframes desce{ 50%{ transform:translateY(6px); } }
+
+  /* ---------- palco da anatomia (rolagem) ---------- */
+  #anatomia{ height:720vh; position:relative; }
+  .palco{ position:sticky; top:0; height:100vh; display:grid; grid-template-columns:minmax(0, 1.55fr) minmax(360px, 1fr); gap:2vw; padding:3vh 3vw; align-items:center; }
+  #figura{ width:100%; height:94vh; display:block; overflow:visible; }
+  #figura text{ font-family:'JetBrains Mono', monospace; }
+  .cartao{ border:var(--borda); background:#fff; box-shadow:var(--sombra); padding:clamp(20px, 2vw, 32px); display:flex; flex-direction:column; gap:14px; max-height:92vh; overflow:auto; }
+  .cab{ display:flex; align-items:center; gap:14px; }
+  #num{ font-size:clamp(56px, 5.6vw, 96px); font-weight:700; line-height:.85; letter-spacing:-.04em; }
+  #time{ font-family:'JetBrains Mono', monospace; font-weight:800; font-size:14px; letter-spacing:.12em; text-transform:uppercase;
+         border:var(--borda); padding:5px 10px; }
+  #titulo{ font-size:clamp(28px, 2.5vw, 44px); line-height:1.02; letter-spacing:-.02em; text-transform:uppercase; }
+  #desc{ font-size:clamp(17px, 1.25vw, 22px); line-height:1.4; font-weight:500; }
+  #passo{ font-size:clamp(16px, 1.15vw, 20px); line-height:1.4; font-weight:700; background:var(--tinta); color:#fff; padding:12px 14px; }
+  #passo:empty{ display:none; }
+  #hosts{ display:flex; flex-direction:column; gap:6px; }
+  #hosts div{ display:flex; justify-content:space-between; gap:12px; border:2px solid var(--tinta); padding:7px 10px;
+              font-family:'JetBrains Mono', monospace; font-weight:700; font-size:clamp(13px, .95vw, 16px); }
+  #hosts div span:last-child{ color:var(--cinza); white-space:nowrap; }
+  .camadas{ display:grid; grid-template-columns:repeat(7, 1fr); gap:6px; margin-top:4px; }
+  .camadas button{ font:800 15px 'JetBrains Mono', monospace; border:var(--borda); background:#fff; color:var(--tinta); padding:8px 0; cursor:pointer; }
+  .camadas button.ativo{ background:var(--tinta); color:#fff; }
+  .camadas button:focus-visible{ outline:3px solid var(--soc); outline-offset:2px; }
+  .fase{ font-family:'JetBrains Mono', monospace; font-weight:800; font-size:13px; letter-spacing:.14em; text-transform:uppercase; color:var(--cinza); }
+  .barra{ height:10px; border:var(--borda); background:#fff; }
+  .barra i{ display:block; height:100%; background:var(--tinta); width:0; }
+
+  /* ---------- fim ---------- */
+  .fim{ min-height:70vh; padding:10vh 6vw; display:flex; flex-direction:column; gap:3vh; justify-content:center; }
+  .fim h2{ font-size:clamp(40px, 5vw, 88px); line-height:.92; letter-spacing:-.03em; text-transform:uppercase; max-width:16ch; }
+  .fim .links{ display:flex; gap:18px; flex-wrap:wrap; }
+  .fim a{ font:800 18px 'JetBrains Mono', monospace; text-transform:uppercase; letter-spacing:.06em; color:var(--tinta); text-decoration:none;
+          border:var(--borda); background:#fff; padding:14px 18px; box-shadow:6px 6px 0 0 var(--tinta); transition:transform .12s, box-shadow .12s; }
+  .fim a:hover, .fim a:focus-visible{ transform:translate(3px, 3px); box-shadow:3px 3px 0 0 var(--tinta); outline:none; }
+  .fim a.amarelo{ background:var(--grc); }
+
+  @media (max-width:900px){
+    .abre{ grid-template-columns:1fr; }
+    .palco{ grid-template-columns:1fr; grid-template-rows:56vh auto; padding:2vh 4vw; }
+    #figura{ height:54vh; }
+    .cartao{ max-height:40vh; }
+  }
+  @media (prefers-reduced-motion: reduce){ .rola b{ animation:none; } html{ scroll-behavior:auto; } }
+</style>
+</head>
+<body>
+
+<section class="abre">
+  <div>
+    <span class="fig">FIG_001 · Cyberappfin · Defesa Cibernética</span>
+    <h1><span>Anatomia</span><span>da <span class="rec">Cyberappfin</span></span></h1>
+    <p>Sete camadas. Um pacote. Role a página para desmontar o ambiente e seguir o pacote de ponta a ponta.</p>
+    <p class="rola">Role <b>↓</b></p>
+  </div>
+  <div class="legenda" aria-label="Cor de cada time">
+    <div><i style="background:var(--net)"></i>Network</div>
+    <div><i style="background:var(--iam)"></i>IAM</div>
+    <div><i style="background:var(--soc)"></i>SOC</div>
+    <div><i style="background:var(--end)"></i>Endpoint</div>
+    <div><i style="background:var(--grc)"></i>GRC</div>
+    <div><i style="background:var(--brand)"></i>ITSM</div>
+  </div>
+</section>
+
+<section id="anatomia" aria-label="Anatomia do ambiente">
+  <div class="palco">
+    <svg id="figura" viewBox="0 0 1200 1060" role="img" aria-label="Vista explodida das sete camadas do ambiente"></svg>
+    <aside class="cartao" aria-live="polite">
+      <span class="fase" id="fase">Parte 1 · a anatomia</span>
+      <div class="barra" aria-hidden="true"><i id="progresso"></i></div>
+      <div class="cab"><span id="num">01</span><span id="time">Network</span></div>
+      <h2 id="titulo">Internet · SD-WAN</h2>
+      <p id="desc"></p>
+      <p id="passo"></p>
+      <div id="hosts"></div>
+      <nav class="camadas" aria-label="Ir para uma camada"></nav>
+    </aside>
+  </div>
+</section>
+
+<section class="fim">
+  <span class="fig">FIG_002 · e quando algo dá errado?</span>
+  <h2>O pacote chegou. Agora o processo.</h2>
+  <div class="links">
+    <a href="jornada.html">A jornada do pacote ↗</a>
+    <a class="amarelo" href="drp.html">Plano de recuperação (DRP) ↗</a>
+  </div>
+</section>
+
+<script>
+/* =====================================================================
+   Anatomia da Cyberappfin — protótipo da direção "Engenharia crua"
+   Dados: os mesmos validados na apresentação (jornada.html).
+   ===================================================================== */
+const NS = 'http://www.w3.org/2000/svg';
+const svg = document.getElementById('figura');
+const $ = id => document.getElementById(id);
+const COR = { net:'#14B8A6', iam:'#8B5CF6', soc:'#F59E0B', end:'#22C55E', grc:'#EAB308', brand:'#4C8DF6', dmz:'#F87171' };
+
+const CAMADAS = [
+  { nome:'Internet · SD-WAN', time:'Network', cor:COR.net,
+    desc:'Todo o tráfego entra por um SD-WAN formado por dois gateways UniFi: ele escolhe o melhor caminho de saída e mantém a conexão se um caminho falhar.',
+    passo:'Um e-mail chega da internet. É o primeiro ponto de controle antes de qualquer coisa.',
+    hosts:[['Gateway UniFi 1', 'SD-WAN'], ['Gateway UniFi 2', 'SD-WAN']] },
+  { nome:'UniFi · firewall', time:'Network', cor:'#0E8F80',
+    desc:'O porteiro da rede: decide o que pode passar de uma VLAN para outra. Cada liberação é origem → destino → porta, no menor privilégio.',
+    passo:'O pacote passa pelo firewall. Se o destino não estiver liberado, para aqui.',
+    hosts:[['Regras entre VLANs', 'UniFi'], ['Bloqueio de domínios', 'resposta a incidentes']] },
+  { nome:'Cisco 2960 · trunk', time:'Network', cor:'#6FD8C9',
+    desc:'O switch leva as seis VLANs por um único cabo (trunk 802.1Q), marcando cada pacote com o número da sua VLAN.',
+    passo:'O switch carimba o pacote com a VLAN de destino e o manda pelo trunk.',
+    hosts:[['Trunk 802.1Q', '6 VLANs'], ['Gateway de cada VLAN', '10.10.X.1']] },
+  { nome:'VLANs 10 a 60', time:'Network', cor:'#FFFFFF', vlans:true,
+    desc:'Seis segmentos isolados. Quem compromete uma estação da VLAN 40 não chega direto aos controladores de domínio.',
+    passo:'O pacote entra na VLAN 40, a dos usuários, onde estão as estações de trabalho.',
+    hosts:[['10 · Gerência', '10.10.10.0/24'], ['20 · Servidores', '10.10.20.0/24'], ['30 · DMZ', '10.10.30.0/27'],
+           ['40 · Usuários', '10.10.40.0/24'], ['50 · SOC', '10.10.50.0/27'], ['60 · Backup', '10.10.60.0/24']] },
+  { nome:'Servidores', time:'IAM · GRC', cor:COR.iam,
+    itens:[COR.iam, COR.iam, COR.dmz, COR.grc],
+    desc:'Os dois controladores de domínio, a aplicação financeira na DMZ e o servidor de backup, cada um na sua VLAN.',
+    passo:'A estação pede autenticação ao Active Directory. Todo acesso passa por aqui.',
+    hosts:[['NT-001 · AD-01', '10.10.20.10'], ['NT-002 · AD-02', '10.10.20.11'], ['Firefly · firesrv', '10.10.30.3'], ['NT-003 · Veeam', '10.10.60.143']] },
+  { nome:'Wazuh · SOC', time:'SOC', cor:COR.soc,
+    itens:[COR.soc, '#FDE68A', '#FCA5A5', COR.brand],
+    desc:'Recebe os logs de todos os agentes e aplica 30 regras próprias. Quatro delas correlacionam eventos numa janela de tempo. A CyberFin IA enriquece o alerta, sem decidir nada.',
+    passo:'O Wazuh vê a conexão a um domínio suspeito e dispara o alerta. A IA classifica; o analista confirma.',
+    hosts:[['Wazuh · wazuhsrv', '10.10.50.21'], ['Zabbix + Grafana', '10.10.50.15'], ['OpenVAS · openvaz', '10.10.50.7'], ['CyberFin IA', '10.10.50.19']] },
+  { nome:'Zammad · ITSM', time:'ITSM', cor:COR.brand,
+    desc:'Onde o incidente vira ticket: grupos SOC-N1, N2 e N3, seis fases de tratamento, e todo ticket fecha como real, falso positivo ou inconclusivo.',
+    passo:'Fim da linha: o incidente vira um ticket no Zammad, com responsável, evidências e prazo.',
+    hosts:[['Zammad · zammadsrv', '10.10.50.17'], ['Grupos', 'SOC-N1 · N2 · N3']] }
+];
+const VLAN_CORES = [COR.brand, COR.iam, COR.dmz, COR.end, COR.soc, COR.grc];
+
+/* ---------- geometria isométrica ---------- */
+const CX = 600, A = 200, B = 100, H = 30;          // meia-largura, meia-altura do losango, espessura
+const W = 1200, ALTURA = 1060;
+const pts = arr => arr.map(p => p.join(',')).join(' ');
+function el(tag, attrs = {}, pai = svg){ const e = document.createElementNS(NS, tag); for(const k in attrs) e.setAttribute(k, attrs[k]); pai.appendChild(e); return e; }
+const escurece = (hex, f) => { const n = parseInt(hex.slice(1), 16); const c = s => Math.round(((n >> s) & 255) * f); return `rgb(${c(16)},${c(8)},${c(0)})`; };
+// ponto (u, v) dentro do losango do topo: u vai do canto de cima para a direita, v para a esquerda
+const P = (cx, cy, a, b, u, v) => [cx + (u - v) * a, cy - b + (u + v) * b];
+
+function laje(pai, cx, cy, a, b, h, cor, sombra = 10){
+  const g = el('g', {}, pai);
+  const silh = [[cx - a, cy], [cx, cy - b], [cx + a, cy], [cx + a, cy + h], [cx, cy + b + h], [cx - a, cy + h]];
+  if(sombra) el('polygon', { points:pts(silh.map(([x, y]) => [x + sombra, y + sombra])), fill:'#111' }, g);
+  el('polygon', { points:pts([[cx - a, cy], [cx, cy + b], [cx, cy + b + h], [cx - a, cy + h]]), fill:escurece(cor === '#FFFFFF' ? '#E8E6E0' : cor, .82), stroke:'#111', 'stroke-width':3, 'stroke-linejoin':'round' }, g);
+  el('polygon', { points:pts([[cx, cy + b], [cx + a, cy], [cx + a, cy + h], [cx, cy + b + h]]), fill:escurece(cor === '#FFFFFF' ? '#E8E6E0' : cor, .62), stroke:'#111', 'stroke-width':3, 'stroke-linejoin':'round' }, g);
+  const topo = el('polygon', { points:pts([[cx, cy - b], [cx + a, cy], [cx, cy + b], [cx - a, cy]]), fill:cor, stroke:'#111', 'stroke-width':3, 'stroke-linejoin':'round' }, g);
+  return { g, topo };
+}
+
+/* ---------- montagem da figura ---------- */
+el('line', { x1:CX, y1:20, x2:CX, y2:ALTURA - 20, stroke:'#111', 'stroke-width':3, 'stroke-dasharray':'10 9', id:'eixo' });
+const grupos = CAMADAS.map((c, i) => {
+  const g = el('g', { class:'camada', 'data-i':i });
+  const corpo = el('g', {}, g);
+  laje(corpo, CX, 0, A, B, H, c.cor);
+  if(c.vlans){
+    VLAN_CORES.forEach((cor, j) => el('polygon', { points:pts([P(CX, 0, A, B, j / 6, 0), P(CX, 0, A, B, (j + 1) / 6, 0), P(CX, 0, A, B, (j + 1) / 6, 1), P(CX, 0, A, B, j / 6, 1)]),
+      fill:cor, stroke:'#111', 'stroke-width':2.5 }, corpo));
+    // contorno do topo por cima das faixas
+    el('polygon', { points:pts([[CX, -B], [CX + A, 0], [CX, B], [CX - A, 0]]), fill:'none', stroke:'#111', 'stroke-width':3 }, corpo);
+  }
+  if(c.itens){
+    const pos = [[.30, .86], [.58, .86], [.86, .30], [.86, .58]];   // nas bordas da frente: a camada de cima não esconde e o pacote passa no meio
+    c.itens.forEach((cor, j) => { const [x, y] = P(CX, 0, A, B, pos[j][0], pos[j][1]); laje(corpo, x, y - 14, 38, 19, 22, cor, 4); });
+  }
+  // rótulo com linha de chamada: pares à esquerda, ímpares à direita
+  const esq = i % 2 === 0;
+  const xCanto = esq ? CX - A : CX + A, xRot = esq ? 330 : 870;
+  const rot = el('g', { class:'rotulo' }, g);
+  el('line', { x1:xCanto, y1:0, x2:xRot, y2:0, stroke:'#111', 'stroke-width':2.5 }, rot);
+  el('circle', { cx:xCanto, cy:0, r:5, fill:'#111' }, rot);
+  const bw = 290, bx = esq ? xRot - bw : xRot;
+  el('rect', { x:bx + 5, y:-27, width:bw, height:54, fill:'#111' }, rot);
+  const caixa = el('rect', { x:bx, y:-32, width:bw, height:54, fill:'#fff', stroke:'#111', 'stroke-width':3 }, rot);
+  const t1 = el('text', { x:bx + 14, y:-9, 'font-size':15, 'font-weight':800, fill:'#55575C', 'letter-spacing':1.5 }, rot); t1.textContent = String(i + 1).padStart(2, '0') + ' · ' + c.time.toUpperCase();
+  const t2 = el('text', { x:bx + 14, y:13, 'font-size':19, 'font-weight':800, fill:'#111', 'letter-spacing':.5 }, rot); t2.textContent = c.nome.toUpperCase();
+  return { g, corpo, caixa, t1, t2 };
+});
+// ordem de desenho: a camada de cima (índice 0) fica na frente
+for(let i = CAMADAS.length - 1; i >= 0; i--) svg.appendChild(grupos[i].g);
+
+// pacote: um cubo preto com topo branco
+const pacote = el('g', { id:'pacote' });
+laje(pacote, 0, 0, 26, 13, 26, '#FFFFFF', 0);
+pacote.querySelectorAll('polygon')[0].setAttribute('fill', '#111');
+pacote.querySelectorAll('polygon')[1].setAttribute('fill', '#111');
+
+/* ---------- botões de camada ---------- */
+const nav = document.querySelector('.camadas');
+CAMADAS.forEach((c, i) => {
+  const b = document.createElement('button');
+  b.textContent = String(i + 1).padStart(2, '0');
+  b.setAttribute('aria-label', `Ir para a camada ${i + 1}: ${c.nome}`);
+  b.addEventListener('click', () => irPara(i));
+  nav.appendChild(b);
+});
+
+/* ---------- rolagem → cena ---------- */
+const sec = $('anatomia');
+const FASE_A = .32;                                   // fatia da rolagem usada para desmontar
+const suave = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+const reduzir = matchMedia('(prefers-reduced-motion: reduce)').matches;
+let ativaAnterior = -1;
+
+function progressoRolagem(){
+  const total = sec.offsetHeight - innerHeight;
+  return Math.min(1, Math.max(0, (scrollY - sec.offsetTop) / total));
+}
+function centros(abertura){
+  const gap = 44 + abertura * 80;                     // de quase encostadas a bem separadas
+  const altura = (CAMADAS.length - 1) * gap;
+  const topo = (ALTURA - altura) / 2;
+  return CAMADAS.map((_, i) => topo + i * gap);
+}
+function render(){
+  const p = progressoRolagem();
+  const abertura = reduzir ? 1 : suave(Math.min(1, p / FASE_A));
+  const ys = centros(abertura);
+  const naJornada = p > FASE_A;
+  const N = CAMADAS.length;
+  // na jornada: o pacote fica parado em cada camada (60% da fatia) e desce rápido para a próxima (40%)
+  const t = naJornada ? Math.min(N - 1, (p - FASE_A) / (1 - FASE_A) * N) : -1;
+  const k = naJornada ? Math.min(N - 1, Math.floor(t)) : -1;
+  const f = naJornada && k < N - 1 ? t - k : 0;
+  const desce = f < .6 ? 0 : suave((f - .6) / .4);
+  const ativa = naJornada ? (desce > .5 ? k + 1 : k) : Math.min(N - 1, Math.floor(abertura * N * .999));
+
+  grupos.forEach((x, i) => {
+    const sobe = (naJornada && i === ativa) ? -16 : 0;
+    x.g.setAttribute('transform', `translate(0 ${ys[i] + sobe})`);
+    const on = i === ativa;
+    x.caixa.setAttribute('fill', on ? '#111' : '#fff');
+    x.t1.setAttribute('fill', on ? '#BDBDBD' : '#55575C');
+    x.t2.setAttribute('fill', on ? '#fff' : '#111');
+  });
+
+  if(naJornada){
+    const y = k >= N - 1 ? ys[N - 1] : ys[k] + (ys[k + 1] - ys[k]) * desce;
+    const sobe = desce === 0 || desce === 1 ? -16 : 0;
+    // pousa na ponta da frente do topo (u = v = .88), a única parte que a camada de cima nunca cobre
+    pacote.setAttribute('transform', `translate(${CX} ${y + 37 + sobe})`);
+    pacote.style.display = '';
+    // desenhado logo acima da camada de onde está saindo: ao descer, cai pela borda da frente e continua visível
+    const acima = grupos[k - 1];
+    if(acima) svg.insertBefore(pacote, acima.g); else svg.appendChild(pacote);
+  } else pacote.style.display = 'none';
+
+  $('progresso').style.width = (p * 100).toFixed(1) + '%';
+  $('fase').textContent = naJornada ? 'Parte 2 · a jornada do pacote' : 'Parte 1 · a anatomia';
+  if(ativa !== ativaAnterior || naJornada !== render.ultimaFase){
+    const c = CAMADAS[ativa];
+    $('num').textContent = String(ativa + 1).padStart(2, '0');
+    $('time').textContent = c.time; $('time').style.background = c.vlans ? '#fff' : c.cor;
+    $('titulo').textContent = c.nome;
+    $('desc').textContent = c.desc;
+    $('passo').textContent = naJornada ? c.passo : '';
+    $('hosts').innerHTML = c.hosts.map(([a, b]) => `<div><span>${a}</span><span>${b}</span></div>`).join('');
+    [...nav.children].forEach((b, i) => b.classList.toggle('ativo', i === ativa));
+    ativaAnterior = ativa; render.ultimaFase = naJornada;
+  }
+}
+// botão de camada: rola até o pacote estar naquela camada
+function irPara(i){
+  const total = sec.offsetHeight - innerHeight;
+  const p = FASE_A + (i + .3) / CAMADAS.length * (1 - FASE_A);   // meio da pausa naquela camada
+  scrollTo({ top:sec.offsetTop + p * total, behavior:reduzir ? 'auto' : 'smooth' });
+}
+let pedido = false;
+addEventListener('scroll', () => { if(!pedido){ pedido = true; requestAnimationFrame(() => { render(); pedido = false; }); } }, { passive:true });
+addEventListener('resize', render);
+render();
+</script>
+</body>
+</html>

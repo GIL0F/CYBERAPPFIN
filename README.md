@@ -1,15 +1,51 @@
 # 🏢 CYBERAPPFIN
 
-> Site institucional fictício desenvolvido como parte do projeto acadêmico de simulação empresarial — **Faculdade Impacta**.
+> Empresa fictícia desenvolvida como projeto acadêmico de simulação empresarial e Defesa Cibernética — **Faculdade Impacta**.
 
-## 📖 Sobre o projeto
+A turma foi dividida em times, cada um responsável por uma área da empresa (Network, IAM, SOC, Endpoint e GRC). Este repositório reúne a apresentação de todas elas — e mostra como ela evoluiu ao longo do semestre.
 
-Este repositório contém o site institucional de uma **empresa fictícia**, criada como parte de um trabalho da disciplina de simulação empresarial da Faculdade Impacta. A turma foi dividida em times, cada um responsável por uma área da empresa, e este site reúne a apresentação de todas elas em um único lugar — no lugar de vários arquivos de PowerPoint separados.
+---
 
-O site tem duas partes:
+## 🏁 Apresentação final — Anatomia da Cyberappfin
 
-- **Home institucional** — como se fosse a página real da empresa: apresentação, sobre e as áreas.
-- **Modo apresentação** — ao clicar em uma área, o site entra em um modo de slides (navegável por seta/clique), ideal para apresentar em sala de aula.
+**👉 [Abrir a Apresentação final](https://gil0f.github.io/CYBERAPPFIN/anatomia.html)** · [ver o arquivo no GitHub](https://github.com/GIL0F/CYBERAPPFIN/blob/main/anatomia.html)
+
+Uma página só, de rolagem, com tudo o que o projeto construiu:
+
+| Capítulo | O que mostra |
+|---|---|
+| **Anatomia** | As 7 camadas do ambiente em vista explodida (SD-WAN → UniFi → Cisco 2960 → VLANs → servidores → Wazuh → Zammad) e um pacote atravessando cada uma |
+| **Organização** | Os cinco times e o plano de subida do ambiente |
+| **Topologia** | O mapa da rede com o fluxo dos pacotes, passo a passo: perímetro, VLANs, AD, SOC, agentes, OpenVAS, DMZ e as regras de firewall |
+| **Detecção** | As 30 regras customizadas do Wazuh, regras de correlação, CyberFin IA e as demonstrações ao vivo |
+| **Incidente** | Simulação de phishing no mapa e o tratamento completo: severidade, CSIRT, escalonamento, Zammad e o ticket do início ao fim |
+| **Continuidade** | Backup, BIA (impacto e mitigação), ordem de recuperação, o DR no mapa e o checklist pós-restauração |
+| **GRC** | Políticas, conformidade e riscos |
+
+Um menu fixo no topo leva a qualquer capítulo. Os documentos completos abrem em outra aba:
+
+- 📄 [Plano de Recuperação de Desastres (DRP)](https://gil0f.github.io/CYBERAPPFIN/drp.html)
+- 🛡️ [Catálogo de regras do Wazuh](https://gil0f.github.io/CYBERAPPFIN/regras-wazuh.html)
+- 🔧 [Runbook técnico](https://gil0f.github.io/CYBERAPPFIN/runbook-tecnico.html)
+
+---
+
+## 🗺️ Evolução do projeto
+
+Cada etapa continua publicada, para mostrar o caminho até a versão final.
+
+| # | Versão | Quando | Abrir | Arquivo |
+|---|---|---|---|---|
+| 1 | **Site institucional** — home da empresa + modo slides por área | ago/2026 | [abrir](https://gil0f.github.io/CYBERAPPFIN/index.html) | [`index.html`](index.html) |
+| 2 | **Protótipo V2** — prédio 3D, um andar por time, status em % | set/2026 | [abrir](https://gil0f.github.io/CYBERAPPFIN/prototipo-v2.html) | [`prototipo-v2.html`](prototipo-v2.html) |
+| 3 | **Relatórios do OpenVAS** — scan, matriz de risco e guia | set/2026 | [scan](https://gil0f.github.io/CYBERAPPFIN/openvas-scan.html) · [matriz](https://gil0f.github.io/CYBERAPPFIN/openvas-risk-matrix.html) · [guia](https://gil0f.github.io/CYBERAPPFIN/openvas-guia.html) | [`openvas-*.html`](openvas-scan.html) |
+| 4 | **A jornada do pacote** — apresentação em slides para projetor (55 telas) | out/2026 | [abrir](https://gil0f.github.io/CYBERAPPFIN/jornada.html) | [`jornada.html`](jornada.html) |
+| 5 | **Dashboards do Grafana** — apresentação guiada dos painéis do SOC | nov/2026 | [abrir](https://gil0f.github.io/CYBERAPPFIN/dashboards/) | [`dashboards/`](dashboards/index.html) |
+| 6 | **🏁 Apresentação final** — Anatomia da Cyberappfin, tudo numa página | nov/2026 | [abrir](https://gil0f.github.io/CYBERAPPFIN/anatomia.html) | [`anatomia.html`](anatomia.html) |
+
+> **Na sala:** a versão em slides (`jornada.html`) é a feita para o projetor — setas navegam, **N** mostra as notas, **F** tela cheia, **B** tela preta, **P** pausa as animações.
+
+---
 
 ## 🧩 Áreas da empresa
 
@@ -19,45 +55,39 @@ O site tem duas partes:
 | 🔐 **IAM** | Identidades, acessos e controle de permissões |
 | 📋 **GRC** | Políticas, gestão de risco e conformidade |
 | 🛡️ **SOC** | Monitoramento, detecção e resposta a incidentes |
-| 💻 **Endpoint** | Segurança de dispositivos, EDR e gestão de patches |
-
-## 🚀 Como acessar
-
-O site está publicado via **GitHub Pages**:
-
-**🔗 [seu-usuario.github.io/nome-do-repositorio](#)** ← atualize este link depois de publicar
-
-## 🛠️ Tecnologia
-
-Site estático, sem backend — um único arquivo `index.html` com HTML, CSS e JavaScript embutidos. Não depende de instalação, build ou servidor: basta abrir no navegador ou publicar em qualquer serviço de hospedagem estática.
-
-## ✏️ Como editar o conteúdo
-
-Todo o conteúdo do site fica em duas variáveis, no topo do bloco `<script>` dentro do `index.html`:
-
-```js
-const COMPANY = { ... }   // nome, tagline, texto "sobre" e contato da empresa
-const TEAMS   = { ... }   // um bloco por área — cada time edita só o seu
-```
-
-Cada time só precisa mexer no **seu próprio bloco** dentro de `TEAMS`, sem afetar o conteúdo dos outros. Dentro de cada bloco:
-
-- `blurb` → frase curta que aparece no card da área, na home
-- `slides` → conteúdo do modo apresentação daquele time (missão, equipe, processos, ferramentas, etc.)
-
-Depois de editar, é só salvar e subir a alteração (commit) — o GitHub Pages atualiza o site sozinho em 1–2 minutos.
-
-## 📤 Como publicar
-
-1. Repositório precisa ser **público** (necessário para GitHub Pages gratuito)
-2. `Settings` → `Pages` → Fonte: **Implantar a partir de uma ramificação**
-3. Branch: `main` · Pasta: `/ (raiz)` → **Salvar**
-4. Aguardar alguns minutos e acessar o link gerado
-
-## 👥 Time responsável por este repositório
-
-_Adicione aqui os nomes dos integrantes do time responsável pela manutenção do site._
+| 💻 **Endpoint** | Segurança de dispositivos e hardening |
 
 ---
 
-<p align="center"><sub>Projeto acadêmico — Faculdade Impacta · Simulação Empresarial</sub></p>
+## 🛠️ Tecnologia
+
+Site estático, sem backend: cada página é um arquivo HTML com CSS e JavaScript embutidos. Não depende de instalação, build ou servidor — basta abrir no navegador ou publicar em qualquer hospedagem estática.
+
+| Arquivo | O que é |
+|---|---|
+| `anatomia.html` | Apresentação final (gerada pelo script abaixo) |
+| `jornada.html` | Apresentação em slides — **fonte do conteúdo** da apresentação final |
+| `drp.html`, `regras-wazuh.html`, `runbook-tecnico.html` | Documentos de apoio |
+| `DESIGN.md` | Linguagem visual dos slides |
+| `referencias/DESIGN-anatomia.md` | Linguagem visual da apresentação final ("Engenharia crua") |
+| `ferramentas/` | Script que monta a apresentação final |
+
+### ✏️ Como atualizar a apresentação final
+
+O conteúdo (textos, IPs, regras, telas) vem da `jornada.html`. Depois de editar a jornada, gere a página única de novo:
+
+```bash
+python3 ferramentas/montar-pagina-unica.py
+```
+
+Assim os slides e a apresentação final nunca ficam diferentes.
+
+---
+
+## 📤 Como publicar
+
+O site está no **GitHub Pages**, a partir da branch `main`, pasta raiz. Depois de um commit no `main`, o Pages atualiza sozinho em 1–2 minutos.
+
+---
+
+<p align="center"><sub>Projeto acadêmico — Faculdade Impacta · Simulação Empresarial · Defesa Cibernética</sub></p>

@@ -34,7 +34,7 @@
   #mapa .t-mono{ font-family:'JetBrains Mono', ui-monospace, monospace; fill:var(--muted); }
   #mapa .t-muted{ fill:var(--muted); }
   .no{ transition:opacity .45s ease; }
-  body.focando .no{ opacity:.18; }
+  body.focando .no{ opacity:.3; }
   body.focando .no.foco{ opacity:1; }
   .lig{ fill:none; stroke:var(--line-2); stroke-width:2.5; }
   .lig.trac{ stroke-dasharray:7 7; }
@@ -405,6 +405,26 @@
   #painel h1, .s-titulo, .bloco h4, .etapa h4{ font-weight:800; }
   #rodape button{ font-weight:700; }
   #dica, #contador{ font-weight:600; color:var(--muted); }
+  /* ---------- revisão de design (design-review) ---------- */
+  /* P1: nas visões gerais do mapa em telas até 1500 px, o painel estreita e o mapa ganha espaço */
+  @media (max-width:1500px){
+    body.mapa-largo{ --panel-w:450px; }
+    body.mapa-largo #painel h1{ font-size:27px; }
+    body.mapa-largo #painel .topo{ padding:22px 26px 0; }
+    body.mapa-largo #conteudo{ padding:16px 26px 24px; }
+    .regras .col-cat{ display:none; }
+  }
+  /* P2: servidores do mapa alcançáveis pelo teclado */
+  #mapa .host.link:focus{ outline:none; }
+  #mapa .host.link:focus-visible rect{ stroke:#FACC15 !important; stroke-width:3; }
+  .doc-link:focus-visible, .amb-link:focus-visible{ outline:3px solid #FACC15; outline-offset:3px; }
+  /* P2: tecla P pausa as animações */
+  body.pausado *, body.pausado *::before, body.pausado *::after{ animation-play-state:paused !important; }
+  #pausa{ position:fixed; top:16px; left:22px; z-index:30; display:none; font-weight:700; font-size:14px; letter-spacing:.1em; text-transform:uppercase;
+          padding:6px 12px; border-radius:999px; background:#33270F; color:#F5D08A; }
+  body.pausado #pausa{ display:block; }
+  /* P3: anúncio curto para leitor de tela */
+  .sr-only{ position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
 </style>
 </head>
 <body>
@@ -415,7 +435,9 @@
   <svg id="mapa" viewBox="0 0 1600 920" preserveAspectRatio="xMidYMid meet" aria-label="Topologia da Cyberappfin"></svg>
 </div>
 
-<section id="sala" aria-live="polite"></section>
+<section id="sala"></section>
+<div id="anuncio" class="sr-only" aria-live="polite"></div>
+<div id="pausa" aria-hidden="true">⏸ Pausado (P)</div>
 
 <aside id="painel">
   <div class="topo">
@@ -434,7 +456,7 @@
   <div id="pontos"></div>
   <span id="contador"></span>
   <button id="prox" aria-label="Próxima parada">Próxima →</button>
-  <span id="dica">← → navega · N notas · F tela cheia · B tela preta</span>
+  <span id="dica">← → navega · N notas · F tela cheia · B tela preta · P pausa</span>
 </nav>
 
 <script>
@@ -592,7 +614,9 @@ VLANS.forEach((v, i) => {
       h.classList.add('link');
       texto(h, x + COL_W - 22, HOST_Y(j) + 25, '↗', { 'text-anchor':'end', 'font-size':16, 'font-weight':700, fill:'#7DD3FC' });
       el('title', {}, h).textContent = 'Abrir ' + lk[0][0];
+      h.setAttribute('tabindex', '0'); h.setAttribute('role', 'link'); h.setAttribute('aria-label', `Abrir ${lk[0][0]} (${lk[0][1]})`);
       h.addEventListener('click', () => window.open(lk[0][1], '_blank', 'noopener'));
+      h.addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); window.open(lk[0][1], '_blank', 'noopener'); } });
     }
   });
 });
@@ -638,9 +662,11 @@ function pacote(pontos, cor, dur = 1600, raio = 7){
 // repete um conjunto de pacotes enquanto a parada estiver ativa
 function emLoop(fn, intervalo){
   const minha = geracao;
+  // com "reduzir movimento" a cena roda uma vez e fica parada
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches){ fn(); return; }
   (async function volta(){
     while(minha === geracao){
-      fn();
+      if(!document.body.classList.contains('pausado')) fn();
       await new Promise(r => setTimeout(r, intervalo));
     }
   })();
@@ -715,8 +741,8 @@ const REGRAS = [{"id": "100001", "n": 5, "cat": "SSH", "det": "Falha de autentic
 const TRAT = { L:'Ledger / correlação', C:'Case + Zammad', X:'Case + Zammad crítico', A:'Atualiza o ticket' };
 const corNivel = n => n >= 13 ? '#F87171' : n >= 10 ? '#FB923C' : n >= 6 ? '#FACC15' : '#94A3B8';
 function tabelaRegras(lista){
-  return `<table class="regras"><tr><th>ID</th><th>Nível</th><th>Categoria</th><th>Detecção</th><th>O que significa</th><th>Tratamento</th></tr>${lista.map(r => `
-    <tr class="${r.corr ? 'corr' : ''}"><td>${r.id}</td><td><span class="niv" style="background:${corNivel(r.n)}">${r.n}</span></td><td>${r.cat}</td>
+  return `<table class="regras"><tr><th>ID</th><th>Nível</th><th class="col-cat">Categoria</th><th>Detecção</th><th>O que significa</th><th>Tratamento</th></tr>${lista.map(r => `
+    <tr class="${r.corr ? 'corr' : ''}"><td>${r.id}</td><td><span class="niv" style="background:${corNivel(r.n)}">${r.n}</span></td><td class="col-cat">${r.cat}</td>
       <td class="det">${r.det}${r.corr ? '<span class="tag-corr">CORRELAÇÃO</span>' : ''}</td><td>${r.fun}</td><td><span class="trat ${r.tr}">${TRAT[r.tr]}</span></td></tr>`).join('')}</table>`;
 }
 const LINK_REGRAS = `<a class="doc-link" href="regras-wazuh.html" target="_blank" rel="noopener" style="background:#7DD3FC">Catálogo completo das regras ↗ <small>local_rules.xml</small></a>`;
@@ -1062,8 +1088,7 @@ const PARADAS = [
       emLoop(() => [0,1,2,3,5].forEach((i, k) => setTimeout(() => pacote(viaBus(ov, { x:LANE(i), y:420 }), '#FB923C', 1600, 5), k * 300)), 3400);
     },
     html:`<h3>Regra 1 · Varredura por VLAN</h3>
-      <p>Uma tarefa por sub-rede: o alvo é a <b>sub-rede inteira da VLAN</b>, para descobrir qualquer máquina ou serviço que apareça.</p>
-      <div class="chips"><span class="chip">VLAN 10</span><span class="chip">VLAN 20</span><span class="chip">VLAN 30</span><span class="chip">VLAN 40</span><span class="chip">VLAN 50</span><span class="chip">VLAN 60</span></div>
+      <p>Uma tarefa por sub-rede, nas <b>VLANs 10, 20, 30, 40, 50 e 60</b>: o alvo é a sub-rede inteira, para descobrir qualquer máquina ou serviço que apareça.</p>
       <h3>Regra 2 · Baseline por servidor</h3>
       <p>Uma tarefa por ativo crítico, para comparar o mesmo servidor ao longo do tempo.</p>
       <div class="chips"><span class="chip">NT-001</span><span class="chip">NT-002</span><span class="chip">NT-003</span><span class="chip">Wazuh</span><span class="chip">Zabbix + Grafana</span><span class="chip">OpenVAS</span><span class="chip">Firefly</span></div>
@@ -1146,7 +1171,7 @@ const PARADAS = [
   /* =================== MAPA: simulação de incidente (PB-010, 4 passos) =================== */
   ...[0, 1, 2, 3, 4, 5].map(passo => ({
     quem:P34, cor:COR.danger, titulo:'Simulação de incidente', sub:'Phishing · playbook PB-010',
-    cam:[0, 20, 1600, 900], incidente:passo,
+    cam:[[0, 20, 1070, 890], [776, 330, 550, 580], [776, 330, 550, 580], [262, 20, 1066, 890], [262, 330, 1066, 580], [776, 330, 550, 580]][passo], incidente:passo,
     foco: passo === 0 ? ['sdwan', 'unifi', 'cisco', 'barramento', 'ligacoes', 'vlan40']
         : passo === 1 ? ['vlan40', 'vlan50', 'barramento']
         : passo === 2 ? ['vlan50']
@@ -1453,7 +1478,7 @@ const PARADAS = [
   },
   ...[0, 1, 2, 3, 4, 5].map(passo => ({
     quem:P4, cor:COR.grc, titulo:'DR na prática: restaurando o ambiente', sub:'Cenário: perda das VMs · tudo volta a partir do backup',
-    cam:[0, 20, 1600, 900], dr:passo,
+    cam:[[262, 20, 1318, 890], [278, 20, 1302, 890], [262, 330, 1318, 580], [262, 330, 1318, 580], [262, 330, 1318, 580], [262, 330, 1318, 580]][passo], dr:passo,
     foco: [['externo', 'vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
            ['unifi', 'cisco', 'externo', 'ligacoes', 'barramento', 'vlan60'],
            ['vlan20', 'vlan60', 'barramento'],
@@ -1673,8 +1698,12 @@ function ir(i){
     $('sala').scrollTop = 0;
   }
 
+  // mapa largo (mostra quase todas as colunas): painel mais estreito em telas pequenas
+  document.body.classList.toggle('mapa-largo', !sala && (p.cam || MUNDO)[2] > 950);
+  $('anuncio').textContent = `Parada ${i + 1} de ${PARADAS.length}: ${p.titulo}`;
   camera(sala ? MUNDO : (p.cam || MUNDO));
   focar(sala ? null : p.foco);
+  if(sala) ajustarTela();
   // os pacotes só saem depois que a câmera termina de se mover, para não "se perderem"
   const minha = geracao;
   setTimeout(() => {
@@ -1692,10 +1721,33 @@ function ir(i){
   try{ history.replaceState(null, '', '#' + (i + 1)); }catch(e){}
 }
 
+// telas cheias com sobra de espaço crescem até 30%; as densas ficam como estão
+function ajustarTela(){
+  const sala = $('sala'), corpo = sala.querySelector('.s-corpo');
+  if(!corpo) return;
+  corpo.style.zoom = 1;
+  const cs = getComputedStyle(sala);
+  const cabe = () => {
+    const lim = sala.getBoundingClientRect();
+    const baixo = lim.bottom - parseFloat(cs.paddingBottom) + 1, dir = lim.right - parseFloat(cs.paddingRight) + 1;
+    if(sala.scrollHeight > sala.clientHeight + 1) return false;
+    return [...corpo.querySelectorAll('*')].every(e => { const r = e.getBoundingClientRect(); return r.bottom <= baixo && r.right <= dir; });
+  };
+  if(!cabe()) return;
+  let z = 1;
+  while(z < 1.3){
+    corpo.style.zoom = (z + 0.05).toFixed(2);
+    if(!cabe()){ corpo.style.zoom = z.toFixed(2); break; }
+    z += 0.05;
+  }
+}
+window.addEventListener('resize', () => { if(document.body.classList.contains('modo-sala')) ajustarTela(); });
+
 $('ant').addEventListener('click', () => ir(atual - 1));
 $('prox').addEventListener('click', () => ir(atual + 1));
 document.addEventListener('keydown', e => {
-  if(e.target.closest && e.target.closest('button') && (e.key === ' ' || e.key === 'Enter')) return;
+  if(e.target.closest && e.target.closest('button, a, [role="link"]') && (e.key === ' ' || e.key === 'Enter')) return;
+  if(e.key === 'p' || e.key === 'P'){ document.body.classList.toggle('pausado'); return; }
   if(['ArrowRight', 'PageDown', ' '].includes(e.key)){ e.preventDefault(); ir(atual + 1); }
   else if(['ArrowLeft', 'PageUp'].includes(e.key)){ e.preventDefault(); ir(atual - 1); }
   else if(e.key === 'Home') ir(0);
