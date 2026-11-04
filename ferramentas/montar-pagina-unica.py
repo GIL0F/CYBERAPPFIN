@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Monta anatomia.html: a página única "Anatomia da Cyberappfin".
+"""Monta final.html: a página única "Anatomia da Cyberappfin".
 
 Junta numa rolagem só:
   - a abertura e a anatomia das 7 camadas (ferramentas/anatomia-base.html);
@@ -642,5 +642,5 @@ html = f"""{head}{css_base}{css_pagina}</style>
 </body>
 </html>
 """
-(RAIZ / 'anatomia.html').write_text(html, encoding='utf-8')
-print('anatomia.html gerado:', len(html), 'bytes')
+(RAIZ / 'final.html').write_text(html, encoding='utf-8')
+print('final.html gerado:', len(html), 'bytes')

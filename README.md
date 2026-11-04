@@ -8,7 +8,7 @@ A turma foi dividida em times, cada um responsável por uma área da empresa (Ne
 
 ## 🏁 Apresentação final — Anatomia da Cyberappfin
 
-**👉 [Abrir a Apresentação final](https://gil0f.github.io/CYBERAPPFIN/anatomia.html)** · [ver o arquivo no GitHub](https://github.com/GIL0F/CYBERAPPFIN/blob/main/anatomia.html)
+**👉 [Abrir a Apresentação final](https://gil0f.github.io/CYBERAPPFIN/final.html)** · [ver o arquivo no GitHub](https://github.com/GIL0F/CYBERAPPFIN/blob/main/final.html)
 
 Uma página só, de rolagem, com tudo o que o projeto construiu:
 
@@ -42,7 +42,7 @@ Cada etapa continua publicada, para mostrar o caminho até a versão final.
 | 3 | **Relatórios do OpenVAS** — scan, matriz de risco e guia | set/2026 | [scan](https://gil0f.github.io/CYBERAPPFIN/openvas-scan.html) · [matriz](https://gil0f.github.io/CYBERAPPFIN/openvas-risk-matrix.html) · [guia](https://gil0f.github.io/CYBERAPPFIN/openvas-guia.html) | [`openvas-*.html`](openvas-scan.html) |
 | 4 | **A jornada do pacote** — apresentação em slides para projetor (55 telas) | out/2026 | [abrir](https://gil0f.github.io/CYBERAPPFIN/jornada.html) | [`jornada.html`](jornada.html) |
 | 5 | **Dashboards do Grafana** — apresentação guiada dos painéis do SOC | nov/2026 | [abrir](https://gil0f.github.io/CYBERAPPFIN/dashboards/) | [`dashboards/`](dashboards/index.html) |
-| 6 | **🏁 Apresentação final** — Anatomia da Cyberappfin, tudo numa página | nov/2026 | [abrir](https://gil0f.github.io/CYBERAPPFIN/anatomia.html) | [`anatomia.html`](anatomia.html) |
+| 6 | **🏁 Apresentação final** — Anatomia da Cyberappfin, tudo numa página | nov/2026 | [abrir](https://gil0f.github.io/CYBERAPPFIN/final.html) | [`final.html`](final.html) |
 
 > **Na sala:** a versão em slides (`jornada.html`) é a feita para o projetor — setas navegam, **N** mostra as notas, **F** tela cheia, **B** tela preta, **P** pausa as animações.
 
@@ -66,7 +66,7 @@ Site estático, sem backend: cada página é um arquivo HTML com CSS e JavaScrip
 
 | Arquivo | O que é |
 |---|---|
-| `anatomia.html` | Apresentação final (gerada pelo script abaixo) |
+| `final.html` | Apresentação final (gerada pelo script abaixo) |
 | `jornada.html` | Apresentação em slides — **fonte do conteúdo** da apresentação final |
 | `drp.html`, `regras-wazuh.html`, `runbook-tecnico.html` | Documentos de apoio |
 | `DESIGN.md` | Linguagem visual dos slides |
