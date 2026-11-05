@@ -258,7 +258,7 @@
         <tr><td><b>Rede</b></td><td><span class="tag net">Network</span></td><td>Valida SD-WAN, firewall, VLANs e trunks; confere a publicação do Firefly pelo proxy 10.0.50.2.</td></tr>
         <tr><td><b>Identidade</b></td><td><span class="tag iam">IAM</span></td><td>Restaura o NT-001, reconstrói o NT-002 e valida o AD.</td></tr>
         <tr><td><b>Backup</b></td><td><span class="tag grc">GRC</span></td><td>Traz o NT-003 de volta primeiro, opera o Veeam e o repositório no TrueNAS: escolha do ponto íntegro e restaurações.</td></tr>
-        <tr><td><b>Serviços do SOC</b></td><td><span class="tag soc">SOC</span></td><td>Restaura e valida Wazuh, Zabbix + Grafana, OpenVAS, CyberFin IA e Zammad.</td></tr>
+        <tr><td><b>Serviços do SOC</b></td><td><span class="tag soc">SOC</span></td><td>Restaura e valida Wazuh, Zabbix + Grafana, OpenVAS, Cyberappfin IA e Zammad.</td></tr>
         <tr><td><b>Estações e hardening</b></td><td><span class="tag end">Endpoint</span></td><td>Confere o hardening dos servidores restaurados e faz a reimagem das estações.</td></tr>
         <tr><td><b>Notificações</b></td><td><span class="tag grc">GRC</span> <span class="tag">DPO</span> <span class="tag">Jurídico</span></td><td>Avaliam e fazem a notificação à ANPD (LGPD) e ao BACEN (SCD).</td></tr>
       </table></div>
@@ -386,7 +386,7 @@
             <li><b>Wazuh Manager</b> (10.10.50.21): restaurar e conferir <code>systemctl status wazuh-manager</code>, o dashboard e as regras customizadas.</li>
             <li><b>Zabbix + Grafana</b> (10.10.50.15): restaurar e conferir os hosts monitorados e os painéis.</li>
             <li><b>OpenVAS</b> (10.10.50.7): restaurar e conferir as tarefas por VLAN e por servidor (será usado na fase 7).</li>
-            <li><b>CyberFin IA</b> (10.10.50.19): restaurar e testar a classificação de um alerta.</li>
+            <li><b>Cyberappfin IA</b> (10.10.50.19): restaurar e testar a classificação de um alerta.</li>
             <li><b>ITSM: Zammad</b> (10.10.50.17): restaurar e passar para ele o registro do desastre feito até aqui.</li>
           </ol>
           <div class="portao"><p><b>Critério de saída:</b> Wazuh recebendo eventos dos agentes já restaurados (portas 1514 e 1515), Zabbix monitorando, OpenVAS com as tarefas e Zammad aberto.</p></div>
@@ -414,7 +414,7 @@
           <div class="quem"><span class="tag soc">SOC</span><span class="tag end">Endpoint</span><span class="tag net">Network</span><span class="tag grc">GRC</span></div>
           <ol class="passos">
             <li>Conferir que <b>todos os agentes</b> reportam ao Wazuh e que o Zabbix monitora todos os hosts.</li>
-            <li><b>Teste ponta a ponta:</b> gerar um evento controlado e comprovar que ele é detectado no Wazuh, correlacionado no CyberFin e vira ticket no Zammad. Validar também o acesso legítimo às aplicações.</li>
+            <li><b>Teste ponta a ponta:</b> gerar um evento controlado e comprovar que ele é detectado no Wazuh, correlacionado no Cyberappfin e vira ticket no Zammad. Validar também o acesso legítimo às aplicações.</li>
             <li>Rodar o <b>OpenVAS</b> em cada servidor restaurado e <b>comparar com o baseline</b>: nenhuma porta ou serviço novo.</li>
             <li>Endpoint confere ClamAV e UFW nos servidores e faz a <b>reimagem das estações</b> das VLANs 10 e 40, se tiverem sido afetadas.</li>
             <li>Executar um <b>backup completo novo</b> de todos os servidores no NT-003.</li>
@@ -541,7 +541,7 @@ systemctl status veeamservice</pre></div>
         <tr><td>Wazuh Manager</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         <tr><td>Zabbix + Grafana</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         <tr><td>OpenVAS</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
-        <tr><td>CyberFin IA</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+        <tr><td>Cyberappfin IA</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         <tr><td>ITSM (Zammad)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
         <tr><td>Firefly (firesrv)</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td></tr>
       </table></div>
@@ -622,7 +622,7 @@ systemctl status veeamservice</pre></div>
         <tr><td>5</td><td>Wazuh Manager <span class="mono">(wazuhsrv)</span></td><td class="mono">10.10.50.21</td><td>50</td><td>SIEM</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
         <tr><td>5</td><td>Zabbix + Grafana <span class="mono">(zabbix-grafana)</span></td><td class="mono">10.10.50.15</td><td>50</td><td>Disponibilidade e painéis</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
         <tr><td>5</td><td>OpenVAS <span class="mono">(openvaz)</span></td><td class="mono">10.10.50.7</td><td>50</td><td>Varredura de vulnerabilidades</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
-        <tr><td>5</td><td>CyberFin IA <span class="mono">(cyberfinia)</span></td><td class="mono">10.10.50.19</td><td>50</td><td>Classificação de alertas</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
+        <tr><td>5</td><td>Cyberappfin IA <span class="mono">(cyberfinia)</span></td><td class="mono">10.10.50.19</td><td>50</td><td>Classificação de alertas</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
         <tr><td>5</td><td>ITSM: Zammad <span class="mono">(zammadsrv)</span></td><td class="mono">10.10.50.17</td><td>50</td><td>Registro de incidentes</td><td>Entire Machine Restore (Veeam)</td><td>SOC</td></tr>
         <tr><td>6</td><td>Firefly <span class="mono">(firesrv)</span></td><td class="mono">10.10.30.3</td><td>30</td><td>Aplicação financeira, publicada pelo proxy 10.0.50.2</td><td>Pacote do backup dedicado (banco, arquivos, configuração)</td><td>Network</td></tr>
         <tr><td>7</td><td>Estações</td><td class="mono">10.10.10.x / 10.10.40.x</td><td>10, 40</td><td>Gerência e usuários</td><td>Reimagem e reingresso no domínio</td><td>Endpoint</td></tr>

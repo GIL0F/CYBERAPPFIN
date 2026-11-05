@@ -461,9 +461,9 @@ const CAMADAS = [
     hosts:[['NT-001 · AD-01', '10.10.20.10'], ['NT-002 · AD-02', '10.10.20.11'], ['Firefly · firesrv', '10.10.30.3'], ['NT-003 · Veeam', '10.10.60.143']] },
   { nome:'Wazuh · SOC', time:'SOC', cor:COR.soc,
     itens:[COR.soc, '#FDE68A', '#FCA5A5', COR.brand],
-    desc:'Recebe os logs de todos os agentes e aplica 30 regras próprias. Quatro delas correlacionam eventos numa janela de tempo. A CyberFin IA enriquece o alerta, sem decidir nada.',
+    desc:'Recebe os logs de todos os agentes e aplica 30 regras próprias. Quatro delas correlacionam eventos numa janela de tempo. A Cyberappfin IA enriquece o alerta, sem decidir nada.',
     passo:'O Wazuh vê a conexão a um domínio suspeito e dispara o alerta. A IA classifica; o analista confirma.',
-    hosts:[['Wazuh · wazuhsrv', '10.10.50.21'], ['Zabbix + Grafana', '10.10.50.15'], ['OpenVAS · openvaz', '10.10.50.7'], ['CyberFin IA', '10.10.50.19']] },
+    hosts:[['Wazuh · wazuhsrv', '10.10.50.21'], ['Zabbix + Grafana', '10.10.50.15'], ['OpenVAS · openvaz', '10.10.50.7'], ['Cyberappfin IA', '10.10.50.19']] },
   { nome:'Zammad · ITSM', time:'ITSM', cor:COR.brand,
     desc:'Onde o incidente vira ticket: grupos SOC-N1, N2 e N3, seis fases de tratamento, e todo ticket fecha como real, falso positivo ou inconclusivo.',
     passo:'Fim da linha: o incidente vira um ticket no Zammad, com responsável, evidências e prazo.',
@@ -622,7 +622,7 @@ const C = { soc: 'var(--soc)', net: 'var(--net)', iam: 'var(--iam)', end: 'var(-
 // marcas: [x, y, largura, altura] em % da imagem; uma por ponto, na mesma ordem
 const P = [
   { tipo: 'capa',
-    titulo: 'Como o SOC enxerga o ambiente',
+    titulo: 'Dashboards',
     lead: 'O Grafana reúne o que o Wazuh, o Zabbix e o Zammad registram. São 28 dashboards; nesta visita passamos pelos 11 que contam a operação do SOC, da entrada do alerta até os indicadores.',
     notas: 'Abrir dizendo que tudo que vamos ver é dado do laboratório, coletado pelas ferramentas da VLAN 50. A ordem segue o caminho de um alerta: entra pelo Command Center, é investigado nos painéis especializados e termina nos KPIs.' },
   { img: 'command-center', area: 'Ponto de partida', c: 'soc',
@@ -663,9 +663,9 @@ const P = [
     titulo: 'Detection Engineering',
     lead: 'As regras que o próprio SOC escreveu, além das regras padrão do Wazuh.',
     marcas: [[0.4, 27.8, 99.2, 18.6], [0.4, 57, 99.2, 33.2]],
-    pontos: [['Detecções das regras CyberFin', 'SQL Injection, correlação ofensiva, honeypot e secrets.'], ['Regras, ativos e origens', 'Quais regras próprias dispararam, em quais ativos e de quais IPs.']],
+    pontos: [['Detecções das regras Cyberappfin', 'SQL Injection, correlação ofensiva, honeypot e secrets.'], ['Regras, ativos e origens', 'Quais regras próprias dispararam, em quais ativos e de quais IPs.']],
     numeros: [['2 mil', 'detecções próprias', ''], ['149', 'SQL injection', 'alerta'], ['250', 'honeypot e secrets', 'alerta']],
-    notas: 'Aqui mostramos o trabalho autoral do SOC: regras escritas para o cenário da CyberFin, como as da faixa 100110 a 100130 para o Firefly. O honeypot é uma isca; qualquer acesso a ele já é suspeito por definição.' },
+    notas: 'Aqui mostramos o trabalho autoral do SOC: regras escritas para o cenário da Cyberappfin, como as da faixa 100110 a 100130 para o Firefly. O honeypot é uma isca; qualquer acesso a ele já é suspeito por definição.' },
   { img: 'vulnerabilidades', area: 'Risco', c: 'brand',
     titulo: 'Vulnerability Management',
     lead: 'A postura de risco: onde estão as vulnerabilidades e o que corrigir primeiro.',
@@ -681,10 +681,10 @@ const P = [
     numeros: [['12', 'problemas ativos', 'aviso'], ['1', 'alto', 'alerta'], ['8', 'serviços com falha', 'aviso']],
     notas: 'Segurança também é disponibilidade. O Zabbix mostra serviços parados, como agentes e antivírus, e há quanto tempo estão assim. Um agente parado é um ponto cego para o SOC.' },
   { img: 'visao-geral', area: 'Servidores do SOC', c: 'end',
-    titulo: 'CyberFin Visão Geral',
+    titulo: 'Cyberappfin Visão Geral',
     lead: 'CPU, memória e tempo no ar dos servidores que sustentam o SOC.',
     marcas: [[0.4, 22.8, 33, 76.5], [33.4, 22.8, 33, 76.5], [66.4, 22.8, 33.2, 76.5]],
-    pontos: [['CPU', 'Uso de processador de cada servidor nos últimos 5 minutos.'], ['Memória', 'O Wazuh é o que mais usa memória, perto da metade.'], ['Tempo no ar', 'CyberFin IA, Wazuh, OpenVAS e Firefly estáveis há mais de 3 dias.']],
+    pontos: [['CPU', 'Uso de processador de cada servidor nos últimos 5 minutos.'], ['Memória', 'O Wazuh é o que mais usa memória, perto da metade.'], ['Tempo no ar', 'Cyberappfin IA, Wazuh, OpenVAS e Firefly estáveis há mais de 3 dias.']],
     notas: 'Os servidores do SOC precisam estar de pé para que todo o resto funcione. Aqui vemos que estão estáveis e com folga de recurso.' },
   { img: 'network-okr2', area: 'Outras áreas', c: 'net',
     titulo: 'OKR 2 de Rede',
@@ -699,11 +699,7 @@ const P = [
     marcas: [[1.8, 32.6, 20, 38], [22.2, 32.6, 23.9, 38], [1.8, 76.6, 24, 21.8]],
     pontos: [['MTTD real', 'Do alerta no Wazuh até o ticket no Zammad. Oscilou entre 14 e 20 minutos hoje, em torno do limite de 15.'], ['Severidade S1 a S3', 'A proporção dos alertas que pedem atenção humana.'], ['Cobertura dos ativos críticos', '8 de 9: o NT-003 está bloqueado pelo firewall nas portas do Wazuh.']],
     numeros: [['19 min', 'MTTD agora', 'alerta'], ['5 min', 'meta do SOC', ''], ['8 de 9', 'agentes críticos', 'aviso']],
-    notas: 'O MTTD é real e hoje ficou em torno do limite de 15 minutos da política, bem acima da nossa meta de 5. A amostra ainda é pequena e a média fica mais confiável com mais tickets; é o primeiro ponto de melhoria. A cobertura em 8 de 9 é um achado real: o painel mostrou o NT-003 sem eventos e a investigação encontrou o bloqueio de firewall.' },
-  { tipo: 'fim',
-    titulo: 'O que vem a seguir',
-    lead: 'O painel já mostra o que é real e marca o que ainda é simulado. Os próximos passos fecham essa diferença.',
-    notas: 'Fechar mostrando que o trabalho continua: cada pendência tem dono e próximo passo. Abrir para perguntas.' }
+    notas: 'O MTTD é real e hoje ficou em torno do limite de 15 minutos da política, bem acima da nossa meta de 5. A amostra ainda é pequena e a média fica mais confiável com mais tickets; é o primeiro ponto de melhoria. A cobertura em 8 de 9 é um achado real: o painel mostrou o NT-003 sem eventos e a investigação encontrou o bloqueio de firewall.' }
 ];
 const PROX = [
   ['soc', 'Reduzir o MTTD', 'Hoje em torno de 15 a 20 minutos; a meta do SOC é 5. Abrir o ticket automaticamente a partir do alerta.'],
@@ -741,7 +737,7 @@ const VLANS = [
   { n:20, uso:'Servidores', rede:'10.10.20.0/24', cor:COR.iam,   hosts:[['NT-001 · AD-01','10.10.20.10'],['NT-002 · AD-02','10.10.20.11']] },
   { n:30, uso:'DMZ',        rede:'10.10.30.0/27', cor:COR.danger, hosts:[['Firefly · firesrv','10.10.30.3']] },
   { n:40, uso:'Usuários',   rede:'10.10.40.0/24', cor:COR.end,   hosts:[['Workstation','10.10.40.x'],['Workstation','10.10.40.x'],['Workstation','10.10.40.x']] },
-  { n:50, uso:'Segurança / SOC', rede:'10.10.50.0/27', cor:COR.soc, hosts:[['Wazuh Manager','10.10.50.21'],['Zabbix + Grafana','10.10.50.15'],['OpenVAS','10.10.50.7'],['CyberFin IA','10.10.50.19'],['ITSM · Zammad','10.10.50.17']] },
+  { n:50, uso:'Segurança / SOC', rede:'10.10.50.0/27', cor:COR.soc, hosts:[['Wazuh Manager','10.10.50.21'],['Zabbix + Grafana','10.10.50.15'],['OpenVAS','10.10.50.7'],['Cyberappfin IA','10.10.50.19'],['ITSM · Zammad','10.10.50.17']] },
   { n:60, uso:'Backup',     rede:'10.10.60.0/24', cor:COR.grc,   hosts:[['NT-003 · Backup','10.10.60.143']] }
 ];
 /* ---------- links para o ambiente real ----------
@@ -751,7 +747,7 @@ const AMBIENTE = {
   'Wazuh Manager':    [['Wazuh', 'https://10.10.50.21']],
   'Zabbix + Grafana': [['Zabbix', 'http://10.10.50.15/zabbix'], ['Grafana', 'http://10.10.50.15:3000']],
   'OpenVAS':          [['OpenVAS', 'https://10.10.50.7:9392']],
-  'CyberFin IA':      [['CyberFin IA', '']],
+  'Cyberappfin IA':      [['Cyberappfin IA', '']],
   'ITSM · Zammad':    [['Zammad', 'http://10.10.50.17']],
   'Firefly · firesrv': [['Firefly', 'http://10.0.50.2:8080']]
 };
@@ -1177,7 +1173,7 @@ const PARADAS = [
       <ul><li style="--cor:${COR.iam}">Dois controladores de domínio com replicação confirmada</li>
       <li style="--cor:${COR.iam}"><b>GPO:</b> senha mínima de 10 caracteres, bloqueio após 5 tentativas</li>
       <li style="--cor:${COR.iam}"><b>11 OUs e 18 grupos</b> de segurança, um por perfil RBAC</li></ul>
-      <p>Política vigente: <b>POL-GDI-001 / POL-CA-001 v1.6</b>.</p>`,
+      <p>Política vigente: <b>POL-GDI-001 / POL-CA-001 v2.0</b>.</p>`,
     notas:'Dois controladores evitam que a queda de um derrube o login de todos (a bolinha lilás é a replicação). A permissão vai para o grupo, nunca direto para a pessoa: menor privilégio.'
   },
 
@@ -1189,11 +1185,11 @@ const PARADAS = [
       <tr class="dest"><td>Wazuh 4.14.6</td><td class="mono">.50.21</td><td>SIEM: recebe e correlaciona os logs</td></tr>
       <tr><td>Zabbix + Grafana</td><td class="mono">.50.15</td><td>Disponibilidade e painéis</td></tr>
       <tr><td>OpenVAS</td><td class="mono">.50.7</td><td>Varredura de vulnerabilidades</td></tr>
-      <tr><td>CyberFin IA</td><td class="mono">.50.19</td><td>Classifica os alertas; o analista decide</td></tr>
+      <tr><td>Cyberappfin IA</td><td class="mono">.50.19</td><td>Classifica os alertas; o analista decide</td></tr>
       <tr><td>ITSM (Zammad)</td><td class="mono">.50.17</td><td>Registro e acompanhamento dos incidentes</td></tr></table>
       <ul><li style="--cor:${COR.soc}">Wazuh instalado direto em servidor Linux (standalone)</li>
       <li style="--cor:${COR.soc}">Agentes reportam pelas portas 1514 e 1515</li></ul>
-      ${botoesAmbiente('Wazuh Manager', 'Zabbix + Grafana', 'OpenVAS', 'CyberFin IA', 'ITSM · Zammad')}`,
+      ${botoesAmbiente('Wazuh Manager', 'Zabbix + Grafana', 'OpenVAS', 'Cyberappfin IA', 'ITSM · Zammad')}`,
     notas:'Toda a stack do SOC é open source e fica isolada na VLAN 50. A IA ajuda na triagem dos logs, mas não executa nenhuma ação: a decisão é sempre do analista. O ITSM registra cada incidente com um ticket.'
   },
   {
@@ -1228,7 +1224,7 @@ const PARADAS = [
         <p class="s-rot">Fluxo de um alerta · arquitetura proposta</p>
         <div class="wz-fluxo">
           <span class="nodo" style="--cor:${COR.soc}">Wazuh<small>regra dispara</small></span><span class="seta3">→</span>
-          <span class="nodo" style="--cor:${COR.soc}">CyberFin IA<small>enriquece, sem bloquear</small></span><span class="seta3">→</span>
+          <span class="nodo" style="--cor:${COR.soc}">Cyberappfin IA<small>enriquece, sem bloquear</small></span><span class="seta3">→</span>
           <span class="nodo" style="--cor:#4ADE80">Deduplicação e correlação<small>junta eventos repetidos</small></span><span class="seta3">→</span>
           <span class="nodo" style="--cor:#FB923C">Case e política<small>decide se vira ticket</small></span><span class="seta3">→</span>
           <span class="nodo" style="--cor:${COR.brand}">Zammad<small>ticket do incidente</small></span><span class="seta3">→</span>
@@ -1284,7 +1280,7 @@ const PARADAS = [
               <li><span>Abrir as <b>regras customizadas</b> do Firefly.</span></li>
               <li><span>Destacar 100160 (honeypot), 100113 (brute force), 100114 (LFI), 100115 (SQLi), 100116 (RCE) e as de integridade.</span></li>
               <li><span>Mostrar que eventos de nível baixo alimentam a <b>correlação</b> sem abrir ticket.</span></li>
-              <li><span>Seguir um incidente até o <b>CyberFin</b> e o <b>Zammad</b>.</span></li>
+              <li><span>Seguir um incidente até o <b>Cyberappfin</b> e o <b>Zammad</b>.</span></li>
             </ol>
           </div>
           <div style="display:flex; flex-direction:column; gap:10px">
@@ -1293,17 +1289,17 @@ const PARADAS = [
               <div class="tk-ev" style="--cor:#F87171"><span class="h">1</span><span class="f">Tentativa</span><p>Alguém pede <b>/.env</b> ao Firefly: o arquivo que guarda segredos de configuração.</p></div>
               <div class="tk-ev" style="--cor:#4ADE80"><span class="h">2</span><span class="f">Resposta</span><p>O Firefly nega: <b>HTTP 403</b>.</p></div>
               <div class="tk-ev" style="--cor:${COR.soc}"><span class="h">3</span><span class="f">Detecção</span><p>O Wazuh dispara a regra <b>100160</b> (honeypot, nível 10).</p></div>
-              <div class="tk-ev" style="--cor:#FB923C"><span class="h">4</span><span class="f">Correlação</span><p>O <b>CyberFin</b> processa o alerta; o tratamento da regra é Case + Zammad.</p></div>
+              <div class="tk-ev" style="--cor:#FB923C"><span class="h">4</span><span class="f">Correlação</span><p>O <b>Cyberappfin</b> processa o alerta; o tratamento da regra é Case + Zammad.</p></div>
             </div>
             <div class="conclusao"><b>Conclusão correta:</b> tentativa confirmada e requisição negada. <b>Não</b> é host comprometido.</div>
           </div>
         </div>
         <div class="amb" style="gap:14px">${botoesAmbiente('Wazuh Manager', 'ITSM · Zammad')}${LINK_RUNBOOK}</div>
       </div>`,
-    notas:'Aqui saímos da apresentação e entramos no Wazuh, seguindo o roteiro da esquerda. O objetivo não é só abrir o dashboard: é ligar um evento a uma regra, a correlação, ao incidente e ao tratamento. O caso da direita aconteceu de verdade no ambiente: alguém tentou baixar o /.env do Firefly, a aplicação negou com 403, o Wazuh detectou pela regra 100160 e o CyberFin processou. A conclusão certa é "tentativa negada", não "servidor invadido": saber dizer isso é maturidade de SOC.'
+    notas:'Aqui saímos da apresentação e entramos no Wazuh, seguindo o roteiro da esquerda. O objetivo não é só abrir o dashboard: é ligar um evento a uma regra, a correlação, ao incidente e ao tratamento. O caso da direita aconteceu de verdade no ambiente: alguém tentou baixar o /.env do Firefly, a aplicação negou com 403, o Wazuh detectou pela regra 100160 e o Cyberappfin processou. A conclusão certa é "tentativa negada", não "servidor invadido": saber dizer isso é maturidade de SOC.'
   },
   {
-    quem:P3, cor:COR.soc, titulo:'CyberFin IA: apoio ao analista', sub:'cyberfinia · 10.10.50.19 · a IA sugere, o analista decide',
+    quem:P3, cor:COR.soc, titulo:'Cyberappfin IA: apoio ao analista', sub:'cyberfinia · 10.10.50.19 · a IA sugere, o analista decide',
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="linha" style="grid-template-columns:repeat(3, 1fr)">
           <div class="bloco" style="--cor:${COR.brand}"><span class="rot">Recebe</span><h4>Contexto estruturado</h4><p>O alerta já normalizado e correlacionado: regra, ativo, origem, severidade e histórico.</p></div>
@@ -1443,7 +1439,7 @@ const PARADAS = [
         : ['vlan40', 'vlan50', 'barramento'],
     html: passos([
       ['Entrada:', 'um e-mail de phishing chega à workstation de um colaborador de Contas a Pagar (VLAN 40), que clica no link.'],
-      ['Detecção:', 'o Wazuh detecta a conexão a um domínio suspeito logo após o e-mail. A CyberFin IA classifica o alerta e avisa o SOC.'],
+      ['Detecção:', 'o Wazuh detecta a conexão a um domínio suspeito logo após o e-mail. A Cyberappfin IA classifica o alerta e avisa o SOC.'],
       ['Registro:', 'o analista confirma e abre o ticket no <b>ITSM</b>. O SOC conduz a investigação pelo playbook PB-010.'],
       ['Contenção:', 'Network bloqueia o domínio no UniFi, IAM reseta a senha e revoga as sessões, Endpoint verifica a estação.'],
       ['Erradicação:', 'o SOC procura o mesmo domínio nos logs de <b>todos os agentes</b> do Wazuh, IAM revisa os logons da conta no AD desde o clique e Endpoint faz a varredura completa da estação (reimagem se houver artefato).'],
@@ -1502,7 +1498,7 @@ const PARADAS = [
     quem:P3, cor:COR.soc, titulo:'Escalonamento: quem chama quem', sub:'POL-GI-001 · PB-010 · BIA-001 · cada degrau tem um gatilho para subir',
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="escada">
-          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Degrau 1 · detecção</span><h4>Wazuh e CyberFin IA</h4>
+          <div class="bloco" style="--cor:#94A3B8"><span class="rot">Degrau 1 · detecção</span><h4>Wazuh e Cyberappfin IA</h4>
             <p>O Wazuh gera o alerta e a IA classifica. O aviso chega ao canal do SOC no Telegram.</p>
             <div class="rodape"><b>Sobe sempre:</b> alerta não é incidente; quem confirma é uma pessoa.</div></div>
           <div class="bloco" style="--cor:${COR.soc}"><span class="rot">Degrau 2 · triagem</span><h4>Analista do SOC</h4>
@@ -1528,7 +1524,7 @@ const PARADAS = [
     notas:'Ler da esquerda para a direita, subindo. O alerta nasce no Wazuh e a IA classifica, mas quem confirma é o analista. O coordenador decide o nível e autoriza a contenção. Nível 3 ou 4 aciona o CSIRT; nível 4, dados de clientes ou pagamento indevido sobem à Diretoria, que é quem pode declarar o desastre e disparar o DRP. No nosso phishing: o analista confirmou, o coordenador classificou como nível 3 e o CSIRT foi acionado.'
   },
   {
-    quem:P3, cor:COR.soc, titulo:'Zammad: como o SOC trata um incidente', sub:'zammadsrv · 10.10.50.17 · o CyberFin dá o contexto, o ticket registra a decisão humana',
+    quem:P3, cor:COR.soc, titulo:'Zammad: como o SOC trata um incidente', sub:'zammadsrv · 10.10.50.17 · o Cyberappfin dá o contexto, o ticket registra a decisão humana',
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="linha" style="grid-template-columns:repeat(6, 1fr)">
           <div class="bloco" style="--cor:${COR.soc}"><span class="rot">1 · Detecção</span><p>Alerta do Wazuh ou do Zabbix, com a evidência original.</p></div>
@@ -1548,7 +1544,7 @@ const PARADAS = [
         </div>
         <div class="amb">${botoesAmbiente('ITSM · Zammad')}</div>
       </div>`,
-    notas:'O Zammad é a camada operacional do SOC. O CyberFin normaliza, correlaciona e dá contexto; o ticket registra quem é o responsável, o que foi investigado e o que foi decidido. São seis fases, e os grupos SOC-N1, N2 e N3 definem quem trata em cada nível, com os grupos dos times técnicos acionados quando precisa. Todo ticket fecha com uma classificação: incidente real, falso positivo ou inconclusivo. Se der, abrir o Zammad e mostrar um ticket de verdade.'
+    notas:'O Zammad é a camada operacional do SOC. O Cyberappfin normaliza, correlaciona e dá contexto; o ticket registra quem é o responsável, o que foi investigado e o que foi decidido. São seis fases, e os grupos SOC-N1, N2 e N3 definem quem trata em cada nível, com os grupos dos times técnicos acionados quando precisa. Todo ticket fecha com uma classificação: incidente real, falso positivo ou inconclusivo. Se der, abrir o Zammad e mostrar um ticket de verdade.'
   },
   {
     quem:P3, cor:COR.soc, titulo:'Tratamento do incidente: o ticket do início ao fim', sub:'Zammad (ITSM) · cenário simulado do PB-010 · cada ação fica registrada no ticket',
@@ -1557,13 +1553,13 @@ const PARADAS = [
           <div class="tk-cab">
             <span class="cod">INC-0001 · Zammad (ITSM)</span>
             <h4>Phishing em Contas a Pagar</h4>
-            <dl><dt>Nível</dt><dd>3 · Alta</dd><dt>Playbook</dt><dd>PB-010</dd><dt>Origem</dt><dd>Wazuh + CyberFin IA</dd>
+            <dl><dt>Nível</dt><dd>3 · Alta</dd><dt>Playbook</dt><dd>PB-010</dd><dt>Origem</dt><dd>Wazuh + Cyberappfin IA</dd>
                 <dt>Responsável</dt><dd>Analista do SOC</dd><dt>Contenção</dt><dd>Coordenador do SOC</dd><dt>Situação</dt><dd style="color:#4ADE80">Encerrado</dd></dl>
             <div class="kpi"><div><b>4 min</b><span>clique → alerta<br>meta MTTD &lt; 15 min</span></div><div><b>22 min</b><span>alerta → contenção<br>meta MTTR &lt; 30 min</span></div></div>
           </div>
           <div class="tk-linha">
             <div class="tk-ev" style="--cor:#F87171"><span class="h">09:12</span><span class="f">Entrada</span><p>Colaborador de Contas a Pagar clica no link do e-mail (VLAN 40).</p></div>
-            <div class="tk-ev" style="--cor:${COR.soc}"><span class="h">09:16</span><span class="f">Detecção</span><p>Wazuh alerta a conexão ao domínio suspeito; a CyberFin IA classifica e avisa o SOC no Telegram.</p></div>
+            <div class="tk-ev" style="--cor:${COR.soc}"><span class="h">09:16</span><span class="f">Detecção</span><p>Wazuh alerta a conexão ao domínio suspeito; a Cyberappfin IA classifica e avisa o SOC no Telegram.</p></div>
             <div class="tk-ev" style="--cor:${COR.soc}"><span class="h">09:20</span><span class="f">Registro</span><p>Analista confirma, abre o ticket no ITSM, anexa as evidências e propõe o nível 3.</p></div>
             <div class="tk-ev" style="--cor:#FB923C"><span class="h">09:24</span><span class="f">Decisão</span><p>Coordenador do SOC confirma o nível 3, autoriza a contenção e aciona o CSIRT.</p></div>
             <div class="tk-ev" style="--cor:#F87171"><span class="h">09:38</span><span class="f">Contenção</span><p>Domínio bloqueado no UniFi, senha resetada e sessões revogadas no AD, estação em verificação.</p></div>
@@ -1585,7 +1581,7 @@ const PARADAS = [
           <div class="bloco" style="--cor:${COR.soc}"><span class="rot">Falsos positivos</span><span class="grande">&lt; 10%</span><p>Alertas que não eram incidente. Ajustar as regras do Wazuh reduz esse número.</p></div>
           <div class="bloco" style="--cor:${COR.soc}"><span class="rot">RCIs no prazo</span><span class="grande">100%</span><p>Relatórios dos níveis 3 e 4 entregues em até 5 dias úteis.</p></div>
         </div>
-        <p class="s-txt">Apoio contínuo: <b>CyberFin IA</b> classificando os alertas 24/7, com a decisão final sempre do <b>analista</b>.</p>
+        <p class="s-txt">Apoio contínuo: <b>Cyberappfin IA</b> classificando os alertas 24/7, com a decisão final sempre do <b>analista</b>.</p>
       </div>`,
     notas:'Metas dão objetividade ao SOC. Falsos positivos importam porque um SOC que alerta demais é ignorado. Se perguntarem se as metas já são cumpridas: são metas da política, e o registro dos tickets no ITSM é o que permite medir os tempos. Fechar o bloco do SOC aqui.'
   },
@@ -1713,13 +1709,13 @@ const PARADAS = [
           <span class="acoes"><span>✓ Backup dedicado às 00h e 12h</span><span>✓ SHA-256 validado no TrueNAS</span><span class="pend">Teste de restauração</span></span>
           <span class="pil">Zabbix / Grafana</span><span class="imp">Menos visibilidade e sem alerta de disponibilidade.</span>
           <span class="acoes"><span>✓ Backup da VM e da configuração</span><span>✓ Volta após os serviços-base</span></span>
-          <span class="pil">CyberFin</span><span class="imp">Sem correlação, automação e enriquecimento.</span>
+          <span class="pil">Cyberappfin</span><span class="imp">Sem correlação, automação e enriquecimento.</span>
           <span class="acoes"><span>✓ Fontes e Zammad desacoplados: o SOC segue operando</span><span>✓ Backup</span></span>
           <span class="pil">Zammad</span><span class="imp">Fluxo de tratamento e registro dos incidentes afetados.</span>
           <span class="acoes"><span>✓ Backup</span><span class="pend">Validação do histórico após restore</span></span>
         </div>
       </div>`,
-    notas:'A tela anterior olhou o impacto no negócio; esta olha cada ativo técnico. Para cada um: o que para se ele cair, e o que já reduz esse impacto. Destacar o NT-003: sem ele, nada volta, por isso tem conta local, os backups ficam no TrueNAS, fora da VM, e ele é o primeiro a voltar no DRP. E o CyberFin: se ele cair, o SOC segue operando, porque o Wazuh e o Zammad não dependem dele.'
+    notas:'A tela anterior olhou o impacto no negócio; esta olha cada ativo técnico. Para cada um: o que para se ele cair, e o que já reduz esse impacto. Destacar o NT-003: sem ele, nada volta, por isso tem conta local, os backups ficam no TrueNAS, fora da VM, e ele é o primeiro a voltar no DRP. E o Cyberappfin: se ele cair, o SOC segue operando, porque o Wazuh e o Zammad não dependem dele.'
   },
   {
     quem:P4, cor:COR.grc, titulo:'Em que ordem recuperar', sub:'Runbook de recuperação · camada por camada, sem pular etapas',
@@ -1730,7 +1726,7 @@ const PARADAS = [
           <div class="bloco" style="--cor:${COR.net}"><span class="num">2</span><div><h4>Rede</h4><p>SD-WAN, firewall e VLANs no UniFi e no Cisco 2960; gateways .1.</p></div></div>
           <div class="bloco" style="--cor:${COR.grc}"><span class="num">3</span><div><h4>Backup: NT-003</h4><p>Primeiro servidor a voltar: Veeam com conta local, ligado ao repositório no TrueNAS.</p></div></div>
           <div class="bloco" style="--cor:${COR.iam}"><span class="num">4</span><div><h4>Identidade</h4><p>NT-001 restaurado do backup; NT-002 reconstruído e replicado a partir dele.</p></div></div>
-          <div class="bloco" style="--cor:${COR.soc}"><span class="num">5</span><div><h4>Serviços do SOC</h4><p>Wazuh primeiro; depois Zabbix + Grafana, OpenVAS, CyberFin IA e Zammad.</p></div></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="num">5</span><div><h4>Serviços do SOC</h4><p>Wazuh primeiro; depois Zabbix + Grafana, OpenVAS, Cyberappfin IA e Zammad.</p></div></div>
           <div class="bloco" style="--cor:${COR.danger}"><span class="num">6</span><div><h4>Aplicação</h4><p>Firefly na DMZ, publicado pelo proxy 10.0.50.2; serviços na ordem dos MTPD.</p></div></div>
           <div class="bloco" style="--cor:${COR.brand}"><span class="num">7</span><div><h4>Volta à operação</h4><p>Agentes, varredura contra o baseline, backup novo e só então a internet.</p></div></div>
         </div>
@@ -1752,7 +1748,7 @@ const PARADAS = [
       ['Desastre:', 'as VMs do ambiente são perdidas: NT-001, NT-002, NT-003, o Firefly e a stack do SOC. A Diretoria declara o desastre e o relógio do RTO começa. A rede e o <b>repositório de backup no TrueNAS</b>, no ambiente externo, continuam íntegros.'],
       ['Base e NT-003:', 'o ambiente externo entrega VMs novas e o Network confere SD-WAN, firewall e VLANs. O <b>primeiro servidor a voltar é o NT-003</b>: o Veeam é reinstalado com conta local, fora do domínio, ligado ao repositório no TrueNAS, e escolhe o último ponto íntegro de cada VM.'],
       ['Identidade:', 'o NT-001 volta pela restauração completa do Veeam; o NT-002 é reconstruído e <b>replica a partir dele</b>.'],
-      ['SOC:', '<b>Wazuh primeiro</b>, para enxergar o ambiente enquanto ele volta; depois Zabbix + Grafana, OpenVAS, CyberFin IA e Zammad.'],
+      ['SOC:', '<b>Wazuh primeiro</b>, para enxergar o ambiente enquanto ele volta; depois Zabbix + Grafana, OpenVAS, Cyberappfin IA e Zammad.'],
       ['Aplicação:', 'o <b>Firefly</b> volta na DMZ pelo backup dedicado (banco, arquivos e configuração) e é publicado de novo pelo proxy 10.0.50.2. Depois, os serviços de negócio na ordem do MTPD. Cada servidor só é liberado depois do checklist.'],
       ['Volta à operação:', 'agentes reportando ao Wazuh, OpenVAS comparando com o baseline, um evento de teste chegando até o Zammad e <b>backup novo</b> no NT-003. Só então a internet é liberada; RPO e RTO reais vão para o registro.']
     ], passo, COR.grc) + LINK_DRP,
@@ -1762,7 +1758,7 @@ const PARADAS = [
       'Fase 4: o AD sai do backup. Só um controlador volta do backup; o outro é reconstruído e replica, para não termos dois ADs inconsistentes.',
       'Fase 5: o Wazuh vem primeiro porque, enquanto o ambiente volta, o SOC precisa enxergar o que acontece.',
       'Fase 6: as aplicações por último, na ordem da BIA. O Firefly tem um backup próprio, de banco, arquivos e configuração, já validado com SHA-256. Nada é liberado sem o checklist que mostramos a seguir.',
-      'Fase 7: o ambiente só reabre monitorado, varrido, com um evento de teste percorrendo Wazuh, CyberFin e Zammad, e com backup novo. Os tempos reais são comparados com a BIA. Tudo isso está no documento do DRP, no link do painel.'
+      'Fase 7: o ambiente só reabre monitorado, varrido, com um evento de teste percorrendo Wazuh, Cyberappfin e Zammad, e com backup novo. Os tempos reais são comparados com a BIA. Tudo isso está no documento do DRP, no link do painel.'
     ][passo]
   })),
   {
@@ -1811,19 +1807,20 @@ const PARADAS = [
     quem:P4, cor:COR.grc, titulo:'GRC: políticas e conformidade', sub:'Uma financeira regulada precisa provar que é segura',
     sala:`<div class="s-corpo">
         <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
-          <div class="doc"><span class="cod">POL-GDI-001 · POL-CA-001</span><h4>Identidades e Controle de Acesso</h4><p>Ciclo de vida de identidades, MFA, controle de contas privilegiadas e trilhas de auditoria.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.6 · vigente</span></div>
-          <div class="doc"><span class="cod">POL-CR-001</span><h4>Criptografia</h4><p>Algoritmos, gestão de chaves e proteção de dados em trânsito e em repouso.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v1.4 · vigente</span></div>
-          <div class="doc"><span class="cod">POL-GI-001</span><h4>Gestão de Incidentes</h4><p>Matriz de severidade, ciclo de resposta, CSIRT, notificação e KPIs.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.2 · SOC</span></div>
-          <div class="doc"><span class="cod">POL-CN-001</span><h4>Continuidade do Negócio</h4><p>BIA, RTO/RPO, backup 3-2-1, DRP e plano de testes.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v1.2 · SOC</span></div>
+          <div class="doc"><span class="cod">POL-GDI-001 · POL-CA-001</span><h4>Identidades e Controle de Acesso</h4><p>Ciclo de vida de identidades, MFA, controle de contas privilegiadas e trilhas de auditoria.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v2.0 · vigente</span></div>
+          <div class="doc"><span class="cod">POL-CR-001</span><h4>Criptografia</h4><p>Algoritmos, gestão de chaves e proteção de dados em trânsito e em repouso.</p><span class="selo2" style="background:#D6F5DF;color:#14532D">v2.0 · vigente</span></div>
+          <div class="doc"><span class="cod">POL-GI-001</span><h4>Gestão de Incidentes</h4><p>Matriz de severidade, ciclo de resposta, CSIRT, notificação e KPIs.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v2.0 · SOC</span></div>
+          <div class="doc"><span class="cod">POL-CN-001</span><h4>Continuidade do Negócio</h4><p>BIA, RTO/RPO, backup 3-2-1, DRP e plano de testes.</p><span class="selo2" style="background:#FDE9C8;color:#7C3F00">v2.0 · SOC</span></div>
         </div>
-        <div class="linha" style="grid-template-columns:repeat(4, 1fr)">
-          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">100%</span><p>Inventário de ativos</p></div>
-          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">90%</span><p>PSI e políticas complementares</p></div>
+        <div class="linha" style="grid-template-columns:1.4fr 1fr 1fr">
+          <div class="bloco" style="--cor:${COR.grc}"><span class="rot">Plataforma desenvolvida pelo GRC</span><h4>ValidAI</h4>
+            <p>Verificação automática de conformidade com a ISO/IEC 27001 e 27002.</p>
+            <a class="amb-link" href="https://validai-beta.vercel.app" target="_blank" rel="noopener">Abrir o ValidAI ↗ <small>validai-beta.vercel.app</small></a></div>
           <div class="bloco" style="--cor:${COR.grc}"><span class="grande">11</span><p>Playbooks de resposta (PB-000 a PB-010)</p></div>
-          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">90%</span><p>Documentação do projeto</p></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="grande">80%</span><p>Documentação do projeto</p></div>
         </div>
       </div>`,
-    notas:'Banco Central e LGPD exigem política escrita, não só prática. GRC coordena e cada time contribui com a política da sua área: o SOC escreveu as de incidentes e continuidade. São 11 playbooks: o PB-000 é o mestre e o PB-010, de phishing, é o usado na simulação.'
+    notas:'Banco Central e LGPD exigem política escrita, não só prática. GRC coordena e cada time contribui com a política da sua área: o SOC escreveu as de incidentes e continuidade. Todo o pacote de políticas está na versão 2.0. Para verificar a conformidade delas com a ISO/IEC 27001 e 27002, o GRC desenvolveu o ValidAI, que faz essa checagem automaticamente; se der, abrir o link e mostrar. São 11 playbooks: o PB-000 é o mestre e o PB-010, de phishing, é o usado na simulação. A documentação está em 80%: BIA e DRP ainda serão refinados para a entrega final.',
   },
   {
     quem:P4, cor:COR.danger, titulo:'Onde estão os riscos', sub:'O que as varreduras e os testes mostram',
@@ -1881,7 +1878,7 @@ async function rodarIncidente(passo){
   WS.classList.add('alerta');
   selo(WS, 'SUSPEITA', COR.danger);
   if(passo === 1){
-    // detecção no Wazuh e classificação pela CyberFin IA
+    // detecção no Wazuh e classificação pela Cyberappfin IA
     emLoop(async () => { if(await pacote(viaBus(ws, wz), COR.danger, 1500, 7)) pacote(viaBus(wz, ia), '#FCA5A5', 900, 6); }, 3000);
   }
   if(passo === 2){
@@ -1924,7 +1921,7 @@ const CAPS = [
   { id:'organizacao', rot:'02', nome:'Organização', titulo:'Como nos organizamos', partes:[{ salas:[2] }] },
   { id:'topologia', rot:'03', nome:'Topologia', titulo:'A topologia e o fluxo dos pacotes', partes:[{ mapa:[3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20] }] },
   { id:'deteccao', rot:'04', nome:'Detecção', titulo:'Detecção: Wazuh, IA e firewall', partes:[{ salas:[10, 11, 12, 13, 14, 15, 16, 21] }] },
-  { id:'dashboards', rot:'05', nome:'Dashboards', titulo:'Como o SOC enxerga o ambiente', partes:[{ dash:true }] },
+  { id:'dashboards', rot:'05', nome:'Dashboards', titulo:'Dashboards', partes:[{ dash:true }] },
   { id:'incidente', rot:'06', nome:'Incidente', titulo:'Um incidente, do clique ao ticket', partes:[{ mapa:[22, 23, 24, 25, 26, 27] }, { salas:[28, 29, 30, 31, 32, 33] }] },
   { id:'continuidade', rot:'07', nome:'Continuidade', titulo:'Backup, BIA e recuperação', partes:[{ salas:[35, 36, 37, 38, 39, 40] }, { mapa:[34, 41, 42, 43, 44, 45, 46] }, { salas:[47, 48, 49, 50, 51, 52] }] },
   { id:'grc', rot:'08', nome:'GRC', titulo:'Governança e riscos', partes:[{ salas:[53] }] }

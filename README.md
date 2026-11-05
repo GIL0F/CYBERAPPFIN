@@ -17,7 +17,7 @@ Uma página só, de rolagem, com tudo o que o projeto construiu:
 | **Anatomia** | As 7 camadas do ambiente em vista explodida (SD-WAN → UniFi → Cisco 2960 → VLANs → servidores → Wazuh → Zammad) e um pacote atravessando cada uma |
 | **Organização** | Os cinco times e o plano de subida do ambiente |
 | **Topologia** | O mapa da rede com o fluxo dos pacotes, passo a passo: perímetro, VLANs, AD, SOC, agentes, OpenVAS, DMZ e as regras de firewall |
-| **Detecção** | As 30 regras customizadas do Wazuh, regras de correlação, CyberFin IA e as demonstrações ao vivo |
+| **Detecção** | As 30 regras customizadas do Wazuh, regras de correlação, Cyberappfin IA e as demonstrações ao vivo |
 | **Dashboards** | Os 11 dashboards do Grafana do SOC, com zoom em cada área, gráficos se desenhando e números animados |
 | **Incidente** | Simulação de phishing no mapa e o tratamento completo: severidade, CSIRT, escalonamento, Zammad e o ticket do início ao fim |
 | **Continuidade** | Backup, BIA (impacto e mitigação), ordem de recuperação, o DR no mapa e o checklist pós-restauração |

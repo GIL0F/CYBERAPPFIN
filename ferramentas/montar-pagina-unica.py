@@ -91,7 +91,7 @@ const CAPS = [
   { id:'organizacao', rot:'02', nome:'Organização', titulo:'Como nos organizamos', partes:[{ salas:[2] }] },
   { id:'topologia', rot:'03', nome:'Topologia', titulo:'A topologia e o fluxo dos pacotes', partes:[{ mapa:[3, 4, 5, 6, 7, 8, 9, 17, 18, 19, 20] }] },
   { id:'deteccao', rot:'04', nome:'Detecção', titulo:'Detecção: Wazuh, IA e firewall', partes:[{ salas:[10, 11, 12, 13, 14, 15, 16, 21] }] },
-  { id:'dashboards', rot:'05', nome:'Dashboards', titulo:'Como o SOC enxerga o ambiente', partes:[{ dash:true }] },
+  { id:'dashboards', rot:'05', nome:'Dashboards', titulo:'Dashboards', partes:[{ dash:true }] },
   { id:'incidente', rot:'06', nome:'Incidente', titulo:'Um incidente, do clique ao ticket', partes:[{ mapa:[22, 23, 24, 25, 26, 27] }, { salas:[28, 29, 30, 31, 32, 33] }] },
   { id:'continuidade', rot:'07', nome:'Continuidade', titulo:'Backup, BIA e recuperação', partes:[{ salas:[35, 36, 37, 38, 39, 40] }, { mapa:[34, 41, 42, 43, 44, 45, 46] }, { salas:[47, 48, 49, 50, 51, 52] }] },
   { id:'grc', rot:'08', nome:'GRC', titulo:'Governança e riscos', partes:[{ salas:[53] }] }
