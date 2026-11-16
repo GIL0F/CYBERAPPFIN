@@ -46,6 +46,34 @@ for a, b in [("document.body.classList.remove('focando')", "svg.classList.remove
     nucleo = nucleo.replace(a, b)
 incidente = entre(js_j, 'async function rodarIncidente', '\nfunction ir(')
 incidente = 'async function rodarIncidente' + incidente
+# OKRs das áreas (okrs.html): entram num shadow DOM, com o CSS da página de OKRs isolado do resto
+import json as _json, re as _re
+okr_html = (RAIZ / 'okrs.html').read_text(encoding='utf-8')
+okr_css = entre(okr_html, '<style>', '</style>')
+okr_css = okr_css.replace(':root{', ':host{ display:block; ', 1)
+okr_css = _re.sub(r'\n  body\{.*?\}\n', '\n', okr_css, count=1, flags=_re.S)
+okr_css = _re.sub(r'\n  body::after\{.*?\}\n', '\n', okr_css, count=1, flags=_re.S)
+okr_css = okr_css.replace('position:sticky; top:24px;', 'position:sticky; top:calc(var(--topo, 0px) + 16px);')
+okr_css = okr_css.replace('scroll-margin-top:24px;', 'scroll-margin-top:calc(var(--topo, 0px) + 16px);')
+okr_css += '\n  .wrap{ max-width:none; }\n  header{ padding-top:0; }\n'
+okr_corpo = entre(okr_html, '<body>', '<script>')
+okr_corpo = _re.sub(r'\s*<span class="fig">CAP_09 · OKRs</span>\s*<h1>.*?</h1>', '', okr_corpo, count=1, flags=_re.S)
+okr_js = entre(okr_html, '<script>', '</script>').replace('document.getElementById', 'raiz.getElementById')
+motor_okrs = f"""
+/* OKRs das áreas — copiados de okrs.html por ferramentas/montar-pagina-unica.py */
+function montarOKRs(sec){{
+  const host = document.createElement('div');
+  sec.appendChild(host);
+  const raiz = host.attachShadow({{ mode:'open' }});
+  raiz.innerHTML = '<style>' + {_json.dumps(okr_css, ensure_ascii=False)} + '</style>' + {_json.dumps(okr_corpo, ensure_ascii=False)};
+{okr_js}
+  raiz.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', e => {{
+    e.preventDefault(); const alvo = raiz.getElementById(a.getAttribute('href').slice(1));
+    if(alvo) alvo.scrollIntoView({{ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }});
+  }}));
+}}
+"""
+
 # dados dos dashboards do Grafana (dashboards/index.html): marcações, pontos, números e próximos passos
 dash_dados = entre(dash_html, 'const C = {', 'let atual = 0')
 dash_dados = 'const C = {' + dash_dados
@@ -93,8 +121,9 @@ const CAPS = [
   { id:'deteccao', rot:'04', nome:'Detecção', titulo:'Detecção: Wazuh, IA e firewall', partes:[{ salas:[10, 11, 12, 13, 14, 15, 16, 21] }] },
   { id:'dashboards', rot:'05', nome:'Dashboards', titulo:'Dashboards', partes:[{ dash:true }] },
   { id:'incidente', rot:'06', nome:'Incidente', titulo:'Um incidente, do clique ao ticket', partes:[{ mapa:[22, 23, 24, 25, 26, 27] }, { salas:[28, 29, 30, 31, 32, 33] }] },
-  { id:'continuidade', rot:'07', nome:'Continuidade', titulo:'Backup, BIA e recuperação', partes:[{ salas:[35, 36, 37, 38, 39, 40] }, { mapa:[34, 41, 42, 43, 44, 45, 46] }, { salas:[47, 48, 49, 50, 51, 52] }] },
-  { id:'grc', rot:'08', nome:'GRC', titulo:'Governança e riscos', partes:[{ salas:[53] }] }
+  { id:'continuidade', rot:'07', nome:'Continuidade', titulo:'Backup, BIA e recuperação', partes:[{ salas:[35, 36, 38, 39, 40] }, { mapa:[34, 41, 42, 43, 44, 45, 46] }, { salas:[47, 48, 49, 50, 51, 52] }] },
+  { id:'grc', rot:'08', nome:'GRC', titulo:'Governança e riscos', partes:[{ salas:[53] }] },
+  { id:'okrs', rot:'09', nome:'OKRs', titulo:'OKRs por área', partes:[{ okrs:true }] }
 ];
 
 // as cores do conteúdo foram feitas para fundo escuro: no papel claro, viram tons legíveis
@@ -181,6 +210,7 @@ CAPS.forEach(c => {
     if(parte.salas) parte.salas.forEach(n => sec.appendChild(artigoSala(n)));
     if(parte.mapa) sec.appendChild(blocoMapa(parte.mapa));
     if(parte.dash) blocoDash(sec);
+    if(parte.okrs) montarOKRs(sec);
   });
   capitulos.appendChild(sec);
 });
@@ -441,8 +471,12 @@ css_pagina = r"""
   .calor .cab{ font:800 12px 'JetBrains Mono', monospace; letter-spacing:.06em; text-transform:uppercase; text-align:center; padding:6px 0; }
   .calor .srv{ font-weight:700; display:flex; align-items:center; }
   .calor .cel{ border:2px solid var(--tinta); padding:10px 4px; text-align:center; font-weight:700; font-size:15px; }
-  .calor .n2{ background:#FACC15; } .calor .n3{ background:#FB923C; } .calor .n4{ background:#F87171; }
+  .calor .n1{ background:#CBD5E1; } .calor .n2{ background:#FACC15; } .calor .n3{ background:#FB923C; } .calor .n4{ background:#F87171; }
   .marcos p{ font-size:14px; line-height:1.4; border-top:3px solid var(--tinta); padding-top:8px; }
+  .calor.bia, .marcos.bia{ grid-template-columns:minmax(130px, 13%) repeat(5, 1fr) minmax(130px, 1.15fr); }
+  .calor.bia .cab{ display:flex; flex-direction:column; align-items:center; justify-content:flex-end; }
+  .calor .cab small{ display:block; font-size:.8em; letter-spacing:0; opacity:.75; }
+  .calor .cel.idx{ border-width:4px; }
   .mitiga{ display:grid; grid-template-columns:minmax(140px, 13%) minmax(190px, 27%) 1fr; gap:6px; }
   .mitiga .cab{ font:800 12px 'JetBrains Mono', monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--cinza); padding:4px 8px; }
   .mitiga .pil{ font:700 18px 'Space Grotesk', sans-serif; display:flex; align-items:center; padding:10px; border:var(--borda); border-left:10px solid var(--grc); background:#fff; }
@@ -603,7 +637,7 @@ nav = """<nav class="topo-nav" aria-label="Capítulos">
   <a class="marca" href="#inicio">Cyberappfin</a>
   <a href="#anatomia">Anatomia</a><a href="#organizacao">Organização</a><a href="#topologia">Topologia</a>
   <a href="#deteccao">Detecção</a><a href="#dashboards">Dashboards</a><a href="#incidente">Incidente</a><a href="#continuidade">Continuidade</a>
-  <a href="#grc">GRC</a><a href="#fim">Documentos</a>
+  <a href="#grc">GRC</a><a href="#okrs">OKRs</a><a href="#fim">Documentos</a>
 </nav>"""
 
 fim = """<section class="fim" id="fim">
@@ -613,6 +647,8 @@ fim = """<section class="fim" id="fim">
     <a class="amarelo" href="drp.html" target="_blank" rel="noopener"><b>Plano de recuperação (DRP)</b><span>Cenário, papéis, as 8 fases da restauração e o checklist, item a item.</span><em>drp.html ↗</em></a>
     <a href="regras-wazuh.html" target="_blank" rel="noopener"><b>Regras do Wazuh</b><span>O catálogo completo das regras customizadas do local_rules.xml.</span><em>regras-wazuh.html ↗</em></a>
     <a href="runbook-tecnico.html" target="_blank" rel="noopener"><b>Runbook técnico</b><span>Roteiro, evidências e o que ainda precisa ser comprovado.</span><em>runbook-tecnico.html ↗</em></a>
+    <a href="okrs.html" target="_blank" rel="noopener"><b>OKRs das áreas</b><span>Os OKRs das cinco áreas, com fórmulas, metas e os painéis do Grafana.</span><em>okrs.html ↗</em></a>
+    <a href="okrs-soc.html" target="_blank" rel="noopener"><b>OKRs do SOC</b><span>A apresentação dos OKRs do SOC, no modelo da declaração do GRC.</span><em>okrs-soc.html ↗</em></a>
     <a href="jornada.html" target="_blank" rel="noopener"><b>Versão em slides</b><span>A mesma história, feita para o projetor: setas, notas e tela preta.</span><em>jornada.html ↗</em></a>
   </div>
   <div class="obrigado"><div><h2>Obrigado!</h2><p>Perguntas?</p></div><a href="#inicio">↑ Voltar ao início</a></div>
@@ -636,6 +672,7 @@ html = f"""{head}{css_base}{css_pagina}</style>
 </script>
 <script>
 {motor_dash}
+{motor_okrs}
 {motor}
 {pagina_js}
 </script>

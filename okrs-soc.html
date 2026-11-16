@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OKRs do SOC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700;800&display=swap">
+<style>
+  /* Apresentação do SOC no estilo "Engenharia crua" da final.html. Uma tela por slide (16:9), mesma sequência da declaração do GRC. */
+  :root{
+    --papel:#FAF8F2; --tinta:#111111; --cinza:#55575C; --branco:#FFFFFF; --listra:#EEEBE2;
+    --soc:#F59E0B; --verde:#4ADE80; --amarelo:#FACC15; --vermelho:#F87171; --azul:#93C5FD;
+    --borda:3px solid var(--tinta); --sombra:8px 8px 0 0 var(--tinta);
+    --disp:'Space Grotesk', system-ui, sans-serif; --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
+    color-scheme:light;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-snap-type:y mandatory; }
+  body{ background:var(--papel); color:var(--tinta); font-family:var(--disp); margin:0; }
+  body::after{ content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background-image:linear-gradient(#11111110 1px, transparent 1px), linear-gradient(90deg, #11111110 1px, transparent 1px); background-size:32px 32px; }
+
+  .sl{ min-height:100vh; scroll-snap-align:start; display:flex; flex-direction:column; gap:clamp(14px, 2.4vh, 28px);
+       padding-block:clamp(20px, 4vh, 48px); padding-left:max(16px, env(safe-area-inset-left, 0px), 4vw); padding-right:max(16px, env(safe-area-inset-right, 0px), 4vw); position:relative; }
+  .topo{ display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap; align-items:center; }
+  .fig{ font:800 clamp(12px, .95vw, 16px) var(--mono); letter-spacing:.14em; text-transform:uppercase; display:inline-block; border:var(--borda);
+        padding:6px 12px; background:var(--branco); box-shadow:4px 4px 0 0 var(--tinta); }
+  .pag{ font:800 clamp(12px, .95vw, 16px) var(--mono); letter-spacing:.1em; color:var(--cinza); }
+  .rot{ font:800 clamp(12px, .9vw, 15px) var(--mono); letter-spacing:.14em; text-transform:uppercase; }
+  h2{ font-size:clamp(34px, 4.4vw, 76px); line-height:.92; letter-spacing:-.03em; margin:0; text-transform:uppercase; text-wrap:balance; }
+  h2 .rec{ background:var(--soc); border:var(--borda); padding:0 .12em; box-shadow:6px 6px 0 0 var(--tinta); display:inline-block; }
+  p{ margin:0; }
+
+  /* capa */
+  .capa{ justify-content:center; }
+  .capa h1{ font-size:clamp(56px, 9vw, 168px); line-height:.86; letter-spacing:-.045em; margin:0; text-transform:uppercase; }
+  .capa h1 .rec{ background:var(--soc); border:var(--borda); padding:0 .1em; box-shadow:var(--sombra); display:inline-block; margin-top:.06em; }
+  .capa .lead{ font-size:clamp(20px, 1.8vw, 32px); line-height:1.3; font-weight:500; max-width:40ch; }
+  .capa .meta{ font:700 clamp(13px, 1vw, 17px) var(--mono); color:var(--cinza); text-transform:uppercase; letter-spacing:.06em; }
+
+  /* caixas */
+  .grade2{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:clamp(16px, 2vw, 28px); flex:1; align-content:start; }
+  .cx{ border:var(--borda); background:var(--branco); padding:clamp(16px, 2vw, 30px); display:flex; flex-direction:column; gap:12px; min-width:0; }
+  .cx p{ font-size:clamp(17px, 1.45vw, 26px); line-height:1.4; font-weight:500; }
+  .cx.cor{ background:var(--soc); box-shadow:var(--sombra); }
+  .cx.cheia{ grid-column:1 / -1; }
+  .obj{ font-size:clamp(28px, 3vw, 54px); line-height:1.02; letter-spacing:-.02em; font-weight:700; text-wrap:balance; }
+  .fluxo{ display:flex; flex-wrap:wrap; gap:10px; align-items:center; font:800 clamp(14px, 1.1vw, 19px) var(--mono); text-transform:uppercase; }
+  .fluxo b{ border:var(--borda); padding:8px 12px; background:var(--papel); }
+
+  /* tabela de KPIs */
+  .tab-wrap{ overflow-x:auto; border:var(--borda); background:var(--branco); box-shadow:var(--sombra); }
+  table{ border-collapse:collapse; width:100%; min-width:900px; font-variant-numeric:tabular-nums; }
+  th{ font:800 clamp(11px, .85vw, 14px) var(--mono); letter-spacing:.1em; text-transform:uppercase; text-align:left; padding:12px 14px; border-bottom:var(--borda); background:var(--tinta); color:var(--branco); }
+  td{ padding:clamp(10px, 1.5vh, 16px) 14px; border-bottom:2px solid var(--tinta); vertical-align:middle; font-size:clamp(15px, 1.15vw, 20px); font-weight:500; }
+  tr:last-child td{ border-bottom:0; }
+  td.n{ font:800 clamp(16px, 1.3vw, 22px) var(--mono); border-left:12px solid var(--s); }
+  td .nome{ font-weight:700; font-size:clamp(17px, 1.3vw, 23px); }
+  td .form{ font:600 clamp(12px, .9vw, 15px) var(--mono); color:var(--cinza); margin-top:4px; }
+  td.v{ font:800 clamp(17px, 1.35vw, 24px) var(--mono); white-space:nowrap; }
+  td.v.falta{ color:var(--cinza); }
+  td.v.falta span{ border:2px dashed var(--cinza); padding:2px 8px; font-size:.8em; }
+  .sim{ display:block; width:max-content; font:800 11px var(--mono); letter-spacing:.08em; text-transform:uppercase; border:2px dashed var(--tinta); padding:1px 6px; margin-top:4px; }
+  .nota-sim{ font-size:clamp(11px, .8vw, 13px)!important; font-style:italic; }
+  .lead-fontes{ font-size:clamp(16px, 1.3vw, 22px); font-weight:500; line-height:1.4; max-width:70ch; }
+  .fontes{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:12px; }
+  .fontes div{ border:var(--borda); background:var(--branco); padding:10px 12px; display:flex; flex-direction:column; gap:4px; font-size:clamp(13px, .95vw, 16px); font-weight:500; line-height:1.35; min-width:0; }
+  .fontes div.real{ border-left:12px solid var(--verde); }
+  .fontes div.simu{ border-style:dashed; border-left:12px dashed var(--tinta); }
+  .fontes b{ font:800 clamp(13px, .95vw, 16px) var(--mono); }
+  .sim.med{ border-style:solid; background:var(--verde); }
+  td.m{ font:700 clamp(14px, 1.05vw, 18px) var(--mono); white-space:nowrap; }
+  .barra{ position:relative; height:16px; border:var(--borda); background:var(--branco); width:clamp(110px, 10vw, 180px); }
+  .barra i{ position:absolute; left:0; top:0; bottom:0; width:var(--p); background:var(--s); animation:cresce 1s cubic-bezier(.2,.8,.2,1) both; }
+  .barra u{ position:absolute; top:-6px; bottom:-6px; border-left:4px solid var(--tinta); left:var(--m); }
+  .barra u.lim{ border-left-style:dashed; }
+  .pill{ font:800 clamp(11px, .85vw, 14px) var(--mono); letter-spacing:.08em; text-transform:uppercase; border:var(--borda); padding:5px 9px; white-space:nowrap; background:var(--s); display:inline-block; }
+  .placar{ display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
+  .placar .n{ font-size:clamp(34px, 3.2vw, 58px); font-weight:700; letter-spacing:-.03em; line-height:.9; border:var(--borda); background:var(--branco); padding:8px 14px; box-shadow:5px 5px 0 0 var(--tinta); }
+  .placar span{ font:700 clamp(13px, 1vw, 17px) var(--mono); text-transform:uppercase; letter-spacing:.06em; }
+  .legenda{ display:flex; gap:16px; flex-wrap:wrap; font:700 clamp(12px, .9vw, 15px) var(--mono); }
+  .legenda span{ display:flex; gap:8px; align-items:center; }
+  .legenda i{ width:20px; height:14px; border:2px solid var(--tinta); background:var(--s); }
+
+  /* painel */
+  .painel{ border:var(--borda); background:var(--tinta); box-shadow:var(--sombra); margin:0; display:flex; flex-direction:column; flex:1; min-height:0; }
+  .painel img{ display:block; width:100%; height:auto; max-height:72vh; object-fit:contain; background:var(--tinta); }
+  .painel figcaption{ background:var(--branco); border-top:var(--borda); padding:10px 14px; font:700 clamp(13px, 1vw, 16px) var(--mono); }
+  .pontos{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:14px; }
+  .pontos div{ border:var(--borda); background:var(--branco); padding:12px 14px; font-size:clamp(14px, 1.05vw, 18px); font-weight:500; line-height:1.35; }
+  .pontos b{ display:block; font-size:clamp(16px, 1.2vw, 21px); }
+
+  /* próximos passos */
+  .passos{ display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:clamp(14px, 1.6vw, 24px); }
+  .passos .cx{ box-shadow:6px 6px 0 0 var(--tinta); }
+  .passos .kpi{ font:800 clamp(12px, .9vw, 15px) var(--mono); letter-spacing:.1em; text-transform:uppercase; border:var(--borda); padding:4px 8px; align-self:start; background:var(--soc); }
+  .passos h3{ font-size:clamp(22px, 2vw, 34px); line-height:1.05; margin:0; }
+
+  .dica{ position:fixed; right:max(16px, env(safe-area-inset-right, 0px)); bottom:max(14px, env(safe-area-inset-bottom, 0px)); font:700 12px var(--mono); color:var(--cinza); background:var(--papel); border:2px solid var(--cinza); padding:4px 8px; }
+  @keyframes cresce{ from{ width:0; } }
+  @media (prefers-reduced-motion: reduce){ .barra i{ animation:none; } }
+  @media (max-width:900px){ html{ scroll-snap-type:none; } .sl{ min-height:auto; } .grade2, .pontos, .passos{ grid-template-columns:1fr; } .dica{ display:none; } }
+</style>
+</head>
+<body>
+
+<!-- 1 · capa -->
+<section class="sl capa" id="s1">
+  <span class="fig">Cyberappfin · Security Operations Center</span>
+  <h1>OKRs e KPIs<br><span class="rec">do SOC</span></h1>
+  <p class="lead">Objetivos, resultados-chave e indicadores do time do SOC para o ciclo de avaliação, no mesmo modelo da declaração do GRC.</p>
+  <span class="meta">Rascunho para validação do time · 16/11/2026 · Classificação: Interno</span>
+</section>
+
+<!-- 2 · propósito e visão -->
+<section class="sl" id="s2">
+  <div class="topo"><span class="fig">Propósito e visão</span><span class="pag">02</span></div>
+  <h2>Ver tudo. <span class="rec">Tratar rápido.</span></h2>
+  <div class="grade2">
+    <div class="cx"><span class="rot">Propósito</span>
+      <p>Formalizar os dois OKRs do SOC e os oito KPIs que medem cada um, com fórmula, valor de hoje, meta e frequência.</p></div>
+    <div class="cx cor"><span class="rot">Visão de longo prazo</span>
+      <p>Um SOC que enxerga todo o ambiente e transforma cada alerta relevante em incidente tratado dentro do prazo da política.</p></div>
+    <div class="cx cheia"><span class="rot">O caminho de um alerta, que é o que os KPIs medem</span>
+      <div class="fluxo"><b>Evento</b>→<b>Wazuh · regra</b>→<b>Cyberappfin · correlação</b>→<b>Zammad · ticket</b>→<b>Analista · decisão</b></div>
+      <p>OKR 1 mede a primeira metade: se o SOC vê o evento e se a regra dispara. OKR 2 mede a segunda: quanto tempo leva até virar ticket e até ser resolvido.</p></div>
+  </div>
+</section>
+
+<!-- 3 · OKR 1 -->
+<section class="sl" id="s3">
+  <div class="topo"><span class="fig">OKR 1 — Visibilidade</span><span class="pag">03</span></div>
+  <div class="grade2">
+    <div class="cx cor cheia"><span class="rot">Objetivo 1</span>
+      <span class="obj">Enxergar todo o ambiente e detectar os ataques conhecidos.</span></div>
+    <div class="cx"><span class="rot">Justificativa</span>
+      <p>O SOC só responde ao que vê. Ativo sem agente é ponto cego, e regra que não dispara deixa o ataque passar sem alerta.</p></div>
+    <div class="cx"><span class="rot">Situação de partida</span>
+      <p>Wazuh 4.14.6 com 30 regras customizadas (29 do ambiente e a 100001, de exemplo). O NT-003 não enviava eventos: o firewall bloqueia as portas 1514 e 1515 da VLAN 60.</p></div>
+  </div>
+</section>
+
+<!-- 4 · KPIs OKR 1 -->
+<section class="sl" id="s4" data-okr="0">
+  <div class="topo"><span class="fig">OKR 1 — KPIs</span><span class="pag">04</span></div>
+</section>
+
+<!-- 5 · painel OKR 1 -->
+<section class="sl" id="s5">
+  <div class="topo"><span class="fig">OKR 1 — Painel</span><span class="pag">05</span></div>
+  <figure class="painel"><img src="dashboards/img/detection.jpg" alt="Painel Detection Engineering no Grafana">
+    <figcaption>Grafana · Detection Engineering · as regras do SOC disparando no ambiente</figcaption></figure>
+  <div class="pontos">
+    <div><b>≈ 2 mil</b>detecções das regras próprias</div>
+    <div><b>149</b>tentativas de SQL Injection</div>
+    <div><b>250</b>acessos a honeypot e secrets</div>
+  </div>
+</section>
+
+<!-- 6 · OKR 2 -->
+<section class="sl" id="s6">
+  <div class="topo"><span class="fig">OKR 2 — Resposta</span><span class="pag">06</span></div>
+  <div class="grade2">
+    <div class="cx cor cheia"><span class="rot">Objetivo 2</span>
+      <span class="obj">Transformar cada alerta relevante em incidente tratado, rápido e sem retrabalho.</span></div>
+    <div class="cx"><span class="rot">Justificativa</span>
+      <p>Quanto mais cedo um alerta vira ticket, menor o dano; a política dá 15 minutos. Ticket duplicado e falso positivo tomam o tempo do analista.</p></div>
+    <div class="cx"><span class="rot">Situação de partida</span>
+      <p>Fluxo Wazuh → Cyberappfin → Zammad funcionando, com caso homologado (GET /.env → 403 → regra 100160). O tempo até o ticket ficou em 19 minutos, acima do limite.</p></div>
+  </div>
+</section>
+
+<!-- 7 · KPIs OKR 2 -->
+<section class="sl" id="s7" data-okr="1">
+  <div class="topo"><span class="fig">OKR 2 — KPIs</span><span class="pag">07</span></div>
+</section>
+
+<!-- 7b · fontes -->
+<section class="sl" id="s7b">
+  <div class="topo"><span class="fig">De onde vem cada número</span><span class="pag">07b</span></div>
+  <h2>Medido ou <span class="rec">projetado</span></h2>
+  <p class="lead-fontes">O laboratório não tem operação real: não há clientes nem incidentes em volume. Medimos o que o ambiente mostra e projetamos o resto para o cenário da empresa.</p>
+  <div class="fontes" id="fontes"></div>
+</section>
+
+<!-- 8 · painel OKR 2 -->
+<section class="sl" id="s8">
+  <div class="topo"><span class="fig">OKR 2 — Painel</span><span class="pag">08</span></div>
+  <figure class="painel"><img src="dashboards/img/kpis-soc.jpg" alt="Painel SOC KPIs e OKRs no Grafana">
+    <figcaption>Grafana · SOC KPIs e OKRs · os gráficos marcados “simulado” (falsos positivos) usam dados de teste até o Zammad ser ligado ao Grafana</figcaption></figure>
+  <div class="pontos">
+    <div><b>19 min</b>do alerta no Wazuh até o ticket no Zammad</div>
+    <div><b>14 a 20 min</b>variação ao longo do dia</div>
+    <div><b>7,6%</b>falsos positivos em outubro (projeção)</div>
+  </div>
+</section>
+
+<!-- 9 · próximos passos -->
+<section class="sl" id="s9">
+  <div class="topo"><span class="fig">Onde estamos e o que vem</span><span class="pag">09</span></div>
+  <div class="placar" id="placar"></div>
+  <div class="passos">
+    <div class="cx"><span class="kpi">KPI 2.1 · Tempo até o ticket</span><h3>Abrir o ticket automaticamente</h3>
+      <p>O ticket nasce do alerta, sem esperar a IA. É o caminho para sair de 19 e chegar a 5 minutos.</p></div>
+    <div class="cx"><span class="kpi">KPI 1.1 · Cobertura</span><h3>Liberar o NT-003</h3>
+      <p>Abrir TCP 1514 e 1515 da VLAN 60 até o Wazuh para chegar a 9 de 9 ativos críticos.</p></div>
+    <div class="cx"><span class="kpi">KPI 2.2 · MTTR</span><h3>Zammad no Grafana</h3>
+      <p>Com o token de API, o MTTR e os demais tempos passam a ser calculados direto dos tickets.</p></div>
+  </div>
+</section>
+
+<span class="dica">↑ ↓ ou espaço para navegar</span>
+
+<script>
+const OKRS = [
+  [
+    { n:'1.1', nome:'Cobertura dos ativos críticos', form:'Ativos críticos enviando eventos ao Wazuh ÷ 9', hoje:'8 de 9', pct:88.9, meta:100, freq:'Diária' },
+    { n:'1.2', nome:'Regras customizadas validadas', form:'Regras que dispararam (tráfego real ou teste) ÷ 23 testáveis', hoje:'21 de 23', pct:91.3, meta:100, freq:'Mensal',
+      sim:'Projeção do cenário. Medido no lab: 100113 (brute force) com 0 disparos em 30 dias. Fora da conta: 100001 (exemplo) e as 6 de integridade e defesa, que não se testam em produção.' },
+    { n:'1.3', nome:'VLANs com varredura de vulnerabilidade', form:'VLANs com tarefa no OpenVAS ÷ 6 (VLANs 10 a 60)', hoje:'6 de 6', pct:100, meta:100, freq:'Mensal' },
+  ],
+  [
+    { n:'2.1', nome:'Tempo até o ticket (MTTD do SOC)', form:'Média de (abertura do ticket no Zammad − alerta no Wazuh)', tempo:true, hojeMin:19, metaMin:5, limMin:15, escala:25, freq:'Diária' },
+    { n:'2.2', nome:'MTTR', form:'Média de (fechamento − abertura) dos tickets de incidente', tempo:true, hojeMin:41, metaMin:30, limMin:30, escala:60, freq:'Semanal',
+      sim:'Projeção do cenário até o Zammad ser ligado ao Grafana. Coerente com o tempo até o ticket acima do limite.' },
+    { n:'2.3', nome:'Falsos positivos', form:'Tickets fechados como falso positivo ÷ tickets fechados', menor:true, hojePct:7.6, metaPct:20, freq:'Mensal',
+      sim:'Projeção do cenário (o painel do Grafana marca como “simulado”): 12,5% (jul) → 10,8% → 9,1% → 7,6% (out).' },
+    { n:'2.4', nome:'Incidentes sem ticket duplicado', form:'Incidentes com um único ticket ÷ incidentes', hoje:'46 de 50', pct:92, meta:100, freq:'Mensal',
+      sim:'Projeção do cenário. A correlação do Cyberappfin junta eventos repetidos; os duplicados vêm de rajadas antes da janela de correlação.' },
+    { n:'2.5', nome:'Incidentes encerrados com conclusão', form:'Tickets fechados com classificação e evidência ÷ tickets fechados', hoje:'36 de 40', pct:90, meta:100, freq:'Mensal',
+      sim:'Projeção do cenário. Os 4 restantes foram fechados sem classificação (real, falso positivo ou inconclusivo).' },
+  ]
+];
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const SIM = ' · projeção';
+function st(k){
+  const tag = k.sim ? SIM : '';
+  if (k.tempo){ const ok = k.hojeMin <= k.metaMin, am = k.hojeMin <= k.limMin;
+    return { s: ok ? 'var(--verde)' : am ? 'var(--amarelo)' : 'var(--vermelho)', t: (ok ? 'Atingido' : am ? 'Abaixo' : k.limMin === k.metaMin ? 'Acima da meta' : 'Acima do limite') + tag, gap:'+' + (k.hojeMin - k.metaMin) + ' min', medido:true }; }
+  if (k.menor){ const g = Math.round((k.hojePct - k.metaPct) * 10) / 10, ok = g <= 0;
+    return { s: ok ? 'var(--verde)' : g <= 10 ? 'var(--amarelo)' : 'var(--vermelho)', t: (ok ? 'Atingido' : 'Abaixo') + tag, gap: (g > 0 ? '+' : '−') + String(Math.abs(g)).replace('.', ',') + ' p.p.', medido:true }; }
+  if (k.pct == null) return { s:'var(--azul)', t:'A medir', gap:'—', medido:false };
+  const g = Math.round((k.pct - k.meta) * 10) / 10, gap = (g >= 0 ? '+' : '−') + String(Math.abs(g)).replace('.', ',') + ' p.p.';
+  return { s: g >= 0 ? 'var(--verde)' : g >= -10 ? 'var(--amarelo)' : 'var(--vermelho)', t: (g >= 0 ? 'Atingido' : 'Abaixo') + tag, gap, medido:true };
+}
+function linha(k){
+  const s = st(k), selo = k.sim ? '<span class="sim">projeção</span>' : '<span class="sim med">medido</span>';
+  let hoje, barra, meta;
+  if (k.tempo){ hoje = k.hojeMin + ' min' + selo; meta = k.metaMin + ' min' + (k.limMin !== k.metaMin ? '<br><small>limite ' + k.limMin + '</small>' : '');
+    barra = `<div class="barra" style="--s:${s.s}"><i style="--p:${Math.min(100, k.hojeMin / k.escala * 100)}%"></i><u style="--m:${k.metaMin / k.escala * 100}%"></u>${k.limMin !== k.metaMin ? `<u class="lim" style="--m:${k.limMin / k.escala * 100}%"></u>` : ''}</div>`; }
+  else if (k.menor){ hoje = String(k.hojePct).replace('.', ',') + '%' + selo; meta = '&lt; ' + k.metaPct + '%';
+    barra = `<div class="barra" style="--s:${s.s}"><i style="--p:${k.hojePct}%"></i><u style="--m:${k.metaPct}%"></u></div>`; }
+  else if (k.pct == null){ hoje = '<span>medir</span>'; meta = typeof k.meta === 'number' ? k.meta + '%' : esc(k.meta); barra = `<div class="barra"></div>`; }
+  else { hoje = esc(k.hoje) + selo; meta = k.meta + '%'; barra = `<div class="barra" style="--s:${s.s}"><i style="--p:${k.pct}%"></i><u style="--m:${k.meta}%"></u></div>`; }
+  return `<tr><td class="n" style="--s:${s.s}">${k.n}</td><td><div class="nome">${esc(k.nome)}</div><div class="form">${esc(k.form)}</div></td>
+    <td class="v${s.medido ? '' : ' falta'}">${hoje}</td><td>${barra}</td><td class="m">${meta}</td><td class="m">${s.gap}</td><td class="m">${k.freq}</td><td><span class="pill" style="--s:${s.s}">${s.t}</span></td></tr>`;
+}
+const legenda = `<div class="legenda"><span><i style="--s:var(--verde)"></i>Na meta</span><span><i style="--s:var(--amarelo)"></i>Até 10 p.p. abaixo / entre meta e limite</span><span><i style="--s:var(--vermelho)"></i>Mais de 10 p.p. abaixo / acima do limite</span><span><b class="sim med" style="margin:0">medido</b>no laboratório</span><span><b class="sim" style="margin:0">projeção</b>cenário Cyberappfin: o lab não tem operação real</span></div>`;
+document.querySelectorAll('[data-okr]').forEach(sec => {
+  const ks = OKRS[+sec.dataset.okr], med = ks.filter(k => st(k).medido), ok = med.filter(k => st(k).t.startsWith('Atingido')), sim = ks.filter(k => k.sim).length;
+  sec.insertAdjacentHTML('beforeend', `<div class="placar"><span class="n">${ok.length}/${med.length}</span><span>KPIs na meta · ${ks.length - sim} medido${ks.length - sim === 1 ? '' : 's'} no lab · ${sim} projeç${sim === 1 ? 'ão' : 'ões'}</span></div>
+    <div class="tab-wrap"><table><thead><tr><th>Nº</th><th>Indicador e fórmula</th><th>Hoje</th><th>Hoje × meta</th><th>Meta</th><th>Gap</th><th>Frequência</th><th>Status</th></tr></thead>
+    <tbody>${ks.map(linha).join('')}</tbody></table></div>${legenda}`);
+});
+const todos = OKRS.flat(), med = todos.filter(k => st(k).medido), ok = med.filter(k => st(k).t.startsWith('Atingido')), nsim = todos.filter(k => k.sim).length;
+document.getElementById('placar').innerHTML = `<span class="n">${ok.length}/${med.length}</span><span>KPIs na meta</span><span class="n">${todos.length - nsim}</span><span>medidos no laboratório</span><span class="n">${nsim}</span><span>projeções do cenário Cyberappfin</span>`;
+
+const FONTES = {"1.1": "Medido no lab · painel SOC KPIs e OKRs (Grafana)", "1.3": "Medido no lab · tarefas do OpenVAS por VLAN", "2.1": "Medido no lab · painel SOC KPIs e OKRs (Grafana)"};
+document.getElementById('fontes').innerHTML = OKRS.flat().map(k => `<div class="${k.sim ? 'simu' : 'real'}"><b>${k.n} · ${esc(k.nome)}</b>${k.sim ? esc(k.sim) : esc(FONTES[k.n] || 'Real')}</div>`).join('');
+// navegação por teclado, slide a slide
+const sls = [...document.querySelectorAll('.sl')];
+addEventListener('keydown', e => {
+  if (!['ArrowDown','ArrowRight','PageDown',' ','ArrowUp','ArrowLeft','PageUp'].includes(e.key)) return;
+  e.preventDefault();
+  const atual = sls.findIndex(s => s.getBoundingClientRect().top > -innerHeight / 2);
+  const ir = ['ArrowUp','ArrowLeft','PageUp'].includes(e.key) ? atual - 1 : atual + 1;
+  sls[Math.max(0, Math.min(sls.length - 1, ir))].scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+});
+</script>
+
+</body>
+</html>
