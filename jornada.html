@@ -722,7 +722,7 @@ function passos(lista, atual, cor){
     `<div class="passo ${k < atual ? 'feito' : k === atual ? 'ativo' : ''}"><span><b>${rot}</b>${k === atual ? ' ' + txt : ''}</span></div>`).join('')}</div>`;
 }
 /* subir o ambiente do zero, camada por camada (comandos de restauração; o checklist de validação fica no DRP, seção 10) */
-const SUBIR = [{"n": 1, "t": "Rede: Cisco 2960 e UniFi", "pq": "As VLANs e os trunks precisam existir antes de qualquer servidor voltar.", "cmd": [["Cisco 2960 (console)", ["copy tftp://<tftp>/cisco2960.cfg startup-config", "reload", "show vlan brief", "show interfaces trunk"]], ["UniFi", ["Settings > System > Backups > Restore: arquivo .unf do kit"]]], "ok": "VLANs 10 a 60 ativas e trunks 802.1Q nas portas dos hosts.", "falha": "Recriar as VLANs à mão pelo inventário do anexo do DRP."}, {"n": 2, "t": "NT-003: Veeam do zero", "pq": "É o primeiro a voltar: dele saem todos os outros servidores, inclusive o AD.", "cmd": [["Windows Server novo", ["Rename-Computer -NewName NT-003 -Restart", "New-NetIPAddress -InterfaceAlias Ethernet -IPAddress 10.10.60.143 -PrefixLength 24 -DefaultGateway 10.10.60.1", "Instalar o Veeam B&R (ISO do kit) com a conta local, fora do domínio"]], ["Veeam: ligar o repositório do TrueNAS", ["Backup Infrastructure > Add Repository > SMB: \\\\<truenas>\\veeam", "Sync-VBRBackupRepository -Repository (Get-VBRBackupRepository -Name TrueNAS)"]]], "ok": "Get-VBRBackup lista os backups das VMs importados do TrueNAS.", "falha": "Conferir com o ambiente externo a permissão do compartilhamento no TrueNAS."}, {"n": 3, "t": "Escolher o ponto de restauração", "pq": "Define o RPO real: é deste ponto que cada servidor volta.", "cmd": [["Veeam PowerShell (NT-003)", ["$b = Get-VBRBackup -Name \"<job do servidor>\"", "$rp = Get-VBRRestorePoint -Backup $b | Sort-Object CreationTime | Select-Object -Last 1", "$rp | Select-Object Name, CreationTime"]]], "ok": "Ponto íntegro mais recente escolhido; data e hora anotadas no registro.", "falha": "Em ransomware, usar um ponto anterior à infecção e registrar o RPO maior."}, {"n": 4, "t": "NT-001 volta do backup", "pq": "Só um controlador volta do backup; é a fonte do domínio para todo o resto.", "cmd": [["Veeam PowerShell (NT-003)", ["Start-VBRRestoreVM -RestorePoint $rp -Reason \"DR GRC-DRP-001\" -PowerUp:$true"]], ["NT-001, depois do boot", ["Get-Service NTDS, DNS, Netlogon, KDC", "dcdiag /q", "Resolve-DnsName cyberappfin.local"]]], "ok": "Serviços do AD rodando, dcdiag sem erros e DNS respondendo.", "falha": "Entrar em modo DSRM (senha no kit) e conferir o banco do AD."}, {"n": 5, "t": "NT-002 reconstruído", "pq": "O segundo DC é refeito e replica do NT-001, para não haver dois ADs diferentes.", "cmd": [["NT-001", ["Usuários e Computadores do AD > Domain Controllers > excluir o NT-002 antigo (limpa os metadados)"]], ["NT-002 novo (10.10.20.11)", ["Set-DnsClientServerAddress -InterfaceAlias Ethernet -ServerAddresses 10.10.20.10", "Install-WindowsFeature AD-Domain-Services -IncludeManagementTools", "Install-ADDSDomainController -DomainName cyberappfin.local -InstallDns -Credential (Get-Credential CYBERAPPFIN\\Administrator)", "repadmin /replsummary"]]], "ok": "repadmin /replsummary sem falhas entre NT-001 e NT-002.", "falha": "Acertar DNS e hora (w32tm /resync) e promover de novo."}, {"n": 6, "t": "Plano B: AD do zero, sem backup", "pq": "Se nenhum ponto do AD servir, o domínio é criado de novo a partir da documentação.", "cmd": [["NT-001 novo", ["Install-WindowsFeature AD-Domain-Services -IncludeManagementTools", "Install-ADDSForest -DomainName cyberappfin.local -DomainNetbiosName CYBERAPPFIN -InstallDns"]], ["OUs e grupos (CSV do kit)", ["Import-Csv ous.csv | ForEach-Object { New-ADOrganizationalUnit -Name $_.Nome -Path $_.Caminho }", "Import-Csv grupos.csv | ForEach-Object { New-ADGroup -Name $_.Nome -GroupScope Global -Path $_.Caminho }"]]], "ok": "11 OUs e 18 grupos recriados; GPO de senha (10 caracteres, bloqueio em 5) reaplicada.", "falha": "Cada máquina volta ao domínio novo com Add-Computer -DomainName cyberappfin.local -Restart."}, {"n": 7, "t": "Wazuh primeiro", "pq": "O SOC precisa enxergar o ambiente enquanto ele volta.", "cmd": [["Rota 1: Veeam", ["Start-VBRRestoreVM -RestorePoint $rpWazuh -PowerUp:$true"]], ["Rota 2: do zero (Ubuntu, 10.10.50.21)", ["curl -sO https://packages.wazuh.com/4.14/wazuh-install.sh", "sudo bash wazuh-install.sh -a", "sudo tar -xzpf wazuh-config.tgz -C /", "sudo systemctl restart wazuh-manager"]]], "ok": "Dashboard em https://10.10.50.21 e os agentes voltando como Active.", "falha": "Agente que não volta: sudo /var/ossec/bin/agent-auth -m 10.10.50.21 no servidor."}, {"n": 8, "t": "Zabbix, Grafana e OpenVAS", "pq": "Disponibilidade, painéis e varredura voltam pelo Veeam, com configuração e histórico.", "cmd": [["Veeam PowerShell (NT-003)", ["Start-VBRRestoreVM -RestorePoint $rpZabbix -PowerUp:$true", "Start-VBRRestoreVM -RestorePoint $rpOpenVAS -PowerUp:$true"]], ["zabbixgrafana (10.10.50.15)", ["sudo systemctl restart zabbix-server zabbix-agent grafana-server", "sudo systemctl is-active zabbix-server grafana-server"]]], "ok": "Hosts verdes no Zabbix e painéis do Grafana com dados de agora.", "falha": "Restaurar a VM de um ponto anterior e registrar a perda de histórico."}, {"n": 9, "t": "Cyberappfin IA e Zammad", "pq": "Fecham o fluxo: alerta, correlação e ticket.", "cmd": [["Veeam PowerShell (NT-003)", ["Start-VBRRestoreVM -RestorePoint $rpCyberappfin -PowerUp:$true", "Start-VBRRestoreVM -RestorePoint $rpZammad -PowerUp:$true"]], ["Zammad do zero (instalação por pacote)", ["sudo /opt/zammad/contrib/backup/zammad_restore.sh"]]], "ok": "Um evento de teste chega ao Zammad como ticket.", "falha": "Abrir tickets à mão: o Cyberappfin é desacoplado e não para o SOC."}, {"n": 10, "t": "Firefly pelo backup dedicado", "pq": "O backup próprio (00h e 12h) é mais recente que o do Veeam e já tem SHA-256.", "cmd": [["Firefly novo (10.10.30.3)", ["scp <truenas>:/backups/firefly/firefly-<data>.tar.gz* .", "sha256sum -c firefly-<data>.tar.gz.sha256", "sudo tar -xzpf firefly-<data>.tar.gz -C /", "cd <pasta do compose> && sudo docker compose up -d", "Importar o dump do banco que vem no pacote"]]], "ok": "curl -I http://10.0.50.2:8080 responde 200 ou 302 pelo proxy.", "falha": "Usar o pacote anterior (12 h antes) e registrar o RPO."}, {"n": 11, "t": "Firefly: firewall de volta", "pq": "O servidor não pode voltar mais aberto do que era.", "cmd": [["Firefly (UFW)", ["sudo ufw default deny incoming", "sudo ufw allow from 10.0.50.2 to any port 8080 proto tcp", "sudo ufw allow from 10.10.50.15 to any port 10050 proto tcp", "sudo ufw allow from 10.10.60.143 to any port 22 proto tcp", "sudo ufw allow from 192.168.4.0/24 to any port 22 proto tcp", "sudo ufw enable"]]], "ok": "Só o proxy chega na 8080; a VLAN 40 continua bloqueada.", "falha": "Tirar a publicação do proxy até as regras estarem certas."}, {"n": 12, "t": "Teste final e backup novo", "pq": "O ambiente só reabre quando o fluxo inteiro funciona e existe um backup novo.", "cmd": [["Teste ponta a ponta", ["curl -I http://10.0.50.2:8080/.env"]], ["Veeam PowerShell (NT-003)", ["Get-VBRJob | Start-VBRJob", "Get-VBRBackupSession | Sort-Object EndTime | Select-Object -Last 5 Name, Result"]], ["Registro", ["RTO real: da declaração do desastre até o serviço validado", "RPO real: do ponto restaurado até a falha"]]], "ok": "403 no teste, regra 100160 no Wazuh, ticket no Zammad e jobs com Result Success.", "falha": "O ambiente não reabre para a internet; volta para a fase que falhou."}];
+const SUBIR = [{"n": 1, "t": "Declarar e preservar", "pq": "Etapa 1. Abre o relógio do RTO e congela o ambiente para não perder evidência.", "cmd": [["Registro (Anexo A do DRP)", ["Horário, escopo, ativos afetados, causa provável e último ponto de backup", "Incidente Nível 4 / S1: o CSIRT é acionado", "Suspender as mudanças sem relação com a recuperação"]]], "ok": "Desastre declarado pelo GRC e registrado no Anexo A.", "falha": "Escalar ao Coordenador do incidente (nível 3)."}, {"n": 2, "t": "Base e rede isolada", "pq": "Etapa 2. Sem rede, storage e virtualização, nada recebe a restauração.", "cmd": [["Network", ["Energia, switches, VLANs, gateways e firewall conferidos", "Hosts e vCenter de pé; se não, reconstruir antes das VMs", "Acesso administrativo só pelo Jump Server, com MFA", "Port group de recuperação isolado: só TrueNAS, TCP 445"]], ["Teste do caminho até o backup", ["Test-NetConnection 192.168.1.200 -Port 445"]]], "ok": "Rede, storage e virtualização prontos; sobreviventes registrados.", "falha": "Recriar VLANs, rotas e regras pelo inventário (pasta 02-Rede-Storage)."}, {"n": 3, "t": "Repositório e ponto", "pq": "Etapa 3. Define de onde cada servidor volta, e com isso o RPO real.", "cmd": [["Network (senha da svc_veeam no cofre)", ["net use \\\\192.168.1.200\\VeeamBackup /user:svc_veeam", "dir \\\\192.168.1.200\\VeeamBackup"]], ["Para cada servidor", ["Pasta do job \"DR - SERVIDOR - FULL - IP\": último ponto íntegro antes do desastre", "Ponto escolhido anotado no Anexo A"]]], "ok": "Um ponto de restauração escolhido e registrado por servidor.", "falha": "Sem ponto íntegro ou sem a senha de criptografia: escalar ao nível 3."}, {"n": 4, "t": "DC pelo Recovery Media", "pq": "Etapa 4. O Recovery Media lê o backup direto do TrueNAS: o servidor do Veeam não precisa estar no ar.", "cmd": [["VM nova, no port group isolado", ["Boot pela ISO do Veeam Recovery Media (datastore, pasta 03-Veeam)", "Bare Metal Recovery > Network storage > \\\\192.168.1.200\\VeeamBackup", "Job do DC, ponto escolhido e senha de criptografia", "Restore mode: Entire computer > mapear os discos > Restore"]]], "ok": "Restore em 100% / Success e Windows em modo normal.", "falha": "Boot em DSRM ou sem subir: corrigir pelo runbook GRC-DRP-001-WIN, como no teste de 07/11."}, {"n": 5, "t": "Validar o AD isolado", "pq": "Nada se reintegra antes de AD DS, DNS, SYSVOL e NETLOGON funcionarem.", "cmd": [["No DC restaurado", ["Get-Service NTDS, DNS, Netlogon, KDC", "Get-SmbShare SYSVOL, NETLOGON", "Resolve-DnsName cyberappfin.local", "dcdiag /q"]]], "ok": "DNS resolve, dcdiag sem erros e o login no domínio funciona.", "falha": "Escalar ao nível 3: risco de replicar um DC restaurado errado."}, {"n": 6, "t": "Tipo de recuperação e reintegração", "pq": "O IAM decide antes de o DC restaurado conversar com outro DC.", "cmd": [["Decisão do IAM", ["Não autoritativa: existe outro DC íntegro, e o restaurado recebe a replicação dele", "Da floresta: nenhum DC íntegro; um DC volta e os demais são refeitos"]], ["Depois de reintegrar", ["repadmin /replsummary", "repadmin /showrepl"]]], "ok": "Replicação saudável entre NT-001 e NT-002.", "falha": "Isolar de novo o DC e escalar ao Coordenador do incidente."}, {"n": 7, "t": "Firefly pela rota própria", "pq": "Etapa 5. O Firefly não está no Veeam: volta pelo backup dedicado (dump do MariaDB, arquivos e uploads).", "cmd": [["VM Ubuntu nova (10.10.30.3)", ["sudo apt install -y docker.io docker-compose-v2 cifs-utils", "sudo mount -t cifs //192.168.1.200/VeeamBackup /mnt/truenas-firefly -o username=svc_veeam", "cd \"/mnt/truenas-firefly/DR - FIREFLY - FULL\" && sha256sum -c <pacote>.sha256", "Restaurar /opt/firefly e importar o dump do MariaDB (script de referência na pasta 05-Firefly)", "cd /opt/firefly && sudo docker compose up -d"]]], "ok": "O Firefly responde na rede interna e os dados conferem com o ponto.", "falha": "Usar o pacote anterior (12 h antes); sem previsão em 2 h, escalar ao nível 4."}, {"n": 8, "t": "Firewall do Firefly", "pq": "Reconstruído do zero, volta com negação por padrão e só os fluxos da matriz.", "cmd": [["UFW", ["sudo ufw default deny incoming", "sudo ufw allow from 10.0.50.2 to any port 8080 proto tcp", "sudo ufw allow from 10.10.50.15 to any port 10050 proto tcp", "sudo ufw allow from 192.168.4.0/24 to any port 22 proto tcp", "sudo ufw enable"]], ["DOCKER-USER (porta publicada pelo Docker)", ["sudo iptables -I DOCKER-USER -p tcp -m conntrack --ctorigdstport 8080 ! -s 10.0.50.2 -j DROP", "sudo netfilter-persistent save"]]], "ok": "Só o proxy chega na 8080, e a política continua depois do reboot.", "falha": "Não publicar até as regras baterem com a matriz da pasta 02-Rede-Storage."}, {"n": 9, "t": "Publicar pelo proxy", "pq": "Cada aplicação é validada por dentro antes de receber tráfego externo.", "cmd": [["Na rede interna", ["curl -I http://10.10.30.3:8080"]], ["No proxy 10.0.50.2 (Nginx)", ["sudo nginx -t && sudo systemctl reload nginx", "curl -I http://10.0.50.2:8080"]]], "ok": "200 ou 302 pelo proxy e o login funcionando.", "falha": "Tirar a aplicação do proxy e voltar à validação interna."}, {"n": 10, "t": "Wazuh", "pq": "Etapa 6. Volta logo depois das aplicações; até lá, o SOC lê os logs locais e os agentes guardam eventos em fila.", "cmd": [["Restauração", ["Recovery Media, pelo mesmo caminho do TrueNAS (runbook GRC-DRP-001-LNX)"]], ["No wazuhsrv (10.10.50.21)", ["sudo systemctl status wazuh-manager wazuh-indexer wazuh-dashboard filebeat --no-pager", "curl -k -u admin https://localhost:9200/_cluster/health?pretty", "sudo /var/ossec/bin/agent_control -l"]]], "ok": "Agentes das aplicações reconectados e um evento de teste no Dashboard.", "falha": "Agente que não volta: sudo /var/ossec/bin/agent-auth -m 10.10.50.21 no servidor."}, {"n": 11, "t": "Zabbix e Grafana", "pq": "Etapa 7. Já testado: em 07/11 o disco voltou em 25 min 32 s.", "cmd": [["Restauração", ["Recovery Media (runbook GRC-DRP-001-LNX)"]], ["No zabbixgrafana (10.10.50.15)", ["sudo systemctl is-active zabbix-server grafana-server", "curl -I http://10.10.50.15:3000/login"]]], "ok": "Hosts recuperados disponíveis no Zabbix e painéis carregando.", "falha": "Travado por mais de 30 min: escalar ao líder do time."}, {"n": 12, "t": "Cyberappfin e Zammad", "pq": "Etapa 8. Fecham o fluxo: alerta, correlação e ticket.", "cmd": [["No zammadsrv (10.10.50.17)", ["sudo ufw status verbose", "sudo iptables -L DOCKER-USER -n"]], ["Fluxo", ["Alerta de teste no Wazuh → Cyberappfin → ticket no Zammad"]]], "ok": "O ticket de teste é criado, atualizado e encerrado.", "falha": "Abrir tickets à mão: o Cyberappfin é desacoplado e não para o SOC."}, {"n": 13, "t": "Teste ponta a ponta", "pq": "Etapa 9. Prova que o ambiente voltou, não só que o restore deu Success.", "cmd": [["Evento controlado", ["curl -I http://10.0.50.2:8080/.env"]], ["Em cada servidor", ["Checklist pós-restore do DRP (seção 11)"]]], "ok": "403 no Firefly, regra 100160 no Wazuh e ticket no Zammad.", "falha": "Voltar à etapa que falhou; o ambiente não reabre."}, {"n": 14, "t": "Encerrar o DR", "pq": "Etapa 10. Fecha o ciclo com backup novo, tempos reais e o relatório.", "cmd": [["Veeam (NT-003)", ["Get-VBRComputerBackupJob | Start-VBRComputerBackupJob", "Get-VBRBackupSession | Sort-Object EndTime | Select-Object -Last 5 Name, Result"]], ["Registro", ["RPO e RTO reais por serviço, comparados com a BIA", "Reabertura autorizada pelo GRC", "RCI em até 5 dias úteis"]]], "ok": "Lições aprendidas registradas e reabertura autorizada.", "falha": "Sem backup novo, o ambiente não é dado como recuperado."}];
 function telaSubir(nums, cor, quem){
   const itens = nums.map(n => SUBIR[n - 1]);
   return `<div class="s-corpo" style="justify-content:center">
@@ -735,7 +735,7 @@ function telaSubir(nums, cor, quem){
           <p class="x"><b>Se falhar:</b> ${c.falha}</p>
         </div>`).join('')}
       </div>
-      <p class="s-txt">Quem executa: <b>${quem}</b> · depois de subir, cada servidor passa pelo checklist de 12 itens do DRP (seção 10) antes de ser liberado.</p>
+      <p class="s-txt">Quem executa: <b>${quem}</b> · cada servidor ainda passa pelo checklist pós-restore do DRP (seção 11) antes de ser liberado.</p>
     </div>`;
 }
 const esc = t => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -777,38 +777,35 @@ function seloTrueNAS(txt, cor){
 const rotaTrueNAS = () => { const nt = hostCentro(5, 0); return [{x:1427,y:274},{x:1427,y:290},{x:1040,y:290},{x:1040,y:170},{x:820,y:170},{x:820,y:BUS_Y},{x:LANE(5),y:BUS_Y},{x:LANE(5),y:nt.y},nt]; };
 function restaurado(k){ const h = hostEls[k]; h.classList.remove('alerta'); h.classList.add('ok'); selo(h, '✓ OK', '#4ADE80', 2); h.querySelector('.selo').classList.remove('pulso'); }
 const TODAS = [DR.bk, ...SERVIDORES];
+// do TrueNAS (ambiente externo) até um servidor: o Veeam Recovery Media lê o backup direto do repositório
+function doTrueNAS(k){ const c = centroDe(k), l = LANE(colDe(c.x));
+  return [{x:1427,y:274},{x:1427,y:290},{x:1040,y:290},{x:1040,y:170},{x:820,y:170},{x:820,y:BUS_Y},{x:l,y:BUS_Y},{x:l,y:c.y},c]; }
 async function rodarDR(passo){
   const minha = geracao;
   const vivo = () => minha === geracao;
   const bk = centroDe(DR.bk);
   const espera = ms => new Promise(r => setTimeout(r, ms));
-  // estado de partida: o que já voltou nas fases anteriores (o NT-003 volta na fase 1)
-  const fases = [[], [DR.bk], DR.ad, DR.soc, DR.dmz];
+  // estado de partida: o que já voltou nas fases anteriores (AD, depois aplicação, depois SOC e NT-003)
+  const fases = [[], [], DR.ad, DR.dmz, [...DR.soc, DR.bk]];
   const prontos = passo >= 5 ? TODAS : fases.slice(0, passo).flat();
   TODAS.forEach(k => prontos.includes(k) ? restaurado(k) : perdida(k));
   seloTrueNAS('ÍNTEGRO', '#4ADE80');
   if(passo === 0){
-    // as VMs caem uma a uma; a rede e o TrueNAS continuam de pé
     TODAS.forEach(k => { hostEls[k].classList.remove('alerta'); hostEls[k].querySelector('.selo')?.remove(); });
-    for(const k of TODAS){
-      if(!vivo()) return;
-      perdida(k);
-      await espera(240);
-    }
+    for(const k of TODAS){ if(!vivo()) return; perdida(k); await espera(240); }
     return;
   }
   if(passo === 1){
-    // rede conferida VLAN por VLAN; depois o NT-003 volta, ligado ao repositório no TrueNAS
+    // rede conferida VLAN por VLAN; depois o repositório no TrueNAS é acessado
     VLANS.forEach((v, i) => setTimeout(() => pacote([{x:820,y:225},{x:820,y:BUS_Y},{x:LANE(i),y:BUS_Y},{x:LANE(i),y:400}], COR.net, 1500, 6), i * 140));
     await espera(2400);
-    if(vivo() && await pacote(rotaTrueNAS(), COR.grc, 2200, 8) && vivo()) restaurado(DR.bk);
+    if(vivo()) await pacote([{x:1427,y:274},{x:1427,y:290},{x:1040,y:290},{x:1040,y:170},{x:820,y:170},{x:820,y:BUS_Y}], COR.grc, 1800, 8);
     return;
   }
-  // fases 2 a 4: cada servidor sai do NT-003, um depois do outro
-  const restaurar = async (k, de = bk, cor = COR.grc) => { if(await pacote(viaBus(de, centroDe(k)), cor, 1300, 7) && vivo()) restaurado(k); };
-  if(passo === 2){ await restaurar('1-0'); if(vivo()) await restaurar('1-1', centroDe('1-0'), '#C4B5FD'); return; }
-  if(passo === 3){ for(const k of DR.soc){ if(!vivo()) return; await restaurar(k); } return; }
-  if(passo === 4){ await restaurar('2-0'); return; }
+  const restaurar = async k => { if(await pacote(doTrueNAS(k), COR.grc, 1500, 7) && vivo()) restaurado(k); };
+  if(passo === 2){ for(const k of DR.ad){ if(!vivo()) return; await restaurar(k); } return; }
+  if(passo === 3){ await restaurar('2-0'); return; }
+  if(passo === 4){ for(const k of [...DR.soc, DR.bk]){ if(!vivo()) return; await restaurar(k); } return; }
   // fase 5: agentes voltam a falar com o Wazuh e o backup novo vai para o NT-003
   const wz = centroDe('4-0');
   emLoop(() => {
@@ -1346,11 +1343,11 @@ const PARADAS = [
     },
     html:`<div class="cards"><div class="card" style="--cor:${COR.grc}"><span class="n">NT-003</span><span class="l mono">Veeam · 10.10.60.143</span></div>
       <div class="card" style="--cor:${COR.grc}"><span class="n">TrueNAS</span><span class="l">repositório central, no ambiente externo</span></div></div>
-      <ul><li style="--cor:${COR.grc}"><b>Veeam:</b> imagem completa das VMs; full aos domingos e incrementais nos dias úteis</li>
+      <ul><li style="--cor:${COR.grc}"><b>Veeam:</b> volumes de cada servidor, um job por servidor; full aos domingos e incrementais nos demais dias; DCs a cada 2 h</li>
       <li style="--cor:${COR.grc}"><b>Firefly:</b> backup dedicado às 00h e 12h (banco, arquivos e configuração); cópia e SHA-256 já validados</li>
       <li style="--cor:${COR.grc}">Backups <b>criptografados</b>, em VLAN isolada</li></ul>
-      <p class="aviso">Restore real pelo Veeam e cópia offsite (3-2-1) ainda em validação.</p>`,
-    notas:'As bolinhas amarelas são as cópias: saem dos servidores para o NT-003, onde roda o Veeam, e de lá vão para o repositório no TrueNAS, no ambiente externo. Por isso, se as VMs forem perdidas, os backups continuam lá. O Firefly tem um backup próprio, duas vezes por dia, já validado com SHA-256. Ser honesto: o restore real pelo Veeam e a cópia fora do ambiente ainda estão sendo validados.'
+      <p class="aviso">Restaurações testadas em 07–08/11; serviços em validação. Não há cópia fora do TrueNAS (3-2-1 pendente).</p>`,
+    notas:'As bolinhas amarelas são as cópias: saem dos servidores para o NT-003, onde roda o Veeam, e de lá vão para o repositório no TrueNAS, no ambiente externo. Por isso, se as VMs forem perdidas, os backups continuam lá. O Firefly tem um backup próprio, duas vezes por dia, já validado com SHA-256. Ser honesto: já testamos restaurações em 07 e 08/11, mas a validação dos serviços ainda está em andamento, e não existe cópia fora do TrueNAS.'
   },
 
   /* =================== SALA: continuidade, GRC, riscos, plano, aplicação =================== */
@@ -1443,76 +1440,76 @@ const PARADAS = [
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="mitiga">
           <span class="cab">Ativo</span><span class="cab">Se parar</span><span class="cab">Como mitigamos</span>
-          <span class="pil">NT-003 · Veeam</span><span class="imp">Sem ele não há restauração de nenhum servidor.</span>
-          <span class="acoes"><span>✓ Conta local, fora do domínio</span><span>✓ Backups no TrueNAS, fora da VM</span><span>✓ Primeiro a voltar no DRP</span></span>
+          <span class="pil">NT-003 · Veeam</span><span class="imp">Sem backups novos e sem gestão dos jobs.</span>
+          <span class="acoes"><span>✓ A restauração não depende dele: o Recovery Media lê direto do TrueNAS</span><span>✓ Senhas da svc_veeam e de criptografia no cofre do Jump Server</span></span>
           <span class="pil">AD / DNS</span><span class="imp">Falha de login e de resolução de nomes em tudo que depende do domínio.</span>
-          <span class="acoes"><span>✓ Dois controladores com replicação</span><span>✓ Backup</span><span>✓ Logo após o NT-003 na recuperação</span></span>
+          <span class="acoes"><span>✓ Dois controladores com replicação</span><span>✓ Backup</span><span>✓ Primeiro servidor a voltar no DRP</span></span>
           <span class="pil">Firewall / rede</span><span class="imp">Segmentos e serviços sem comunicação.</span>
           <span class="acoes"><span>✓ SD-WAN com dois gateways</span><span>✓ Matriz de regras</span><span>✓ Backup de configuração</span></span>
           <span class="pil">Wazuh</span><span class="imp">Perda da detecção e da centralização dos eventos.</span>
-          <span class="acoes"><span>✓ Backup completo</span><span>✓ Primeiro serviço do SOC a voltar</span><span>✓ Validação dos agentes</span></span>
+          <span class="acoes"><span>✓ Backup completo</span><span>✓ Volta logo após as aplicações; agentes guardam eventos em fila</span><span class="pend">Restore iniciado em 08/11</span></span>
           <span class="pil">Firefly</span><span class="imp">Aplicação financeira e seus dados indisponíveis.</span>
           <span class="acoes"><span>✓ Backup dedicado às 00h e 12h</span><span>✓ SHA-256 validado no TrueNAS</span><span class="pend">Teste de restauração</span></span>
           <span class="pil">Zabbix / Grafana</span><span class="imp">Menos visibilidade e sem alerta de disponibilidade.</span>
-          <span class="acoes"><span>✓ Backup da VM e da configuração</span><span>✓ Volta após os serviços-base</span></span>
+          <span class="acoes"><span>✓ Backup da VM e da configuração</span><span>✓ Restore testado em 07/11 (25 min 32 s)</span></span>
           <span class="pil">Cyberappfin</span><span class="imp">Sem correlação, automação e enriquecimento.</span>
           <span class="acoes"><span>✓ Fontes e Zammad desacoplados: o SOC segue operando</span><span>✓ Backup</span></span>
           <span class="pil">Zammad</span><span class="imp">Fluxo de tratamento e registro dos incidentes afetados.</span>
           <span class="acoes"><span>✓ Backup</span><span class="pend">Validação do histórico após restore</span></span>
         </div>
       </div>`,
-    notas:'A tela anterior olhou o impacto no negócio; esta olha cada ativo técnico. Para cada um: o que para se ele cair, e o que já reduz esse impacto. Destacar o NT-003: sem ele, nada volta, por isso tem conta local, os backups ficam no TrueNAS, fora da VM, e ele é o primeiro a voltar no DRP. E o Cyberappfin: se ele cair, o SOC segue operando, porque o Wazuh e o Zammad não dependem dele.'
+    notas:'A tela anterior olhou o impacto no negócio; esta olha cada ativo técnico. Para cada um: o que para se ele cair, e o que já reduz esse impacto. Destacar o NT-003: se ele cair, os backups continuam no TrueNAS e a restauração não depende dele, porque o Recovery Media lê direto do repositório. E o Cyberappfin: se ele cair, o SOC segue operando, porque o Wazuh e o Zammad não dependem dele.'
   },
   {
-    quem:P4, cor:COR.grc, titulo:'Em que ordem recuperar', sub:'Runbook de recuperação · camada por camada, sem pular etapas',
+    quem:P4, cor:COR.grc, titulo:'Em que ordem recuperar', sub:'GRC-DRP-001 v4.0 · as 10 etapas do runbook, camada por camada',
     sala:`<div class="s-corpo" style="justify-content:center">
         <div class="linha ordem" style="grid-template-columns:repeat(4, 1fr)">
-          <div class="bloco" style="--cor:#9FB1C3"><span class="num">0</span><div><h4>Declarar o desastre</h4><p>Diretoria declara, por recomendação do CSIRT. Registrar horário, escopo e ativos afetados; suspender outras mudanças.</p></div></div>
-          <div class="bloco" style="--cor:#9FB1C3"><span class="num">1</span><div><h4>Infraestrutura</h4><p>Virtualização e TrueNAS no ambiente externo (VLAN 200); VMs novas.</p></div></div>
-          <div class="bloco" style="--cor:${COR.net}"><span class="num">2</span><div><h4>Rede</h4><p>SD-WAN, firewall e VLANs no UniFi e no Cisco 2960; gateways .1.</p></div></div>
-          <div class="bloco" style="--cor:${COR.grc}"><span class="num">3</span><div><h4>Backup: NT-003</h4><p>Primeiro servidor a voltar: Veeam com conta local, ligado ao repositório no TrueNAS.</p></div></div>
-          <div class="bloco" style="--cor:${COR.iam}"><span class="num">4</span><div><h4>Identidade</h4><p>NT-001 restaurado do backup; NT-002 reconstruído e replicado a partir dele.</p></div></div>
-          <div class="bloco" style="--cor:${COR.soc}"><span class="num">5</span><div><h4>Serviços do SOC</h4><p>Wazuh primeiro; depois Zabbix + Grafana, OpenVAS, Cyberappfin IA e Zammad.</p></div></div>
-          <div class="bloco" style="--cor:${COR.danger}"><span class="num">6</span><div><h4>Aplicação</h4><p>Firefly na DMZ, publicado pelo proxy 10.0.50.2; serviços na ordem dos MTPD.</p></div></div>
-          <div class="bloco" style="--cor:${COR.brand}"><span class="num">7</span><div><h4>Volta à operação</h4><p>Agentes, varredura contra o baseline, backup novo e só então a internet.</p></div></div>
+          <div class="bloco" style="--cor:#9FB1C3"><span class="num">1</span><div><h4>Declarar o desastre</h4><p>GRC declara; Nível 4 / S1 aciona o CSIRT. Registrar horário, escopo e último ponto de backup.</p></div></div>
+          <div class="bloco" style="--cor:${COR.net}"><span class="num">2</span><div><h4>Infraestrutura base</h4><p>Rede, firewall, storage e virtualização; Jump Server com MFA; port group isolado.</p></div></div>
+          <div class="bloco" style="--cor:${COR.grc}"><span class="num">3</span><div><h4>Repositório de backup</h4><p>TrueNAS acessível e um ponto de restauração escolhido para cada servidor.</p></div></div>
+          <div class="bloco" style="--cor:${COR.iam}"><span class="num">4</span><div><h4>AD e DNS</h4><p>DCs pelo Recovery Media, validados em rede isolada antes de reintegrar.</p></div></div>
+          <div class="bloco" style="--cor:${COR.danger}"><span class="num">5</span><div><h4>Aplicações</h4><p>Firefly pela rota própria, com o firewall reaplicado; publicado no proxy só depois de validado.</p></div></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="num">6</span><div><h4>Wazuh</h4><p>Volta logo após as aplicações e recebe os eventos que os agentes guardaram em fila.</p></div></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="num">7</span><div><h4>Observabilidade e ITSM</h4><p>Etapas 7 e 8: Zabbix e Grafana; depois Cyberappfin e Zammad, com o fluxo de tickets.</p></div></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="num">9</span><div><h4>Teste e encerramento</h4><p>Etapas 9 e 10: checklist, evento ponta a ponta, backup novo, RPO e RTO reais e RCI em 5 dias úteis.</p></div></div>
         </div>
-        <p class="s-txt"><b>Por que o NT-003 vem antes do AD:</b> é nele que roda o Veeam, e é do Veeam que sai o AD. Por isso o NT-003 tem uma conta local de emergência, fora do domínio.</p>
+        <p class="s-txt"><b>Por que as aplicações vêm antes do Wazuh:</b> são o que o cliente usa e têm o menor tempo de retorno. Nesse intervalo o SOC acompanha os logs locais, e os agentes guardam os eventos em fila até o Wazuh voltar.</p>
         <div class="amb" style="gap:14px">${LINK_DRP}${LINK_RUNBOOK}</div>
       </div>`,
-    notas:'A ordem vem do runbook de recuperação, em camadas: cada uma depende da anterior. Primeiro a base: infraestrutura, com o TrueNAS onde estão os backups, e a rede. Depois o NT-003, o primeiro servidor a voltar, porque é nele que roda o Veeam, e é dele que sai todo o resto, inclusive o AD; por isso ele entra com conta local. Com AD e DNS de pé, os serviços do SOC (o Wazuh primeiro, para enxergar o ambiente voltando) e por último as aplicações, na ordem da BIA. Nenhuma fase começa sem a anterior passar no critério de saída. O documento completo do DRP está no link; na próxima tela, essa ordem acontecendo no mapa.',
+    notas:'A ordem vem do runbook GRC-DRP-001, versão 4.0: infraestrutura, identidade, aplicações, segurança, observabilidade, integrações e validação. Na versão anterior o Wazuh vinha antes das aplicações; mudamos a pedido do professor, porque o cliente usa as aplicações e elas têm o menor tempo de retorno. Também não precisamos mais recuperar o servidor do Veeam primeiro: o Recovery Media lê o backup direto do TrueNAS. Nenhuma etapa começa sem a anterior ficar pronta.',
   },
   ...[0, 1, 2, 3, 4, 5].map(passo => ({
-    quem:P4, cor:COR.grc, titulo:'DR na prática: restaurando o ambiente', sub:'Cenário: perda das VMs · tudo volta a partir do backup',
-    cam:[[262, 20, 1318, 890], [278, 20, 1302, 890], [262, 330, 1318, 580], [262, 330, 1318, 580], [262, 330, 1318, 580], [262, 330, 1318, 580]][passo], dr:passo,
+    quem:P4, cor:COR.grc, titulo:'DR na prática: restaurando o ambiente', sub:'GRC-DRP-001 v4.0 · perda das VMs · tudo volta a partir do TrueNAS',
+    cam:[[262, 20, 1318, 890], [278, 20, 1302, 890], [262, 20, 1318, 890], [262, 20, 1318, 890], [262, 20, 1318, 890], [262, 20, 1318, 890]][passo], dr:passo,
     foco: [['externo', 'vlan10', 'vlan20', 'vlan30', 'vlan40', 'vlan50', 'vlan60', 'barramento'],
-           ['unifi', 'cisco', 'externo', 'ligacoes', 'barramento', 'vlan60'],
-           ['vlan20', 'vlan60', 'barramento'],
-           ['vlan20', 'vlan50', 'vlan60', 'barramento'],
-           ['vlan20', 'vlan30', 'vlan50', 'vlan60', 'barramento'],
+           ['unifi', 'cisco', 'externo', 'ligacoes', 'barramento'],
+           ['externo', 'vlan20', 'barramento', 'ligacoes'],
+           ['externo', 'vlan20', 'vlan30', 'barramento', 'ligacoes'],
+           ['externo', 'vlan20', 'vlan30', 'vlan50', 'vlan60', 'barramento', 'ligacoes'],
            ['vlan20', 'vlan30', 'vlan50', 'vlan60', 'barramento']][passo],
     html: passos([
-      ['Desastre:', 'as VMs do ambiente são perdidas: NT-001, NT-002, NT-003, o Firefly e a stack do SOC. A Diretoria declara o desastre e o relógio do RTO começa. A rede e o <b>repositório de backup no TrueNAS</b>, no ambiente externo, continuam íntegros.'],
-      ['Base e NT-003:', 'o ambiente externo entrega VMs novas e o Network confere SD-WAN, firewall e VLANs. O <b>primeiro servidor a voltar é o NT-003</b>: o Veeam é reinstalado com conta local, fora do domínio, ligado ao repositório no TrueNAS, e escolhe o último ponto íntegro de cada VM.'],
-      ['Identidade:', 'o NT-001 volta pela restauração completa do Veeam; o NT-002 é reconstruído e <b>replica a partir dele</b>.'],
-      ['SOC:', '<b>Wazuh primeiro</b>, para enxergar o ambiente enquanto ele volta; depois Zabbix + Grafana, OpenVAS, Cyberappfin IA e Zammad.'],
-      ['Aplicação:', 'o <b>Firefly</b> volta na DMZ pelo backup dedicado (banco, arquivos e configuração) e é publicado de novo pelo proxy 10.0.50.2. Depois, os serviços de negócio na ordem do MTPD. Cada servidor só é liberado depois do checklist.'],
-      ['Volta à operação:', 'agentes reportando ao Wazuh, OpenVAS comparando com o baseline, um evento de teste chegando até o Zammad e <b>backup novo</b> no NT-003. Só então a internet é liberada; RPO e RTO reais vão para o registro.']
+      ['Desastre:', 'as VMs são perdidas, inclusive o NT-003 do Veeam. O GRC declara o desastre, o incidente é Nível 4 / S1 e o relógio do RTO começa. O <b>repositório no TrueNAS</b>, no ambiente externo, continua íntegro.'],
+      ['Base e backup:', 'rede, firewall, storage e virtualização conferidos; acesso só pelo Jump Server, com MFA; um <b>port group isolado</b> para a recuperação. No TrueNAS, cada servidor tem o seu ponto de restauração escolhido.'],
+      ['AD e DNS:', 'os controladores voltam pelo <b>Veeam Recovery Media</b>, que lê o backup direto do TrueNAS, em rede isolada. AD DS, DNS, SYSVOL e NETLOGON validados antes de qualquer reintegração.'],
+      ['Aplicações:', 'o <b>Firefly</b> volta pela rota própria (dump do MariaDB e arquivos), com UFW e DOCKER-USER reaplicados. Validado na rede interna, só depois é publicado de novo pelo proxy 10.0.50.2.'],
+      ['Segurança e observabilidade:', '<b>Wazuh</b> logo depois das aplicações, recebendo os agentes que já voltaram; depois Zabbix e Grafana, Cyberappfin e Zammad. O NT-003 volta para gerir os jobs.'],
+      ['Volta à operação:', 'checklist em cada servidor, evento de teste do Firefly até o ticket no Zammad, <b>backup novo</b> de tudo e RPO e RTO reais registrados. O GRC autoriza a reabertura e o RCI sai em até 5 dias úteis.']
     ], passo, COR.grc) + LINK_DRP,
     notas: [
-      'Escolhemos um desastre concreto: a perda das VMs. A infraestrutura de virtualização continua ou é reconstruída pelo ambiente externo, mas todos os servidores precisam voltar a partir do backup. O que salva é o repositório no TrueNAS, fora das VMs perdidas.',
-      'Fases 1 a 3: infraestrutura, rede e backup. O detalhe que importa: o NT-003 é o primeiro servidor a voltar, porque é nele que roda o Veeam, e é do Veeam que saem todos os outros, inclusive o AD. Por isso ele tem conta local, fora do domínio.',
-      'Fase 4: o AD sai do backup. Só um controlador volta do backup; o outro é reconstruído e replica, para não termos dois ADs inconsistentes.',
-      'Fase 5: o Wazuh vem primeiro porque, enquanto o ambiente volta, o SOC precisa enxergar o que acontece.',
-      'Fase 6: as aplicações por último, na ordem da BIA. O Firefly tem um backup próprio, de banco, arquivos e configuração, já validado com SHA-256. Nada é liberado sem o checklist que mostramos a seguir.',
-      'Fase 7: o ambiente só reabre monitorado, varrido, com um evento de teste percorrendo Wazuh, Cyberappfin e Zammad, e com backup novo. Os tempos reais são comparados com a BIA. Tudo isso está no documento do DRP, no link do painel.'
+      'Escolhemos um desastre concreto: a perda das VMs, inclusive a do próprio servidor do Veeam. O que salva é o repositório no TrueNAS, que fica no ambiente externo, fora das VMs perdidas. Se o TrueNAS também se perder, este runbook não se aplica: não existe cópia externa, e isso está registrado como risco.',
+      'Etapas 2 e 3 do runbook. Primeiro a base: rede, storage, virtualização e acesso pelo Jump Server. A restauração acontece num port group isolado, que só enxerga o TrueNAS, para o servidor restaurado não conflitar com a produção. Para cada servidor, o Network escolhe o último ponto íntegro e anota.',
+      'Etapa 4: o AD vem primeiro porque todo o resto depende de autenticação e de DNS. O detalhe técnico: não precisamos do servidor do Veeam no ar. O Recovery Media, iniciado na VM nova, lê o backup direto do TrueNAS. O IAM decide antes o tipo de recuperação do DC.',
+      'Etapa 5: as aplicações vêm antes do Wazuh, como o professor pediu: são o que o cliente usa e têm o menor tempo de retorno. O Firefly não está no Veeam; volta pelo backup dedicado, com o firewall reaplicado, e só é publicado depois de validado por dentro.',
+      'Etapas 6 a 8: enquanto o Wazuh não volta, o SOC acompanha os logs locais e os agentes guardam os eventos em fila. O Wazuh volta logo em seguida e recebe esses eventos. Depois vêm Zabbix e Grafana, Cyberappfin e Zammad, e o NT-003, para os backups novos.',
+      'Etapas 9 e 10: só reabre com o evento de teste percorrendo o fluxo inteiro e com backup novo. Os tempos reais são comparados com a BIA. O documento completo está no link do painel.'
     ][passo]
   })),
   {
     quem:P4, cor:COR.grc, titulo:'DRP: como restauramos um servidor', sub:'Runbook de DR · rota Veeam para a perda total de uma máquina',
     sala:`<div class="s-corpo" style="justify-content:center">
-        <div class="fluxo"><div class="passo2"><b>1. Restore point</b><span>Confirmar o ponto de backup que será usado</span></div><span class="seta2">→</span><div class="passo2"><b>2. Máquina de destino</b><span>Preparar a VM que vai receber o servidor</span></div><span class="seta2">→</span><div class="passo2"><b>3. Recovery Media</b><span>Iniciar a máquina pela mídia de recuperação do Veeam</span></div><span class="seta2">→</span><div class="passo2"><b>4. Entire Machine Restore</b><span>Restaurar o servidor inteiro a partir do NT-003</span></div><span class="seta2">→</span><div class="passo2"><b>5. Boot e validação</b><span>Ligar e passar pelo checklist abaixo</span></div></div>
+        <div class="fluxo"><div class="passo2"><b>1. Ponto de restauração</b><span>Último ponto íntegro na pasta do job, no TrueNAS</span></div><span class="seta2">→</span><div class="passo2"><b>2. VM nova isolada</b><span>No port group de recuperação, sem contato com a produção</span></div><span class="seta2">→</span><div class="passo2"><b>3. Recovery Media</b><span>Boot pela ISO do Veeam (datastore, pasta 03-Veeam)</span></div><span class="seta2">→</span><div class="passo2"><b>4. Restaurar do TrueNAS</b><span>\\\\192.168.1.200\\VeeamBackup, svc_veeam e senha de criptografia</span></div><span class="seta2">→</span><div class="passo2"><b>5. Boot e IP de produção</b><span>Validar e só então assumir o IP, com o original isolado</span></div></div>
         <div class="linha" style="grid-template-columns:1.35fr 1fr">
-          <div class="prancheta"><div class="clip"></div><div class="papel"><span class="rot">Checklist depois da restauração · detalhado no DRP, seção 10</span><ul class="check"><li>Sistema operacional inicializa</li><li>Discos e partições corretos</li><li>IP, gateway e VLAN corretos</li><li>DNS e NTP funcionam</li><li>Autenticação no AD funciona</li><li>Banco de dados íntegro</li><li>Aplicação responde</li><li>Dados críticos conferidos</li><li>Wazuh recebe eventos</li><li>Zabbix monitora o host</li><li>Firewall e hardening preservados</li><li>Novo backup pós-DR executado</li></ul></div></div>
+          <div class="prancheta"><div class="clip"></div><div class="papel"><span class="rot">Checklist pós-restore · DRP, seção 11</span><ul class="check"><li>Restore em 100% / Success</li><li>Boot em modo normal, pelo disco restaurado</li><li>Discos, partições e volumes corretos</li><li>IP, gateway e VLAN, sem conflito de IP ou MAC</li><li>DNS e NTP funcionam</li><li>Serviços do servidor ativos</li><li>Banco íntegro, quando houver</li><li>Aplicação e dados críticos conferidos</li><li>Wazuh recebe eventos</li><li>Zabbix monitora o host</li><li>UFW com negação por padrão e DOCKER-USER</li><li>Firewall mantido após reboot e novo backup</li></ul></div></div>
           <div class="bloco" style="--cor:${COR.grc}"><span class="rot">O que se registra ao final</span>
             <p><b>Restore point</b> usado (data e hora do backup restaurado)</p>
             <p><b>RPO real</b>: do último dado recuperado até a falha</p>
@@ -1520,34 +1517,34 @@ const PARADAS = [
             <p><b>Integridade</b>: arquivos, hash, banco e configurações</p>
             <p>Os tempos medidos são comparados com as metas da BIA.</p></div>
         </div>
-        <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap">${LINK_DRP}<p class="s-aviso">Teste obrigatório ainda não realizado: primeiro em rede isolada, depois um teste destrutivo controlado.</p></div>
+        <div style="display:flex; gap:18px; align-items:center; flex-wrap:wrap">${LINK_DRP}<p class="s-aviso"><b>Testes de 07–08/11:</b> Zabbix e Grafana restaurados em 25 min 32 s; NT-002 restaurado e em modo normal após corrigir o boot e sair do DSRM; Wazuh com restauração iniciada. Os serviços ainda estão em validação.</p></div>
       </div>`,
-    notas:'Esta é a parte prática do DRP: como se recupera um servidor perdido usando o Veeam no NT-003. Depois de restaurar, nada é liberado sem passar pelo checklist, que inclui voltar a mandar logs para o Wazuh e a ser monitorado pelo Zabbix. Ao final se registram o RPO e o RTO reais, que são comparados com as metas da BIA. A documentação e os scripts ficam numa pasta de emergência fora dos servidores. Ser honesto: o teste real ainda vai ser feito, primeiro em rede isolada.'
+    notas:'Esta é a rota Veeam do runbook: o servidor perdido volta numa VM nova, isolada, iniciada pelo Recovery Media, que lê o backup direto do TrueNAS. O IP de produção só é aplicado depois de validar, com o original desligado ou isolado. Ser honesto sobre os testes: em 07 e 08/11 restauramos o Zabbix e Grafana e o NT-002; o disco do Zabbix voltou em 25 minutos, mas restore com Success não prova que o serviço voltou, e a validação dos serviços é o próximo passo. O RTO conta da declaração do desastre até o serviço validado.'
   },
   {
-    quem:P4, cor:COR.grc, titulo:"Subir do zero 1/5: rede e Veeam", sub:'Restauração do zero · os comandos de cada camada, na ordem do DRP',
-    sala: telaSubir([1, 2, 3], '#14B8A6', "Network e GRC"),
-    notas:"A rede vem antes de tudo: sem VLAN e trunk, nenhuma VM restaurada conversa. Depois, o NT-003, porque é nele que roda o Veeam e é dele que saem todos os outros. O Veeam é reinstalado com conta local, aponta para o repositório no TrueNAS e importa os backups. O ponto de restauração escolhido aqui define o RPO real."
+    quem:P4, cor:COR.grc, titulo:"Subir do zero 1/5: base e backup", sub:'GRC-DRP-001 v4.0 · os comandos de cada etapa, na ordem do runbook',
+    sala: telaSubir([1, 2, 3], '#14B8A6', "GRC e Network, com o IAM no acesso"),
+    notas:"Etapas 1 a 3 do runbook. Declarar e registrar; conferir a base e criar a rede isolada, onde cada servidor é restaurado sem tocar a produção; e escolher no TrueNAS o ponto de cada servidor. As senhas da svc_veeam e de criptografia ficam no cofre do Jump Server e nunca aparecem em runbook nem em evidência."
   },
   {
-    quem:P4, cor:COR.grc, titulo:"Subir do zero 2/5: o AD", sub:'Restauração do zero · os comandos de cada camada, na ordem do DRP',
-    sala: telaSubir([4, 5, 6], '#8B5CF6', "IAM"),
-    notas:"Só um controlador volta do backup: o NT-001. O NT-002 é promovido de novo e replica dele; restaurar os dois de pontos diferentes cria dois ADs inconsistentes. Se nenhum backup do AD servir, o plano B cria o domínio do zero e recria OUs e grupos a partir da exportação do kit; o custo é reingressar todas as máquinas."
+    quem:P4, cor:COR.grc, titulo:"Subir do zero 2/5: AD e DNS", sub:'GRC-DRP-001 v4.0 · os comandos de cada etapa, na ordem do runbook',
+    sala: telaSubir([4, 5, 6], '#8B5CF6', "IAM, com o Network na restauração"),
+    notas:"Etapa 4. O DC volta pelo Recovery Media, lendo direto do TrueNAS, numa VM isolada. No teste de 07/11 o NT-002 voltou em DSRM e o boot precisou de correção; o runbook do Windows cobre isso. Antes de reintegrar, o IAM decide o tipo de recuperação: não autoritativa, se houver outro DC íntegro, ou da floresta, se não houver."
   },
   {
-    quem:P4, cor:COR.grc, titulo:"Subir do zero 3/5: o SOC", sub:'Restauração do zero · os comandos de cada camada, na ordem do DRP',
-    sala: telaSubir([7, 8, 9], '#F59E0B', "SOC"),
-    notas:"Wazuh primeiro, para enxergar o ambiente enquanto ele volta. Pelo Veeam ele volta inteiro; do zero, o instalador oficial sobe manager, indexer e dashboard, e o pacote de configuração devolve as regras, os decoders e o client.keys, que faz os agentes reconectarem sem novo registro. O resto da stack volta pelo Veeam."
+    quem:P4, cor:COR.grc, titulo:"Subir do zero 3/5: as aplicações", sub:'GRC-DRP-001 v4.0 · os comandos de cada etapa, na ordem do runbook',
+    sala: telaSubir([7, 8, 9], '#F87171', "GRC e Network; o SOC valida"),
+    notas:"Etapa 5, antes do Wazuh, a pedido do professor. O Firefly não está no Veeam: volta pelo backup dedicado, conferindo o SHA-256, restaurando /opt/firefly e o banco MariaDB. O firewall volta igual: UFW com negação por padrão e a DOCKER-USER, porque o Docker publica portas por fora do UFW. Só depois de validar por dentro ele volta ao proxy."
   },
   {
-    quem:P4, cor:COR.grc, titulo:"Subir do zero 4/5: a aplicação", sub:'Restauração do zero · os comandos de cada camada, na ordem do DRP',
-    sala: telaSubir([10, 11], '#F87171', "Dono do serviço, Network e Endpoint"),
-    notas:"O Firefly volta pelo backup dedicado, que é mais recente que o do Veeam: confere o SHA-256, extrai, sobe os containers e importa o banco. Antes de publicar no proxy, o firewall volta com as mesmas regras de antes: só o proxy na 8080, Zabbix na 10050 e SSH só do NT-003 e da VPN administrativa."
+    quem:P4, cor:COR.grc, titulo:"Subir do zero 4/5: segurança e observabilidade", sub:'GRC-DRP-001 v4.0 · os comandos de cada etapa, na ordem do runbook',
+    sala: telaSubir([10, 11, 12], '#F59E0B', "SOC, com o Network na restauração"),
+    notas:"Etapas 6 a 8. O Wazuh volta pelo Recovery Media e recebe os eventos que os agentes guardaram em fila; a fila tem limite, por isso ele vem logo depois das aplicações. O Zabbix e Grafana já foi testado: 25 minutos para gravar o disco. Por fim, Cyberappfin e Zammad, provando o fluxo até o ticket."
   },
   {
-    quem:P4, cor:COR.grc, titulo:"Subir do zero 5/5: reabrir o ambiente", sub:'Restauração do zero · os comandos de cada camada, na ordem do DRP',
-    sala: telaSubir([12], '#22C55E', "SOC e GRC"),
-    notas:"O teste final percorre o fluxo inteiro: o GET /.env no Firefly tem de dar 403, disparar a regra 100160 e virar ticket no Zammad. Depois, um backup novo de tudo, que vira a base dos próximos. Só então a internet é liberada, e os tempos reais vão para o registro e são comparados com a BIA."
+    quem:P4, cor:COR.grc, titulo:"Subir do zero 5/5: teste e encerramento", sub:'GRC-DRP-001 v4.0 · os comandos de cada etapa, na ordem do runbook',
+    sala: telaSubir([13, 14], '#22C55E', "Coordenador do incidente, SOC e GRC"),
+    notas:"Etapas 9 e 10. O teste final percorre o fluxo inteiro: o /.env no Firefly dá 403, dispara a regra 100160 e vira ticket. Depois, backup novo de cada servidor, RPO e RTO reais comparados com a BIA, a reabertura autorizada pelo GRC e o relatório conclusivo em até 5 dias úteis."
   },
   {
     quem:P4, cor:COR.grc, titulo:'GRC: políticas e conformidade', sub:'Uma financeira regulada precisa provar que é segura',

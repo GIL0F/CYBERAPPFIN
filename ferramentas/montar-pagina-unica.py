@@ -644,7 +644,7 @@ fim = """<section class="fim" id="fim">
   <span class="fig">FIG_FIM · documentos completos (abrem em outra aba)</span>
   <h2>Quer o detalhe? Está tudo aqui.</h2>
   <div class="docs">
-    <a class="amarelo" href="drp.html" target="_blank" rel="noopener"><b>Plano de recuperação (DRP)</b><span>Cenário, papéis, as 8 fases da restauração e o checklist, item a item.</span><em>drp.html ↗</em></a>
+    <a class="amarelo" href="drp.html" target="_blank" rel="noopener"><b>Plano de recuperação (DRP)</b><span>Runbook v4.0: as 10 etapas, a rota Veeam pelo Recovery Media, a rota do Firefly, o checklist e os testes de 07–08/11.</span><em>drp.html ↗</em></a>
     <a href="regras-wazuh.html" target="_blank" rel="noopener"><b>Regras do Wazuh</b><span>O catálogo completo das regras customizadas do local_rules.xml.</span><em>regras-wazuh.html ↗</em></a>
     <a href="runbook-tecnico.html" target="_blank" rel="noopener"><b>Runbook técnico</b><span>Roteiro, evidências e o que ainda precisa ser comprovado.</span><em>runbook-tecnico.html ↗</em></a>
     <a href="okrs.html" target="_blank" rel="noopener"><b>OKRs das áreas</b><span>Os OKRs das cinco áreas, com fórmulas, metas e os painéis do Grafana.</span><em>okrs.html ↗</em></a>
