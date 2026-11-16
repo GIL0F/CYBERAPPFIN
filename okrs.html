@@ -12,7 +12,7 @@
   :root{
     --papel:#FAF8F2; --tinta:#111111; --cinza:#55575C; --branco:#FFFFFF; --listra:#EEEBE2;
     --net:#14B8A6; --iam:#8B5CF6; --soc:#F59E0B; --end:#22C55E; --grc:#EAB308;
-    --verde:#4ADE80; --amarelo:#FACC15; --vermelho:#F87171; --azul:#93C5FD;
+    --verde:#4ADE80; --amarelo:#FACC15; --vermelho:#F87171; --azul:#93C5FD; --neutro:#D4D4D8;
     --borda:3px solid var(--tinta); --sombra:8px 8px 0 0 var(--tinta);
     --disp:'Space Grotesk', system-ui, sans-serif; --mono:'JetBrains Mono', ui-monospace, Menlo, monospace;
     color-scheme:light;
@@ -103,6 +103,7 @@
   .nums .hoje{ font-size:clamp(18px, 1.4vw, 24px); font-weight:800; }
   .sim{ display:block; width:max-content; font:800 11px var(--mono); letter-spacing:.08em; text-transform:uppercase; border:2px dashed var(--tinta); padding:1px 6px; margin-top:3px; }
   .sim.med{ border-style:solid; background:var(--verde); }
+  .contagem{ font:800 clamp(16px, 1.2vw, 20px) var(--mono); border:3px dashed var(--tinta); padding:6px 10px; align-self:center; }
   .nota{ grid-column:2 / 4; font:600 14px var(--mono); color:var(--cinza); line-height:1.4; }
 
   .painel{ border:var(--borda); background:var(--tinta); box-shadow:var(--sombra); margin:0; display:flex; flex-direction:column; }
@@ -136,6 +137,8 @@
           <div><i style="--s:var(--verde)"></i>Na meta</div>
           <div><i style="--s:var(--amarelo)"></i>Até 10 p.p. abaixo da meta</div>
           <div><i style="--s:var(--vermelho)"></i>Mais de 10 p.p. abaixo da meta</div>
+          <div><i style="--s:var(--azul)"></i>Em conferência: o dado existe e está sendo conferido</div>
+          <div><i style="--s:var(--neutro)"></i>Sem ocorrência no período</div>
           <div><span class="sim med" style="margin:0">medido</span>Medido no laboratório</div>
           <div><span class="sim" style="margin:0">projeção</span>Projeção do cenário Cyberappfin: o lab não tem operação real</div>
                   </div>
@@ -169,19 +172,30 @@ const AREAS = [
           { n:'2.2', nome:'MTTD de rede', formula:'Média de (abertura do ticket no Zammad − alerta)', tempo:true, hojeMin:19, metaMin:5, limMin:15, escala:25, nota:'Medido do mesmo jeito que o SOC.' },
         ] }
     ] },
-  { id:'iam', nome:'IAM', cor:'var(--iam)', dono:'Time de IAM', proposta:true,
-    visao:'Cada pessoa com o acesso exato do seu perfil, contas protegidas e todo acesso rastreável (POL-GDI-001 e POL-CA-001 v2.0).',
+  { id:'iam', nome:'IAM', cor:'var(--iam)', dono:'Time de IAM', doc:'IAM-OKR-001 · v1.0 · 16/11/2026',
+    visao:'Estar preparada para a certificação ISO/IEC 27001:2022: toda alteração de auditoria, senha, privilégio, conta, grupo e OU no AD detectada, autorizada e tratada a tempo.',
     okrs:[
-      { rot:'OKR 1 — Identidades e acessos', painel:'dashboards/img/windows.jpg', painelTipo:'Painel relacionado no Grafana · Windows Security & Identity', objetivo:'Garantir que cada pessoa tenha só o acesso do seu perfil, com a conta protegida.',
-        just:'No cenário de phishing, a conta roubada é a porta de entrada. Perfil mínimo limita o que o atacante alcança, e senha forte com bloqueio dificulta força bruta.',
-        partida:'AD com dois controladores (NT-001 e NT-002), 11 OUs e 18 grupos de segurança por perfil RBAC. GPO de senha mínima de 10 caracteres e bloqueio após 5 tentativas.',
-        freq:'Trimestral',
+      { rot:'OKR 1 — Auditoria e reset de senha', objetivo:'Garantir que toda alteração na auditoria e todo reset de senha nos controladores de domínio sejam detectados, autorizados e tratados a tempo.',
+        just:'Quem altera a política de auditoria pode apagar o rastro do que fez, e um reset de senha sem chamado pode indicar uso indevido de conta administrativa. Sem detecção e autorização registradas, nenhum dos dois vale como evidência em auditoria.',
+        partida:'Antes das regras, o IAM não tinha indicadores. Regras criadas pelo time no Wazuh (iam_alteracao_auditoria_reset_senha.xml): 100102, alteração da política de auditoria (evento 4719, só por pessoa), e 100103, reset de senha por administrador (evento 4724).',
+        freq:'Mensal',
         kpis:[
-          { n:'1.1', nome:'Controladores de domínio replicando', formula:'DCs com replicação confirmada ÷ DCs', hoje:'2 de 2', pct:100, meta:100 },
-          { n:'1.2', nome:'Perfis RBAC com grupo próprio', formula:'Perfis com grupo de segurança no AD ÷ perfis definidos', hoje:'18 de 18', pct:100, meta:100 },
-          { n:'1.3', nome:'Usuários com acesso só por grupos', formula:'Usuários sem permissão direta ÷ usuários do AD', hoje:'93%', pct:93.3, sim:true, meta:100, nota:'Projeção do cenário. Medição real em 1 minuto no PowerShell do DC.' },
-          { n:'1.4', nome:'Contas privilegiadas com MFA', formula:'Contas administrativas com MFA ÷ contas administrativas', hoje:'50%', pct:50, sim:true, meta:100, nota:'Projeção do cenário. Exigido pela POL-CA-001 v2.0; o AD sozinho não tem MFA, só o acesso pelo JumpServer.' },
-          { n:'1.5', nome:'Revisão de acessos no prazo', formula:'Revisões feitas no período ÷ revisões previstas', hoje:'1 de 1', pct:100, sim:true, meta:100, nota:'Projeção do cenário. Revisão feita na criação dos 18 grupos RBAC.' },
+          { n:'1.1', nome:'Cobertura de detecção', formula:'(alertas 100102 + 100103) ÷ (eventos 4719 feitos por pessoa + eventos 4724 nos DCs)', conf:true, hoje:'5 alertas', meta:'100%', nota:'Medido no lab: 5 alertas da 100103 em 29/10, todos do Administrator no NT-001. Comparar com os eventos 4724 do mesmo dia.' },
+          { n:'1.2', nome:'Resets autorizados', formula:'Alertas 100103 com chamado no Escalation ÷ alertas 100103', conf:true, hoje:'5 resets', meta:'100%', nota:'Conferir se os 5 resets de 29/10 têm chamado no Escalation (canal de chamados da POL-GDI-001, seção 5.8).' },
+          { n:'1.3', nome:'Alterações de auditoria não autorizadas', formula:'Alertas 100102 sem GMUD aprovada', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas da 100102 no período. A mudança de auditoria do ambiente tem GMUD registrada (GMUD-IAM-001, GPO única de auditoria).' },
+          { n:'1.4', nome:'Resposta a alteração de auditoria', formula:'Alertas 100102 analisados em até 1 hora ÷ alertas 100102', semOc:true, hoje:'0 alertas 100102', meta:'100%', nota:'Responsável: SOC. Sem alteração de auditoria no período, não houve o que analisar.' },
+          { n:'1.5', nome:'Conferência de reset', formula:'Alertas 100103 conferidos com o Escalation em até 1 dia útil ÷ alertas 100103', conf:true, hoje:'5 resets', meta:'≥ 95%', nota:'Os mesmos 5 resets de 29/10, conferidos junto com o KPI 1.2.' },
+        ] },
+      { rot:'OKR 2 — Privilégios, contas e grupos', objetivo:'Garantir que toda alteração de privilégio, exclusão de conta e alteração ou exclusão de grupo e OU no Active Directory seja detectada, autorizada e tratada a tempo.',
+        just:'Privilégio concedido sem autorização é o caminho mais curto para comprometer o domínio, e a exclusão de contas, grupos ou OUs pode apagar acessos e evidências. Cada mudança precisa ter chamado ou GMUD e resposta no prazo.',
+        partida:'AD com 2 controladores (NT-001 e NT-002), 11 OUs e 18 grupos de segurança por perfil RBAC. Regras do IAM (iam_alteracao_privilegios_contas_grupos.xml): 100104 privilégio (4728, 4732, 4756 e 4704, fora das contas autorizadas), 100105 exclusão de conta (4726), 100106 grupo (4730, 4734, 4758, 4735, 4737 e 4755) e 100107 OU (5136 e 5141).',
+        freq:'Mensal',
+        kpis:[
+          { n:'2.1', nome:'Cobertura de detecção', formula:'Alertas 100104 a 100107 ÷ eventos equivalentes nos DCs (sem as contas autorizadas)', hoje:'100%', pct:100, meta:100, sim:true, nota:'Projeção do cenário. A 100107 depende da auditoria de Directory Service Changes nos DCs e de SACL de auditoria nas OUs.' },
+          { n:'2.2', nome:'Alterações de privilégio não autorizadas', formula:'Alertas 100104 sem chamado aprovado no Escalation', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas desde a criação da regra (as regras não analisam eventos antigos).' },
+          { n:'2.3', nome:'Exclusões de conta autorizadas', formula:'Alertas 100105 com chamado no Escalation ÷ alertas 100105', semOc:true, hoje:'0 alertas 100105', meta:'100%', nota:'Nenhuma conta excluída desde a criação da regra.' },
+          { n:'2.4', nome:'Alterações de grupo e OU autorizadas', formula:'Alertas 100106 e 100107 com chamado ou GMUD ÷ alertas 100106 e 100107', semOc:true, hoje:'0 alertas', meta:'100%', nota:'Nenhuma alteração de grupo ou OU desde a criação das regras.' },
+          { n:'2.5', nome:'Resposta a alerta crítico', formula:'Alertas 100104 e 100105 analisados em até 1 hora ÷ alertas 100104 e 100105', semOc:true, hoje:'0 alertas', meta:'100%', nota:'Responsável: SOC.' },
         ] }
     ] },
   { id:'soc', nome:'SOC', cor:'var(--soc)', dono:'Time do SOC', proposta:true,
@@ -268,6 +282,9 @@ function status(k){
   }
   if (k.menor){ const g = Math.round((k.hojePct - k.metaPct) * 10) / 10;
     return { s: g <= 0 ? 'var(--verde)' : g <= 10 ? 'var(--amarelo)' : 'var(--vermelho)', txt: (g <= 0 ? 'Atingido' : 'Abaixo') + tag, gap: (g > 0 ? '+' : '−') + String(Math.abs(g)).replace('.', ',') + ' p.p.' }; }
+  if (k.cont){ const g = k.hojeN - k.metaN; return { s: g <= 0 ? 'var(--verde)' : 'var(--vermelho)', txt:(g <= 0 ? 'Atingido' : 'Acima da meta') + tag, gap: (g > 0 ? '+' : '') + g }; }
+  if (k.semOc) return { s:'var(--neutro)', txt:'Sem ocorrência' };
+  if (k.conf) return { s:'var(--azul)', txt:'Em conferência' };
   if (k.pct == null) return { s:'var(--azul)', txt:'A medir' };
   const g = Math.round((k.pct - k.meta) * 10) / 10;
   const gap = (g >= 0 ? '+' : '−') + String(Math.abs(g)).replace('.', ',') + ' p.p.';
@@ -286,6 +303,12 @@ function kpiHTML(k, i){
   } else if (k.menor){
     barra = `<div class="trilho"><i style="--p:${k.hojePct}%;--d:${i*.12}s"></i><span class="marca" style="--m:${k.metaPct}%"></span></div>`;
     nums = `<div><small>Hoje</small><span class="hoje">${String(k.hojePct).replace('.', ',')}%</span>${k.sim ? '<span class="sim">projeção</span>' : '<span class="sim med">medido</span>'}</div><div><small>Meta</small>&lt; ${k.metaPct}%</div><div><small>Gap</small>${st.gap}</div>`;
+  } else if (k.cont){
+    barra = `<div class="contagem">${k.hojeN} ${esc(k.un)}</div>`;
+    nums = `<div><small>Hoje</small><span class="hoje">${k.hojeN}</span><span class="sim med">medido</span></div><div><small>Meta</small>${k.metaN}</div><div><small>Gap</small>${st.gap}</div>`;
+  } else if (k.semOc || k.conf){
+    barra = `<div class="contagem">${esc(k.hoje)}</div>`;
+    nums = `<div><small>Hoje</small><span class="hoje">${k.semOc ? '—' : esc(k.hoje)}</span><span class="sim med">medido</span></div><div><small>Meta</small>${esc(k.meta)}</div>`;
   } else {
     barra = k.pct == null ? `<div class="trilho"></div>` : `<div class="trilho"><i style="--p:${k.pct}%;--d:${i*.12}s"></i><span class="marca" style="--m:${k.meta}%"></span></div>`;
     const pct = k.pct == null ? '—' : String(k.pct).replace('.', ',') + '%';
@@ -295,7 +318,7 @@ function kpiHTML(k, i){
     <div class="linha">${barra}<div class="nums">${nums}</div></div>${k.nota ? `<div class="nota">${esc(k.nota)}</div>` : ''}</div>`;
 }
 function okrHTML(o){
-  const reais = o.kpis.filter(k => !k.ex && (k.tempo || k.menor || k.pct != null));
+  const reais = o.kpis.filter(k => !k.ex && (k.tempo || k.menor || k.cont || k.pct != null));
   const naMeta = reais.filter(k => status(k).txt.startsWith('Atingido')).length;
   const ex = o.ex;
   const bloco = (t, v) => `<div class="bloco"><span class="rot">${t}</span><p>${v ? esc(v) : 'A preencher'}</p></div>`;
@@ -303,7 +326,7 @@ function okrHTML(o){
     <div class="obj${ex ? ' ex' : ''}"><span class="rot">${esc(o.rot)}</span><h3>${esc(o.objetivo)}</h3>
       ${bloco('Justificativa', o.just)}${bloco('Situação de partida', o.partida)}${bloco('Frequência', o.freq)}</div>
     <div class="kpis">
-      <div class="resumo">${reais.length ? `<span class="n">${naMeta}/${reais.length}</span><span>KPIs medidos na meta${o.kpis.length > reais.length ? " · " + (o.kpis.length - reais.length) + " a medir" : ""}</span>` : `<span>${o.kpis.length} KPIs a medir · fórmula e meta definidas</span>`}</div>
+      <div class="resumo">${reais.length ? `<span class="n">${naMeta}/${reais.length}</span><span>KPIs medidos na meta${o.kpis.filter(k => k.semOc).length ? " · " + o.kpis.filter(k => k.semOc).length + " sem ocorrência" : ""}${o.kpis.filter(k => k.conf).length ? " · " + o.kpis.filter(k => k.conf).length + " em conferência" : ""}</span>` : `<span>${o.kpis.length} KPIs a medir · fórmula e meta definidas</span>`}</div>
       ${o.kpis.map(kpiHTML).join('')}
       ${o.painel ? `<figure class="painel"><a href="${o.painel}" target="_blank" rel="noopener"><img src="${o.painel}" alt="Painel do Grafana: ${esc(o.rot)}" loading="lazy"></a>
         <figcaption><span>${esc(o.painelTipo)}</span><a href="${o.painel}" target="_blank" rel="noopener">Abrir em tamanho real ↗</a></figcaption></figure>` : ''}
@@ -312,7 +335,7 @@ function okrHTML(o){
 const geral = document.getElementById('geral'), areas = document.getElementById('areas');
 AREAS.forEach(a => {
   const ks = a.okrs.flatMap(o => o.kpis);
-  const reais = ks.filter(k => !k.ex && (k.tempo || k.menor || k.pct != null)), naMeta = reais.filter(k => status(k).txt.startsWith('Atingido')).length;
+  const reais = ks.filter(k => !k.ex && (k.tempo || k.menor || k.cont || k.pct != null)), naMeta = reais.filter(k => status(k).txt.startsWith('Atingido')).length;
   const vazio = reais.length === 0;
   geral.insertAdjacentHTML('beforeend', `<a href="#${a.id}" class="${vazio ? 'ex' : ''}" style="--c:${a.cor}">
     <span class="time"><i></i>${a.nome}</span>
