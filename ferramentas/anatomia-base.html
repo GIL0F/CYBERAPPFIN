@@ -29,11 +29,18 @@
   .abre h1{ font-size:clamp(56px, 8.4vw, 150px); line-height:.86; letter-spacing:-.04em; margin:3vh 0 2.4vh; text-transform:uppercase; }
   .abre h1 span{ display:block; }
   .abre h1 .rec{ background:var(--soc); padding:0 .12em; border:var(--borda); box-shadow:var(--sombra); display:inline-block; margin-top:.08em; }
-  .abre p{ font-size:clamp(20px, 1.6vw, 28px); line-height:1.35; max-width:30ch; font-weight:500; }
-  .legenda{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
-  .legenda div{ display:flex; gap:12px; align-items:center; border:var(--borda); background:#fff; padding:12px 14px; box-shadow:5px 5px 0 0 var(--tinta);
-                font-family:'JetBrains Mono', monospace; font-weight:700; font-size:clamp(14px, 1.05vw, 18px); text-transform:uppercase; letter-spacing:.06em; }
-  .legenda i{ width:26px; height:26px; border:var(--borda); flex-shrink:0; }
+  .abre p{ font-size:clamp(20px, 1.6vw, 28px); line-height:1.35; max-width:42ch; font-weight:500; }
+  .legenda{ display:flex; flex-direction:column; width:100%; max-width:520px; justify-self:end; border-top:var(--borda); }
+  .legenda > a{ display:grid; grid-template-columns:14px minmax(0, 1fr) auto; gap:4px 16px; align-items:baseline; padding:14px 4px; border-bottom:2px solid var(--tinta);
+                color:var(--tinta); text-decoration:none; transition:padding .25s, background .25s; }
+  .legenda i{ width:14px; height:14px; border:2px solid var(--tinta); background:var(--c); align-self:center; transition:transform .25s; }
+  .legenda b{ font:800 15px 'JetBrains Mono', monospace; letter-spacing:.12em; text-transform:uppercase; }
+  .legenda small{ grid-column:2; font-size:clamp(15px, 1.05vw, 18px); line-height:1.35; color:var(--cinza); font-weight:500; }
+  .legenda em{ grid-row:1 / 3; grid-column:3; align-self:center; font-style:normal; font-weight:700; opacity:0; transform:translateX(-6px); transition:opacity .25s, transform .25s; }
+  .legenda > a:hover, .legenda > a:focus-visible{ padding-left:12px; background:#fff; outline:none; }
+  .legenda > a:hover i, .legenda > a:focus-visible i{ transform:rotate(45deg); }
+  .legenda > a:hover em, .legenda > a:focus-visible em{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce){ .legenda > a, .legenda i, .legenda em{ transition:none; } }
   .rola{ margin-top:4vh; font-family:'JetBrains Mono', monospace; font-weight:800; letter-spacing:.14em; text-transform:uppercase; font-size:15px; }
   .rola b{ display:inline-block; animation:desce 1.4s ease-in-out infinite; }
   @keyframes desce{ 50%{ transform:translateY(6px); } }
@@ -86,19 +93,17 @@
 
 <section class="abre">
   <div>
-    <span class="fig">FIG_001 · Cyberappfin · Defesa Cibernética</span>
-    <h1><span>Anatomia</span><span>da <span class="rec">Cyberappfin</span></span></h1>
-    <p>Sete camadas. Um pacote. Role a página para desmontar o ambiente e seguir o pacote de ponta a ponta.</p>
+    <h1><span><span class="rec">Cyberappfin</span></span></h1>
+    <p>O projeto de defesa cibernética da Cyberappfin: rede, identidades, monitoramento, estações e governança, do ataque à volta do ambiente.</p>
     <p class="rola">Role <b>↓</b></p>
   </div>
-  <div class="legenda" aria-label="Cor de cada time">
-    <div><i style="background:var(--net)"></i>Network</div>
-    <div><i style="background:var(--iam)"></i>IAM</div>
-    <div><i style="background:var(--soc)"></i>SOC</div>
-    <div><i style="background:var(--end)"></i>Endpoint</div>
-    <div><i style="background:var(--grc)"></i>GRC</div>
-    <div><i style="background:var(--brand)"></i>ITSM</div>
-  </div>
+  <nav class="legenda" aria-label="Os times do projeto">
+    <a href="#topologia" style="--c:var(--net)"><i></i><b>Network</b><small>Segmenta a rede e filtra o tráfego no firewall</small><em>→</em></a>
+    <a href="#okrs" style="--c:var(--iam)"><i></i><b>IAM</b><small>Define quem acessa o quê no Active Directory</small><em>→</em></a>
+    <a href="#deteccao" style="--c:var(--soc)"><i></i><b>SOC</b><small>Monitora o ambiente e responde aos alertas</small><em>→</em></a>
+    <a href="#okrs" style="--c:var(--end)"><i></i><b>Endpoint</b><small>Protege estações e servidores</small><em>→</em></a>
+    <a href="#grc" style="--c:var(--grc)"><i></i><b>GRC</b><small>Cuida das políticas, dos riscos e da recuperação</small><em>→</em></a>
+  </nav>
 </section>
 
 <section id="anatomia" aria-label="Anatomia do ambiente">

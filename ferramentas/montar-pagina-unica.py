@@ -27,7 +27,7 @@ abertura = entre(base, '<section class="abre">', '</section>', True)
 anatomia = entre(base, '<section id="anatomia"', '</section>', True)
 
 css_base = (css_base
-    .replace('.legenda{', '.legenda-times{').replace('.legenda div', '.legenda-times div').replace('.legenda i', '.legenda-times i')
+    .replace('.legenda ', '.legenda-times ').replace('.legenda{', '.legenda-times{')
     .replace('.palco{ position:sticky; top:0; height:100vh;', '.palco{ position:sticky; top:var(--topo); height:calc(100vh - var(--topo));')
     .replace('#figura{ width:100%; height:94vh;', '#figura{ width:100%; height:calc(100vh - var(--topo) - 6vh);')
     .replace('max-height:92vh; overflow:auto;', 'max-height:calc(100vh - var(--topo) - 6vh); overflow:auto;'))
@@ -340,6 +340,7 @@ css_pagina = r"""
   body{ padding-top:var(--topo); }
   section[id], .cap{ scroll-margin-top:var(--topo); }
   .abre{ min-height:calc(100vh - var(--topo)); }
+  @media (min-width:901px){ .abre{ grid-template-columns:minmax(0, 1.1fr) minmax(0, .9fr); } .abre h1{ font-size:clamp(56px, 7vw, 130px); } }
   .topo-nav{ position:fixed; top:0; left:0; right:0; height:var(--topo); z-index:50; display:flex; align-items:center; gap:6px; padding:0 2vw;
              background:var(--papel); border-bottom:var(--borda); overflow-x:auto; }
   .topo-nav a{ flex-shrink:0; font:800 13px 'JetBrains Mono', monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--tinta);
@@ -679,5 +680,7 @@ html = f"""{head}{css_base}{css_pagina}</style>
 </body>
 </html>
 """
+# camada de movimento (entradas, revelação ao rolar, barra de progresso): fica num arquivo próprio
+html = html.replace('</body>', (RAIZ / 'ferramentas' / 'movimento.html').read_text(encoding='utf-8') + '\n</body>', 1)
 (RAIZ / 'final.html').write_text(html, encoding='utf-8')
 print('final.html gerado:', len(html), 'bytes')

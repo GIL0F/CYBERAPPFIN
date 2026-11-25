@@ -29,11 +29,18 @@
   .abre h1{ font-size:clamp(56px, 8.4vw, 150px); line-height:.86; letter-spacing:-.04em; margin:3vh 0 2.4vh; text-transform:uppercase; }
   .abre h1 span{ display:block; }
   .abre h1 .rec{ background:var(--soc); padding:0 .12em; border:var(--borda); box-shadow:var(--sombra); display:inline-block; margin-top:.08em; }
-  .abre p{ font-size:clamp(20px, 1.6vw, 28px); line-height:1.35; max-width:30ch; font-weight:500; }
-  .legenda-times{ display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:12px; }
-  .legenda-times div{ display:flex; gap:12px; align-items:center; border:var(--borda); background:#fff; padding:12px 14px; box-shadow:5px 5px 0 0 var(--tinta);
-                font-family:'JetBrains Mono', monospace; font-weight:700; font-size:clamp(14px, 1.05vw, 18px); text-transform:uppercase; letter-spacing:.06em; }
-  .legenda-times i{ width:26px; height:26px; border:var(--borda); flex-shrink:0; }
+  .abre p{ font-size:clamp(20px, 1.6vw, 28px); line-height:1.35; max-width:42ch; font-weight:500; }
+  .legenda-times{ display:flex; flex-direction:column; width:100%; max-width:520px; justify-self:end; border-top:var(--borda); }
+  .legenda-times > a{ display:grid; grid-template-columns:14px minmax(0, 1fr) auto; gap:4px 16px; align-items:baseline; padding:14px 4px; border-bottom:2px solid var(--tinta);
+                color:var(--tinta); text-decoration:none; transition:padding .25s, background .25s; }
+  .legenda-times i{ width:14px; height:14px; border:2px solid var(--tinta); background:var(--c); align-self:center; transition:transform .25s; }
+  .legenda-times b{ font:800 15px 'JetBrains Mono', monospace; letter-spacing:.12em; text-transform:uppercase; }
+  .legenda-times small{ grid-column:2; font-size:clamp(15px, 1.05vw, 18px); line-height:1.35; color:var(--cinza); font-weight:500; }
+  .legenda-times em{ grid-row:1 / 3; grid-column:3; align-self:center; font-style:normal; font-weight:700; opacity:0; transform:translateX(-6px); transition:opacity .25s, transform .25s; }
+  .legenda-times > a:hover, .legenda-times > a:focus-visible{ padding-left:12px; background:#fff; outline:none; }
+  .legenda-times > a:hover i, .legenda-times > a:focus-visible i{ transform:rotate(45deg); }
+  .legenda-times > a:hover em, .legenda-times > a:focus-visible em{ opacity:1; transform:none; }
+  @media (prefers-reduced-motion: reduce){ .legenda-times > a, .legenda-times i, .legenda-times em{ transition:none; } }
   .rola{ margin-top:4vh; font-family:'JetBrains Mono', monospace; font-weight:800; letter-spacing:.14em; text-transform:uppercase; font-size:15px; }
   .rola b{ display:inline-block; animation:desce 1.4s ease-in-out infinite; }
   @keyframes desce{ 50%{ transform:translateY(6px); } }
@@ -86,6 +93,7 @@
   body{ padding-top:var(--topo); }
   section[id], .cap{ scroll-margin-top:var(--topo); }
   .abre{ min-height:calc(100vh - var(--topo)); }
+  @media (min-width:901px){ .abre{ grid-template-columns:minmax(0, 1.1fr) minmax(0, .9fr); } .abre h1{ font-size:clamp(56px, 7vw, 130px); } }
   .topo-nav{ position:fixed; top:0; left:0; right:0; height:var(--topo); z-index:50; display:flex; align-items:center; gap:6px; padding:0 2vw;
              background:var(--papel); border-bottom:var(--borda); overflow-x:auto; }
   .topo-nav a{ flex-shrink:0; font:800 13px 'JetBrains Mono', monospace; letter-spacing:.08em; text-transform:uppercase; color:var(--tinta);
@@ -388,19 +396,17 @@
 </nav>
 <section class="abre" id="inicio">
   <div>
-    <span class="fig">FIG_001 · Cyberappfin · Defesa Cibernética</span>
-    <h1><span>Anatomia</span><span>da <span class="rec">Cyberappfin</span></span></h1>
-    <p>Sete camadas. Um pacote. Role a página para desmontar o ambiente e seguir o pacote de ponta a ponta.</p>
+    <h1><span><span class="rec">Cyberappfin</span></span></h1>
+    <p>O projeto de defesa cibernética da Cyberappfin: rede, identidades, monitoramento, estações e governança, do ataque à volta do ambiente.</p>
     <p class="rola">Role <b>↓</b></p>
   </div>
-  <div class="legenda-times" aria-label="Cor de cada time">
-    <div><i style="background:var(--net)"></i>Network</div>
-    <div><i style="background:var(--iam)"></i>IAM</div>
-    <div><i style="background:var(--soc)"></i>SOC</div>
-    <div><i style="background:var(--end)"></i>Endpoint</div>
-    <div><i style="background:var(--grc)"></i>GRC</div>
-    <div><i style="background:var(--brand)"></i>ITSM</div>
-  </div>
+  <nav class="legenda-times" aria-label="Os times do projeto">
+    <a href="#topologia" style="--c:var(--net)"><i></i><b>Network</b><small>Segmenta a rede e filtra o tráfego no firewall</small><em>→</em></a>
+    <a href="#okrs" style="--c:var(--iam)"><i></i><b>IAM</b><small>Define quem acessa o quê no Active Directory</small><em>→</em></a>
+    <a href="#deteccao" style="--c:var(--soc)"><i></i><b>SOC</b><small>Monitora o ambiente e responde aos alertas</small><em>→</em></a>
+    <a href="#okrs" style="--c:var(--end)"><i></i><b>Endpoint</b><small>Protege estações e servidores</small><em>→</em></a>
+    <a href="#grc" style="--c:var(--grc)"><i></i><b>GRC</b><small>Cuida das políticas, dos riscos e da recuperação</small><em>→</em></a>
+  </nav>
 </section>
 <section id="anatomia" aria-label="Anatomia do ambiente">
   <div class="palco">
@@ -739,45 +745,44 @@ const AREAS = [
     okrs:[
       { rot:'OKR 1 — Segmentação', painel:'dashboards/img/web-dmz.jpg', painelTipo:'Painel relacionado no Grafana · Web/DMZ Security', objetivo:'Separar o ambiente em zonas e liberar só o tráfego necessário.',
         just:'Em uma rede plana, quem invade uma estação alcança qualquer servidor. A liberação por origem → destino → porta limita o estrago a uma zona.',
-        partida:'VLANs 10 a 60 implantadas e a VLAN 70 (PCI) só em requisitos. Regras conhecidas apenas no UFW do Firefly; a matriz completa, incluindo o AD, ainda não está consolidada.',
+        partida:'VLANs 10 a 70 em operação, mas a VLAN 70 (PCI) não estava na documentação da rede. Regras do firewall documentadas só em parte: as do UFW do Firefly estão escritas, as do AD ainda não foram comparadas com o que está aplicado.',
         freq:'Semestral',
         kpis:[
-          { n:'1.1', nome:'VLANs implantadas', formula:'VLANs em operação ÷ VLANs planejadas (10, 20, 30, 40, 50, 60 e 70)', hoje:'6 de 7', pct:85.7, meta:100, nota:'Falta a VLAN 70 (PCI), hoje só com requisitos.' },
-          { n:'1.2', nome:'Fluxos documentados na matriz', formula:'Fluxos origem → destino → porta documentados ÷ fluxos em uso', hoje:'16 de 18', pct:88.9, sim:true, meta:100, nota:'Projeção do cenário. Medido no lab: as 5 regras de entrada do Firefly já estão documentadas. Faltam os fluxos do AD.' },
-          { n:'1.3', nome:'Testes ao vivo de firewall', formula:'Testes demonstrados (permitido e bloqueado) ÷ testes planejados para a apresentação', hoje:'2 de 2', pct:100, meta:100, nota:'Medido no lab: NT-003 → Firefly SSH 22 (permitido) e VLAN 40 → Firefly SSH 22 (bloqueado).' },
+          { n:'1.1', nome:'VLANs documentadas', formula:'VLANs com ID, sub-rede, função e regras descritos na documentação ÷ VLANs em operação (10 a 70)', hoje:'6 de 7', pct:85.7, meta:95, nota:'Medido no lab: a VLAN 70 (PCI) está em operação, mas ainda não aparece na documentação da rede. Documentá-la fecha o KPI.' },
+          { n:'1.2', nome:'Regras de firewall documentadas', formula:'Regras aplicadas no firewall que batem com a documentação ÷ regras aplicadas no firewall', hoje:'16 de 18', pct:88.9, sim:true, meta:95, nota:'Projeção do cenário. Compara o documentado com o aplicado, regra a regra. Medido no lab: as 5 regras de entrada do UFW do Firefly batem com a documentação; faltam as regras do AD.' },
+          { n:'1.3', nome:'Testes ao vivo de firewall', formula:'Testes demonstrados (permitido e bloqueado) ÷ testes planejados para a apresentação', hoje:'2 de 2', pct:100, meta:95, nota:'Medido no lab: NT-003 → Firefly SSH 22 (permitido) e VLAN 40 → Firefly SSH 22 (bloqueado).' },
         ] },
       { rot:'OKR 2 — Segurança da rede', painel:'dashboards/img/network-okr2.jpg', painelTipo:'Painel do OKR no Grafana · OKR 2 de Rede', objetivo:'Manter todos os ativos de rede monitorados e detectar problemas rápido.',
         just:'Ativo sem monitoramento é ponto cego: uma queda ou um ataque passa sem ninguém ver.',
         partida:'Números do painel “OKR 2 de Rede” no Grafana, antes da queda do servidor.', freq:'Contínua (painel do Grafana)',
         kpis:[
-          { n:'2.1', nome:'Cobertura de monitoramento', formula:'Ativos de rede com dados no painel ÷ ativos inventariados', hoje:'100%', pct:100, meta:100, nota:'Fonte: painel “OKR 2 de Rede”.' },
+          { n:'2.1', nome:'Cobertura de monitoramento', formula:'Ativos de rede com dados no painel ÷ ativos inventariados', hoje:'90%', pct:90, meta:95, sim:true, nota:'Projeção do cenário. O painel “OKR 2 de Rede” mostra os ativos com dados, mas o firewall é compartilhado com turmas do 3º e 4º semestre: uma mudança feita por eles pode tirar tráfego do monitoramento sem aviso, então não dá para afirmar 100%.' },
           { n:'2.2', nome:'MTTD de rede', formula:'Média de (abertura do ticket no Zammad − alerta)', tempo:true, hojeMin:19, metaMin:5, limMin:15, escala:25, nota:'Medido do mesmo jeito que o SOC.' },
         ] }
     ] },
   { id:'iam', nome:'IAM', cor:'var(--iam)', dono:'Time de IAM', doc:'IAM-OKR-001 · v1.0 · 16/11/2026',
-    visao:'Estar preparada para a certificação ISO/IEC 27001:2022: toda alteração de auditoria, senha, privilégio, conta, grupo e OU no AD detectada, autorizada e tratada a tempo.',
+    visao:'Estar preparada para a certificação ISO/IEC 27001:2022: toda alteração de auditoria, privilégio, conta, grupo e OU no AD detectada, autorizada e conferida, e nenhuma conta comum com acesso de administrador sem explicação.',
     okrs:[
-      { rot:'OKR 1 — Auditoria e reset de senha', objetivo:'Garantir que toda alteração na auditoria e todo reset de senha nos controladores de domínio sejam detectados, autorizados e tratados a tempo.',
-        just:'Quem altera a política de auditoria pode apagar o rastro do que fez, e um reset de senha sem chamado pode indicar uso indevido de conta administrativa. Sem detecção e autorização registradas, nenhum dos dois vale como evidência em auditoria.',
-        partida:'Antes das regras, o IAM não tinha indicadores. Regras criadas pelo time no Wazuh (iam_alteracao_auditoria_reset_senha.xml): 100102, alteração da política de auditoria (evento 4719, só por pessoa), e 100103, reset de senha por administrador (evento 4724).',
+      { rot:'OKR 1 — Auditoria e elevação de privilégio', painel:'okrs/img/iam-pingcastle.jpg', painelTipo:'Relatório PingCastle do domínio cyberappfin.local · 20/11/2026 (quanto menor, melhor)', objetivo:'Garantir que toda alteração na auditoria do AD seja detectada e autorizada, e que nenhuma conta comum tenha acesso de administrador sem explicação.',
+        just:'Quem altera a auditoria pode apagar o rastro do que fez. E uma conta comum que ganha acesso de administrador por fora dos grupos privilegiados (admin local, GPO ou permissão delegada) é o caminho mais curto para comprometer o domínio sem disparar alerta de grupo. Sem detecção, autorização e conferência registradas, nada disso vale como evidência em auditoria.',
+        partida:'Antes das regras, o IAM não tinha indicadores. Regra 100102 no Wazuh: alteração da política de auditoria do AD (evento 4719, só por pessoa). A auditoria do ambiente usa uma GPO única, com GMUD registrada (GMUD-IAM-001). A inclusão em grupos privilegiados é tratada no OKR 2 (regra 100104); aqui entra o acesso de administrador que não passa por esses grupos. Medido no PingCastle (20/11/2026): risco do domínio 85/100, puxado pelas contas privilegiadas (85/100), e a política de auditoria dos dois DCs não coleta eventos-chave como 4688 (processos), 4672 a 4674 (uso de privilégio sensível), 4610 e 4697 (serviços e pacotes do LSASS) e 4692 (DPAPI).',
         freq:'Mensal',
         kpis:[
-          { n:'1.1', nome:'Cobertura de detecção', formula:'(alertas 100102 + 100103) ÷ (eventos 4719 feitos por pessoa + eventos 4724 nos DCs)', hoje:'100%', pct:100, meta:100, sim:true, nota:'Projeção do cenário. Medido no lab: a 100103 já gerou 5 alertas (29/10, Administrator no NT-001).' },
-          { n:'1.2', nome:'Resets autorizados', formula:'Alertas 100103 com chamado no Escalation ÷ alertas 100103', hoje:'80%', pct:80, meta:100, sim:true, nota:'Projeção do cenário. Escalation é o grupo do Zammad onde os pedidos de alteração de acesso são abertos e aprovados (POL-GDI-001, seção 5.8).' },
-          { n:'1.3', nome:'Alterações de auditoria não autorizadas', formula:'Alertas 100102 sem GMUD aprovada', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas da 100102 no período. A mudança de auditoria do ambiente tem GMUD registrada (GMUD-IAM-001, GPO única de auditoria).' },
-          { n:'1.4', nome:'Resposta a alteração de auditoria', formula:'Alertas 100102 analisados em até 1 hora ÷ alertas 100102', hoje:'90%', pct:90, meta:100, sim:true, nota:'Projeção do cenário. Responsável: SOC. Medido no lab: nenhuma alteração de auditoria (100102) no período.' },
-          { n:'1.5', nome:'Conferência de reset', formula:'Alertas 100103 conferidos com o Escalation em até 1 dia útil ÷ alertas 100103', hoje:'90%', pct:90, meta:95, sim:true, nota:'Projeção do cenário.' },
+          { n:'1.1', nome:'Alterações de auditoria detectadas', formula:'Alertas 100102 ÷ alterações da política de auditoria feitas por pessoa nos controladores NT-001 e NT-002 (evento 4719)', hoje:'90%', pct:90, meta:95, sim:true, nota:'Projeção do cenário. Mostra quantas mudanças na auditoria do AD viraram alerta no Wazuh.' },
+          { n:'1.2', nome:'Resposta a alteração de auditoria', formula:'Alertas 100102 analisados em até 1 hora ÷ alertas 100102', hoje:'90%', pct:90, meta:95, sim:true, nota:'Projeção do cenário. Responsável: SOC. Medido no lab: nenhuma alteração de auditoria (100102) no período.' },
+          { n:'1.3', nome:'Alterações não autorizadas nas políticas de auditoria do AD', formula:'Alertas 100102 (mudança na GPO de auditoria e nas configurações de auditoria dos DCs) sem GMUD aprovada', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas da 100102 no período. Vale para a GPO de auditoria e as políticas relacionadas (auditoria avançada e SACL). O PingCastle (20/11) aponta categorias da auditoria avançada ainda sem GPO nos dois DCs: completá-las é uma mudança que passa por GMUD.' },
+          { n:'1.4', nome:'Contas comuns com acesso de administrador explicadas', formula:'Contas comuns com acesso de administrador fora dos grupos privilegiados (admin local, GPO ou permissão delegada) com origem do acesso e chamado registrados ÷ contas comuns com acesso de administrador', hoje:'85%', pct:85, meta:95, sim:true, nota:'Projeção do cenário. Para cada conta, o IAM registra como ela conseguiu o acesso e qual chamado autorizou. As contas dos grupos privilegiados ficam no KPI 2.5.' },
         ] },
-      { rot:'OKR 2 — Privilégios, contas e grupos', painel:'dashboards/img/windows.jpg', painelTipo:'Painel relacionado no Grafana · Windows Security & Identity', objetivo:'Garantir que toda alteração de privilégio, exclusão de conta e alteração ou exclusão de grupo e OU no Active Directory seja detectada, autorizada e tratada a tempo.',
-        just:'Privilégio concedido sem autorização é o caminho mais curto para comprometer o domínio, e a exclusão de contas, grupos ou OUs pode apagar acessos e evidências. Cada mudança precisa ter chamado ou GMUD e resposta no prazo.',
-        partida:'AD com 2 controladores (NT-001 e NT-002), 11 OUs e 18 grupos de segurança por perfil RBAC. Regras do IAM (iam_alteracao_privilegios_contas_grupos.xml): 100104 privilégio (4728, 4732, 4756 e 4704, fora das contas autorizadas), 100105 exclusão de conta (4726), 100106 grupo (4730, 4734, 4758, 4735, 4737 e 4755) e 100107 OU (5136 e 5141).',
+      { rot:'OKR 2 — Privilégios, contas e grupos', painel:'dashboards/img/windows.jpg', painelTipo:'Painel relacionado no Grafana · Windows Security & Identity', objetivo:'Garantir que toda alteração de privilégio, exclusão de conta e alteração ou exclusão de grupo e OU no Active Directory (controladores NT-001 e NT-002) seja detectada no Wazuh, tenha chamado aprovado no Escalation ou GMUD e, para grupos privilegiados, seja conferida mensalmente contra a lista de membros aprovados.',
+        just:'Privilégio concedido sem autorização é o caminho mais curto para comprometer o domínio. Excluir contas, grupos ou OUs pode apagar acessos e evidências. Por isso, toda mudança desse tipo precisa de chamado ou GMUD aprovado, e as mudanças críticas (inclusão em grupo privilegiado e exclusão de conta administrativa) passam também por conferência mensal.',
+        partida:'AD com 2 controladores (NT-001 e NT-002), 11 OUs e 18 grupos de segurança organizados por perfil RBAC. Medido no PingCastle (20/11/2026): Lixeira do AD desativada (uma exclusão não tem volta) e 2 OUs sem proteção contra exclusão acidental (Domain Controllers e Comercial e Customer Success). Regras criadas pelo IAM no Wazuh (iam_alteracao_privilegios_contas_grupos.xml):\n• 100104, privilégio: inclusão em grupo global, local ou universal e atribuição de direito de usuário (eventos 4728, 4732, 4756 e 4704), feitas por contas fora da lista de contas autorizadas.\n• 100105, exclusão de conta: evento 4726.\n• 100106, grupo: exclusão e alteração de grupo global, local e universal (eventos 4730, 4734, 4758, 4735, 4737 e 4755).\n• 100107, OU: alteração e exclusão de objeto de OU (eventos 5136 e 5141).',
         freq:'Mensal',
         kpis:[
-          { n:'2.1', nome:'Cobertura de detecção', formula:'Alertas 100104 a 100107 ÷ eventos equivalentes nos DCs (sem as contas autorizadas)', hoje:'100%', pct:100, meta:100, sim:true, nota:'Projeção do cenário. A 100107 depende da auditoria de Directory Service Changes nos DCs e de SACL de auditoria nas OUs.' },
-          { n:'2.2', nome:'Alterações de privilégio não autorizadas', formula:'Alertas 100104 sem chamado aprovado no Escalation', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas desde a criação da regra (as regras não analisam eventos antigos). Chamado aprovado = ticket aprovado no grupo Escalation do Zammad.' },
-          { n:'2.3', nome:'Exclusões de conta autorizadas', formula:'Alertas 100105 com chamado no Escalation ÷ alertas 100105', hoje:'100%', pct:100, meta:100, sim:true, nota:'Projeção do cenário. Medido no lab: nenhuma conta excluída desde a criação da regra 100105.' },
-          { n:'2.4', nome:'Alterações de grupo e OU autorizadas', formula:'Alertas 100106 e 100107 com chamado ou GMUD ÷ alertas 100106 e 100107', hoje:'85%', pct:85, meta:100, sim:true, nota:'Projeção do cenário. Medido no lab: nenhuma alteração de grupo ou OU desde a criação das regras 100106 e 100107.' },
-          { n:'2.5', nome:'Resposta a alerta crítico', formula:'Alertas 100104 e 100105 analisados em até 1 hora ÷ alertas 100104 e 100105', hoje:'95%', pct:95, meta:100, sim:true, nota:'Projeção do cenário. Responsável: SOC. Medido no lab: nenhum alerta 100104 ou 100105 desde a criação das regras.' },
+          { n:'2.1', nome:'Cobertura de detecção', formula:'Alertas 100104 a 100107 ÷ eventos equivalentes (4728, 4732, 4756, 4704, 4726, 4730, 4734, 4758, 4735, 4737, 4755, 5136 e 5141) nos controladores NT-001 e NT-002, excluindo as contas autorizadas', hoje:'95%', pct:95, meta:95, sim:true, nota:'Projeção do cenário.' },
+          { n:'2.2', nome:'Alterações de privilégio não autorizadas', formula:'Alertas 100104 sem chamado aprovado no Escalation', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas desde a criação da regra (as regras não analisam eventos antigos).' },
+          { n:'2.3', nome:'Exclusões de conta autorizadas', formula:'Alertas 100105 com chamado aprovado no Escalation ÷ alertas 100105', hoje:'95%', pct:95, meta:95, sim:true, nota:'Projeção do cenário. Medido no lab: nenhuma conta excluída desde a criação da regra 100105.' },
+          { n:'2.4', nome:'Alterações de grupo e OU autorizadas', formula:'Alertas 100106 e 100107 com chamado aprovado no Escalation ou GMUD aprovada ÷ alertas 100106 e 100107', hoje:'85%', pct:85, meta:95, sim:true, nota:'Projeção do cenário.' },
+          { n:'2.5', nome:'Aderência dos grupos privilegiados', formula:'Membros dos grupos privilegiados com aprovação registrada (chamado ou GMUD) ÷ total de membros desses grupos no AD, apurado pelo IAM até o 5º dia útil do mês seguinte', hoje:'1 de 2', pct:50, meta:95, sim:true, nota:'Projeção a partir do PingCastle (20/11): os grupos Domain Admins e Administrators têm 2 membros, o Administrator nativo e a conta de serviço do OpenVAS (svc_openvas), os dois com senha que nunca expira e fora do grupo Protected Users. Falta aprovação registrada para a conta de serviço, que também não deveria ser administradora do domínio.' },
         ] }
     ] },
   { id:'soc', nome:'SOC', cor:'var(--soc)', dono:'Time do SOC', proposta:true,
@@ -788,11 +793,11 @@ const AREAS = [
         partida:'Wazuh 4.14.6 com 30 regras customizadas (29 do ambiente e a 100001, de exemplo). O NT-003 não enviava eventos: o firewall bloqueia as portas 1514 e 1515 da VLAN 60.',
         freq:'Diária e mensal',
         kpis:[
-          { n:'1.1', nome:'Cobertura dos ativos críticos', formula:'Ativos críticos enviando eventos ao Wazuh ÷ 9', hoje:'8 de 9', pct:88.9, meta:100, nota:'Medido no lab · painel SOC KPIs e OKRs.' },
-          { n:'1.2', nome:'Regras customizadas validadas', formula:'Regras que dispararam (tráfego real ou teste) ÷ 23 testáveis', hoje:'21 de 23', pct:91.3, meta:100, sim:true, nota:'Projeção do cenário. Medido no lab: a 100113 (brute force) teve 0 disparos em 30 dias. Fora da conta: 100001 (exemplo) e as 6 de integridade e defesa.' },
-          { n:'1.3', nome:'VLANs com varredura de vulnerabilidade', formula:'VLANs com tarefa no OpenVAS ÷ 6 (VLANs 10 a 60)', hoje:'6 de 6', pct:100, meta:100, nota:'Medido no lab · tarefas do OpenVAS por VLAN.' },
+          { n:'1.1', nome:'Cobertura dos ativos críticos', formula:'Ativos críticos enviando eventos ao Wazuh ÷ 9', hoje:'8 de 9', pct:88.9, meta:95, nota:'Medido no lab · painel SOC KPIs e OKRs.' },
+          { n:'1.2', nome:'Regras customizadas validadas', formula:'Regras customizadas que já dispararam (tráfego real ou teste) ÷ 30 regras customizadas', hoje:'21 de 30', pct:70, meta:95, sim:true, nota:'Projeção do cenário. As 9 sem disparo incluem a 100001 (exemplo), as 6 de integridade e defesa, que dependem de teste dedicado, e a 100113 (brute force), com 0 disparos em 30 dias no lab.' },
+          { n:'1.3', nome:'VLANs com varredura de vulnerabilidade', formula:'VLANs com tarefa no OpenVAS ÷ 6 (VLANs 10 a 60)', hoje:'6 de 6', pct:100, meta:95, nota:'Medido no lab · tarefas do OpenVAS por VLAN.' },
         ] },
-      { rot:'OKR 2 — Resposta', painel:'dashboards/img/kpis-soc.jpg', painelTipo:'Painel do OKR no Grafana · SOC KPIs e OKRs', objetivo:'Transformar cada alerta relevante em incidente tratado, rápido e sem retrabalho.',
+      { rot:'OKR 2 — Resposta', painel:'dashboards/img/kpis-soc.jpg', painelTipo:'Painel do OKR no Grafana · SOC KPIs e OKRs', objetivo:'Tratar os alertas que chegam, rápido e com a rotina do SOC em dia.',
         just:'Quanto mais cedo um alerta vira ticket, menor o dano; a política dá 15 minutos. Ticket duplicado e falso positivo tomam o tempo do analista.',
         partida:'Fluxo Wazuh → Cyberappfin → Zammad funcionando, com caso homologado (GET /.env → 403 → regra 100160). O tempo até o ticket ficou em 19 minutos, acima do limite.',
         freq:'Diária a mensal',
@@ -800,8 +805,8 @@ const AREAS = [
           { n:'2.1', nome:'Tempo até o ticket (MTTD do SOC)', formula:'Média de (abertura do ticket no Zammad − alerta no Wazuh)', tempo:true, hojeMin:19, metaMin:5, limMin:15, escala:25, nota:'Medido no lab · painel SOC KPIs e OKRs.' },
           { n:'2.2', nome:'MTTR', formula:'Média de (fechamento − abertura) dos tickets de incidente', tempo:true, hojeMin:41, metaMin:30, limMin:30, escala:60, sim:true, nota:'Projeção do cenário até o Zammad ser ligado ao Grafana.' },
           { n:'2.3', nome:'Falsos positivos', formula:'Tickets fechados como falso positivo ÷ tickets fechados', menor:true, hojePct:7.6, metaPct:20, sim:true, nota:'Projeção do cenário (o painel do Grafana marca como “simulado”): 12,5% (jul) → 10,8% → 9,1% → 7,6% (out).' },
-          { n:'2.4', nome:'Incidentes sem ticket duplicado', formula:'Incidentes com um único ticket ÷ incidentes', hoje:'46 de 50', pct:92, meta:100, sim:true, nota:'Projeção do cenário. Os duplicados vêm de rajadas antes da janela de correlação.' },
-          { n:'2.5', nome:'Incidentes encerrados com conclusão', formula:'Tickets fechados com classificação e evidência ÷ tickets fechados', hoje:'36 de 40', pct:90, meta:100, sim:true, nota:'Projeção do cenário. Os 4 restantes foram fechados sem classificação.' },
+          { n:'2.4', nome:'Alertas recebidos e tratados', formula:'Alertas de nível 10 ou mais tratados (viraram ticket ou foram analisados e fechados) ÷ alertas de nível 10 ou mais recebidos no mês', hoje:'212 de 240', pct:88.3, meta:95, sim:true, nota:'Projeção do cenário. Mostra o volume que chega ao SOC (240 alertas no mês) e quanto dele a equipe deu conta de tratar (212).' },
+          { n:'2.5', nome:'Atividades da rotina feitas', formula:'Atividades feitas no mês ÷ atividades previstas na rotina do SOC (revisão diária dos painéis, triagem dos alertas, varredura semanal do OpenVAS e revisão mensal das regras)', hoje:'26 de 30', pct:86.7, meta:95, sim:true, nota:'Projeção do cenário. As 4 que faltaram foram revisões diárias de painel em dias sem plantão.' },
         ] }
     ] },
   { id:'endpoint', nome:'Endpoint', cor:'var(--end)', dono:'Time de Endpoint', proposta:true,
@@ -812,18 +817,18 @@ const AREAS = [
         partida:'Estações no domínio recebem senha e bloqueio pelas GPOs. Servidores com ClamAV integrado ao Wazuh (validado com EICAR) e UFW nos Linux, com entrada bloqueada por padrão.',
         freq:'Mensal',
         kpis:[
-          { n:'1.1', nome:'Endpoints com agente Wazuh ativo', formula:'Agentes ativos ÷ endpoints inventariados', hoje:'7 de 10', pct:70, sim:true, meta:100, nota:'Projeção do cenário. Os 7 agentes do Wazuh são reais; as estações da VLAN 40 sem agente são a lacuna.' },
-          { n:'1.2', nome:'Servidores com antivírus integrado', formula:'Servidores com ClamAV reportando ao Wazuh ÷ servidores', hoje:'5 de 6', pct:83.3, sim:true, meta:100, nota:'Projeção do cenário. Medido no lab: detecção validada com o arquivo de teste EICAR.' },
-          { n:'1.3', nome:'Servidores Linux com UFW', formula:'Linux com entrada bloqueada por padrão ÷ servidores Linux', hoje:'6 de 6', pct:100, sim:true, meta:100, nota:'Projeção do cenário. Os slides já mostram UFW com entrada bloqueada por padrão nos Linux.' },
+          { n:'1.1', nome:'Endpoints com agente Wazuh ativo', formula:'Agentes ativos ÷ endpoints inventariados', hoje:'7 de 10', pct:70, sim:true, meta:95, nota:'Projeção do cenário. Os 7 agentes do Wazuh são reais; as estações da VLAN 40 sem agente são a lacuna.' },
+          { n:'1.2', nome:'Servidores com antivírus integrado', formula:'Servidores com ClamAV reportando ao Wazuh ÷ servidores', hoje:'5 de 6', pct:83.3, sim:true, meta:95, nota:'Projeção do cenário. Medido no lab: detecção validada com o arquivo de teste EICAR.' },
+          { n:'1.3', nome:'Servidores Linux com UFW', formula:'Linux com entrada bloqueada por padrão ÷ servidores Linux', hoje:'6 de 6', pct:100, sim:true, meta:95, nota:'Projeção do cenário. Os slides já mostram UFW com entrada bloqueada por padrão nos Linux.' },
         ] },
       { rot:'OKR 2 — Superfície de ataque', painel:'dashboards/img/vulnerabilidades.jpg', painelTipo:'Painel relacionado no Grafana · Vulnerability Management', objetivo:'Reduzir as portas e os serviços expostos sem necessidade.',
         just:'A maior parte dos riscos críticos e altos vem de portas de administração remota (RDP 3389, WinRM 5985, SSH 22) e de TLS desatualizado.',
         partida:'OpenVAS (11/09/2026): 744 ocorrências em 20 hosts, reclassificadas em 167 críticas e 221 altas.',
         freq:'Mensal',
         kpis:[
-          { n:'2.1', nome:'VLANs com varredura própria', formula:'VLANs com tarefa do OpenVAS ÷ VLANs (10 a 60)', hoje:'6 de 6', pct:100, meta:100 },
-          { n:'2.2', nome:'Ativos críticos com baseline', formula:'Ativos com tarefa de baseline no OpenVAS ÷ 7 ativos críticos', hoje:'7 de 7', pct:100, meta:100 },
-          { n:'2.3', nome:'Achados críticos tratados', formula:'Achados críticos corrigidos ou aceitos ÷ 167', hoje:'98 de 167', pct:58.7, sim:true, meta:100, nota:'Projeção do cenário. Partida medida no lab: 167 críticos na reclassificação do OpenVAS (11/09).' },
+          { n:'2.1', nome:'VLANs com varredura própria', formula:'VLANs com tarefa do OpenVAS ÷ VLANs (10 a 60)', hoje:'6 de 6', pct:100, meta:95 },
+          { n:'2.2', nome:'Ativos críticos com baseline', formula:'Ativos com tarefa de baseline no OpenVAS ÷ 7 ativos críticos', hoje:'7 de 7', pct:100, meta:95 },
+          { n:'2.3', nome:'Achados críticos tratados', formula:'Achados críticos corrigidos ou aceitos ÷ 167', hoje:'98 de 167', pct:58.7, sim:true, meta:95, nota:'Projeção do cenário. Partida medida no lab: 167 críticos na reclassificação do OpenVAS (11/09).' },
         ] }
     ] },
   { id:'grc', nome:'GRC', cor:'var(--grc)', dono:'Time de GRC', doc:'GRC-OKR-001 · v1.1 · 26/10/2026',
@@ -833,20 +838,20 @@ const AREAS = [
         just:'Política sem conformidade não tem validade; política que contradiz outra gera dúvida sobre qual regra seguir; e controle sem evidência não é aceito em auditoria.',
         partida:'Nenhuma das 14 políticas tinha revisão de conformidade com normas do mercado.', freq:'Semestral', painel:'okrs/img/grc-okr1.jpg',
         kpis:[
-          { n:'1.1', nome:'Políticas revisadas', formula:'Políticas em conformidade segundo o ValidAI ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
+          { n:'1.1', nome:'Políticas revisadas', formula:'Políticas em conformidade segundo o ValidAI ÷ 14', hoje:'14 de 14', pct:100, meta:95 },
           { n:'1.2', nome:'Achados tratados', formula:'Divergências corrigidas ÷ divergências encontradas', hoje:'6 de 12', pct:50, meta:70 },
           { n:'1.3', nome:'Adequação à ISO 27001', formula:'Políticas adequadas aos requisitos aplicáveis ÷ 14', hoje:'14 de 14', pct:100, meta:80 },
           { n:'1.4', nome:'Período de revisão', formula:'Revisadas dentro do período ÷ previstas para revisão', hoje:'10 de 14', pct:71.4, meta:80 },
-          { n:'1.5', nome:'Políticas sem achados', formula:'Sem achados na avaliação do ValidAI ÷ 14', hoje:'12 de 14', pct:85.7, meta:100 },
+          { n:'1.5', nome:'Políticas sem achados', formula:'Sem achados na avaliação do ValidAI ÷ 14', hoje:'12 de 14', pct:85.7, meta:95 },
         ] },
       { rot:'OKR 2 — Controle de documentos', painelTipo:'Painel do OKR no Grafana · OKR 2 — Controle de documentos', objetivo:'Manter os documentos de segurança da Cyberappfin padronizados, atualizados e acessíveis.',
         just:'Controlar a informação documentada é exigência da ISO/IEC 27001. Documento desatualizado, sem dono ou em versão errada não é aceito em auditoria.',
         partida:'Documentos espalhados entre repositório, Drive e cópias locais, em mais de um modelo; playbooks em duas estruturas e sem uma pasta oficial única.', freq:'Anual', painel:'okrs/img/grc-okr2.jpg',
         kpis:[
-          { n:'2.1', nome:'Documentos padronizados', formula:'Com data, responsável e alterações ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
-          { n:'2.2', nome:'Documentos no modelo oficial', formula:'No modelo visual da PSI ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
-          { n:'2.3', nome:'Documentos publicados', formula:'Publicados na pasta oficial ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
-          { n:'2.4', nome:'Revisão em dia', formula:'Revisados nos últimos 12 meses ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
+          { n:'2.1', nome:'Documentos padronizados', formula:'Com data, responsável e alterações ÷ 14', hoje:'14 de 14', pct:100, meta:95 },
+          { n:'2.2', nome:'Políticas com cobertura de ambiente', formula:'Políticas que cobrem ativos, sistemas e controles que existem no ambiente ÷ 14', hoje:'12 de 14', pct:85.7, meta:95, sim:true, nota:'Projeção do cenário, a confirmar com o GRC. Antes este KPI media o modelo oficial, que é o mesmo que o 2.1 (documentos padronizados).' },
+          { n:'2.3', nome:'Documentos publicados', formula:'Publicados na pasta oficial ÷ 14', hoje:'14 de 14', pct:100, meta:95 },
+          { n:'2.4', nome:'Revisão em dia', formula:'Revisados nos últimos 12 meses ÷ 14', hoje:'14 de 14', pct:100, meta:95 },
           { n:'2.5', nome:'Revisão humana', formula:'Revisados por um membro após o ValidAI ÷ 14', hoje:'14 de 14', pct:100, meta:80 },
         ] }
     ] }
@@ -894,7 +899,7 @@ function kpiHTML(k, i){
   } else {
     barra = k.pct == null ? `<div class="trilho"></div>` : `<div class="trilho"><i style="--p:${k.pct}%;--d:${i*.12}s"></i><span class="marca" style="--m:${k.meta}%"></span></div>`;
     const pct = k.pct == null ? '—' : String(k.pct).replace('.', ',') + '%';
-    nums = `<div><small>Hoje</small><span class="hoje">${k.hoje == null ? '?' : esc(k.hoje)}</span>${k.sim ? '<span class="sim">projeção</span>' : '<span class="sim med">medido</span>'}</div><div><small>%</small>${pct}</div><div><small>Meta</small>${typeof k.meta === 'number' ? k.meta + '%' : esc(k.meta)}</div>${st.gap ? `<div><small>Gap</small>${st.gap}</div>` : ''}`;
+    nums = `<div><small>Hoje</small><span class="hoje">${k.hoje == null ? '?' : esc(k.hoje)}</span>${k.pct == null ? '' : k.sim ? '<span class="sim">projeção</span>' : '<span class="sim med">medido</span>'}</div><div><small>%</small>${pct}</div><div><small>Meta</small>${typeof k.meta === 'number' ? k.meta + '%' : esc(k.meta)}</div>${st.gap ? `<div><small>Gap</small>${st.gap}</div>` : ''}`;
   }
   return `<div class="kpi" style="--s:${st.s}"><span class="num">${esc(k.n)}</span><div><h4>${esc(k.nome)}</h4><div class="formula">${esc(k.formula)}</div></div><span class="pill">${st.txt}</span>
     <div class="linha">${barra}<div class="nums">${nums}</div></div>${k.nota ? `<div class="nota">${esc(k.nota)}</div>` : ''}</div>`;
@@ -903,7 +908,7 @@ function okrHTML(o){
   const reais = o.kpis.filter(k => !k.ex && (k.tempo || k.menor || k.cont || k.pct != null));
   const naMeta = reais.filter(k => status(k).txt.startsWith('Atingido')).length;
   const ex = o.ex;
-  const bloco = (t, v) => `<div class="bloco"><span class="rot">${t}</span><p>${v ? esc(v) : 'A preencher'}</p></div>`;
+  const bloco = (t, v) => `<div class="bloco"><span class="rot">${t}</span><p>${v ? esc(v).replace(/\n/g, '<br>') : 'A preencher'}</p></div>`;
   return `<div class="okr">
     <div class="obj${ex ? ' ex' : ''}"><span class="rot">${esc(o.rot)}</span><h3>${esc(o.objetivo)}</h3>
       ${bloco('Justificativa', o.just)}${bloco('Situação de partida', o.partida)}${bloco('Frequência', o.freq)}</div>
@@ -2351,5 +2356,117 @@ document.querySelectorAll('.cap, #inicio, #fim').forEach(s => new IntersectionOb
 }), { rootMargin:'-45% 0px -50% 0px' }).observe(s));
 
 </script>
+<!-- Camada de movimento da final.html: o gerador (montar-pagina-unica.py) cola este arquivo antes do </body>. Sem efeito para quem pede movimento reduzido. -->
+<style id="movimento">
+/* ===== camada de movimento (prévia) — mesmo estilo "engenharia crua": borda grossa, sombra dura ===== */
+.mv-prog{ position:fixed; left:0; right:0; top:var(--topo); height:6px; z-index:49; display:flex; pointer-events:none; border-bottom:2px solid var(--tinta); background:var(--papel); }
+.mv-prog i{ flex:1; transform-origin:left; transform:scaleX(0); }
+/* abertura */
+.abre h1 > span{ overflow:hidden; padding-bottom:.08em; }
+.mv .abre h1 .w{ display:inline-block; transform:translateY(105%); animation:mvSobe .9s cubic-bezier(.2,.9,.2,1) forwards; animation-delay:calc(var(--i) * 90ms + 150ms); }
+.mv .abre h1 .rec{ animation:mvCarimbo .7s cubic-bezier(.3,1.6,.5,1) both; animation-delay:.75s; }
+.mv .abre > div > p, .mv .abre .fig{ opacity:0; animation:mvAparece .6s ease forwards; animation-delay:1s; }
+.mv .abre .fig{ animation-delay:0s; }
+.mv .legenda-times > a{ opacity:0; animation:mvLinha .5s cubic-bezier(.2,.9,.2,1) forwards; animation-delay:calc(var(--i) * 80ms + 900ms); }
+/* cabeçalho dos capítulos */
+.cap{ position:relative; border-top:none; }
+.cap::before{ content:""; position:absolute; left:0; right:0; top:0; height:3px; background:var(--tinta); transform:scaleX(var(--mv-linha,1)); transform-origin:left; transition:transform 1s cubic-bezier(.7,0,.2,1); }
+.mv .cap:not(.mv-in)::before{ --mv-linha:0; }
+.cap-cab{ position:relative; } .cap-cab .fig{ align-self:flex-start; position:relative; }
+.mv-num{ position:absolute; right:-1vw; top:-6vh; font:700 clamp(140px, 22vw, 380px)/.8 'Space Grotesk', sans-serif; letter-spacing:-.06em; color:transparent;
+         -webkit-text-stroke:3px var(--tinta); opacity:.12; pointer-events:none; user-select:none; will-change:transform; }
+.mv .cap-cab h2 .w{ display:inline-block; transform:translateY(110%); transition:transform .8s cubic-bezier(.2,.9,.2,1); transition-delay:calc(var(--i) * 60ms + 200ms); }
+.mv .cap-cab h2 .l{ display:inline-block; overflow:hidden; vertical-align:top; padding-bottom:.06em; }
+.mv .cap-cab.mv-in h2 .w{ transform:none; }
+.mv .cap-cab .fig{ clip-path:inset(0 100% 0 0); transition:clip-path .6s steps(18); }
+.mv .cap-cab.mv-in .fig{ clip-path:inset(0 0 0 0); }
+/* blocos que "pousam": saem da sombra e assentam */
+.mv .mv-p{ opacity:0; transform:translate(-14px,-14px); transition:opacity .45s ease, transform .6s cubic-bezier(.2,.9,.3,1.25); transition-delay:var(--d,0ms); }
+.mv .mv-p.mv-in{ opacity:1; transform:none; }
+.mv .sala-cab .quem{ transform:rotate(-4deg) scale(.6); opacity:0; transition:transform .5s cubic-bezier(.3,1.7,.5,1), opacity .2s; }
+.mv .sala-cab.mv-in .quem{ transform:none; opacity:1; }
+/* toque: tudo que tem borda responde */
+.card, .chip, .docs a{ transition:transform .14s, box-shadow .14s; }
+.card:hover{ transform:translate(-3px,-3px); box-shadow:6px 6px 0 0 var(--tinta); }
+.chip:hover{ transform:translateY(-2px) rotate(-2deg); background:var(--soc); }
+.docs a:hover{ transform:translate(-4px,-4px) rotate(-.6deg) !important; box-shadow:10px 10px 0 0 var(--tinta) !important; }
+/* menu do topo: pílula que desliza */
+.topo-nav{ position:fixed; }
+.mv-pilula{ position:absolute; top:50%; height:34px; margin-top:-17px; background:var(--tinta); z-index:-1; transition:left .45s cubic-bezier(.6,0,.2,1), width .45s cubic-bezier(.6,0,.2,1); }
+.mv .topo-nav a.ativo:not(.marca){ background:transparent; }
+.topo-nav a{ position:relative; transition:color .3s; }
+/* papel milimetrado com leve paralaxe */
+body::before{ background-position:0 calc(var(--mv-y,0) * -0.15px); }
+@keyframes mvSobe{ to{ transform:none; } }
+@keyframes mvCarimbo{ 0%{ transform:scale(1.5) rotate(-6deg); box-shadow:0 0 0 0 var(--tinta); opacity:0; } 60%{ opacity:1; } 100%{ transform:none; box-shadow:var(--sombra); } }
+@keyframes mvAparece{ to{ opacity:1; } }
+@keyframes mvPousa{ from{ opacity:0; transform:translate(-16px,-24px) rotate(-3deg); box-shadow:0 0 0 0 var(--tinta); } to{ opacity:1; transform:none; box-shadow:5px 5px 0 0 var(--tinta); } }
+@keyframes mvLinha{ from{ opacity:0; transform:translateX(24px); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){ .mv-num{ display:none; } }
+</style>
+<script id="movimento-js">
+(() => {
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const R = document.documentElement; R.classList.add('mv');
+  const cores = ['--net','--iam','--soc','--end','--grc','--brand'];
+  // quebra um título em palavras animáveis
+  const palavras = (el, linha) => {
+    let i = 0;
+    const anda = n => { [...n.childNodes].forEach(c => {
+      if(c.nodeType === 3){ const f = document.createDocumentFragment();
+        c.textContent.split(/(\s+)/).forEach(t => { if(!t) return; if(/^\s+$/.test(t)){ f.append(t); return; }
+          const w = document.createElement('span'); w.className = 'w'; w.style.setProperty('--i', i++); w.textContent = t;
+          if(linha){ const l = document.createElement('span'); l.className = 'l'; l.append(w); f.append(l); } else f.append(w); });
+        c.replaceWith(f);
+      } else if(c.nodeType === 1 && !c.classList.contains('rec')) anda(c); else if(c.nodeType === 1) c.style.setProperty('--i', i++); }); };
+    anda(el);
+  };
+  palavras(document.querySelector('.abre h1'));
+  document.querySelectorAll('.legenda-times > a').forEach((d, i) => d.style.setProperty('--i', i));
+  // barra de progresso nas cores dos times
+  const prog = document.createElement('div'); prog.className = 'mv-prog';
+  cores.forEach(c => { const i = document.createElement('i'); i.style.background = `var(${c})`; prog.append(i); });
+  document.body.append(prog);
+  const segs = [...prog.children];
+  // pílula do menu
+  const nav = document.querySelector('.topo-nav'); const pil = document.createElement('span'); pil.className = 'mv-pilula'; nav.prepend(pil);
+  const movePil = () => { const a = nav.querySelector('a.ativo:not(.marca)'); if(!a){ pil.style.width = 0; return; }
+    pil.style.left = (a.offsetLeft) + 'px'; pil.style.width = a.offsetWidth + 'px'; a.style.color = '#fff'; nav.querySelectorAll('a:not(.ativo)').forEach(x => x.style.color = ''); };
+  new MutationObserver(movePil).observe(nav, { subtree:true, attributes:true, attributeFilter:['class'] });
+  // revelação ao entrar na tela
+  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('mv-in'); io.unobserve(e.target); } }), { rootMargin:'0px 0px -12% 0px' });
+  const nums = [];
+  const prepara = () => {
+    document.querySelectorAll('.cap').forEach(c => { if(c.dataset.mv) return; c.dataset.mv = 1; io.observe(c);
+      const cab = c.querySelector('.cap-cab'); if(!cab) return;
+      const rot = (cab.querySelector('.fig').textContent.match(/CAP_(\d+)/) || [])[1];
+      if(rot){ const n = document.createElement('span'); n.className = 'mv-num'; n.textContent = rot; n.setAttribute('aria-hidden','true'); cab.prepend(n); nums.push(n); }
+      palavras(cab.querySelector('h2'), true); io.observe(cab); });
+    document.querySelectorAll('.sala-cab').forEach(el => io.observe(el));
+    const grupos = ['.sala-corpo > *', '.card', '.fim .docs a', '.fim h2', '.mapa-moldura', '.cap .nota'];
+    document.querySelectorAll(grupos.join(',')).forEach(el => { if(el.classList.contains('mv-p') || el.closest('.mapa-cartao')) return;
+      const irmaos = [...el.parentElement.children].filter(x => x.matches(grupos.join(',')));
+      el.style.setProperty('--d', Math.min(irmaos.indexOf(el), 6) * 70 + 'ms'); el.classList.add('mv-p'); io.observe(el); });
+    // números que contam
+    document.querySelectorAll('.card .n').forEach(el => { if(el.dataset.mvn) return; const m = el.textContent.match(/^(\D*)(\d{1,5})(.*)$/s); if(!m) return;
+      el.dataset.mvn = 1; const alvo = +m[2];
+      const ion = new IntersectionObserver(([e]) => { if(!e.isIntersecting) return; ion.disconnect(); const t0 = performance.now();
+        const passo = t => { const p = Math.min(1, (t - t0) / 900), v = Math.round(alvo * (1 - Math.pow(1 - p, 3)));
+          el.textContent = m[1] + v + m[3]; if(p < 1) requestAnimationFrame(passo); }; requestAnimationFrame(passo); });
+      ion.observe(el); });
+  };
+  prepara(); setTimeout(prepara, 1200);
+  // rolagem: barra, paralaxe do número, papel
+  let pedido = false;
+  const rola = () => { pedido = false; const y = scrollY, H = document.documentElement.scrollHeight - innerHeight, p = H > 0 ? y / H : 0;
+    segs.forEach((s, i) => s.style.transform = `scaleX(${Math.min(1, Math.max(0, p * segs.length - i))})`);
+    R.style.setProperty('--mv-y', y);
+    nums.forEach(n => { const r = n.parentElement.getBoundingClientRect(); n.style.transform = `translateY(${(r.top - innerHeight / 2) * -0.25}px)`; });
+  };
+  addEventListener('scroll', () => { if(!pedido){ pedido = true; requestAnimationFrame(rola); } }, { passive:true });
+  addEventListener('resize', movePil); rola(); movePil();
+})();
+</script>
+
 </body>
 </html>

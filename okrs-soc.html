@@ -163,9 +163,9 @@
   <div class="topo"><span class="fig">OKR 2 — Resposta</span><span class="pag">06</span></div>
   <div class="grade2">
     <div class="cx cor cheia"><span class="rot">Objetivo 2</span>
-      <span class="obj">Transformar cada alerta relevante em incidente tratado, rápido e sem retrabalho.</span></div>
+      <span class="obj">Tratar os alertas que chegam, rápido e com a rotina do SOC em dia.</span></div>
     <div class="cx"><span class="rot">Justificativa</span>
-      <p>Quanto mais cedo um alerta vira ticket, menor o dano; a política dá 15 minutos. Ticket duplicado e falso positivo tomam o tempo do analista.</p></div>
+      <p>Quanto mais cedo um alerta vira ticket, menor o dano; a política dá 15 minutos. Alerta que chega e ninguém trata é um ataque sem resposta, e falso positivo toma o tempo do analista.</p></div>
     <div class="cx"><span class="rot">Situação de partida</span>
       <p>Fluxo Wazuh → Cyberappfin → Zammad funcionando, com caso homologado (GET /.env → 403 → regra 100160). O tempo até o ticket ficou em 19 minutos, acima do limite.</p></div>
   </div>
@@ -215,10 +215,10 @@
 <script>
 const OKRS = [
   [
-    { n:'1.1', nome:'Cobertura dos ativos críticos', form:'Ativos críticos enviando eventos ao Wazuh ÷ 9', hoje:'8 de 9', pct:88.9, meta:100, freq:'Diária' },
-    { n:'1.2', nome:'Regras customizadas validadas', form:'Regras que dispararam (tráfego real ou teste) ÷ 23 testáveis', hoje:'21 de 23', pct:91.3, meta:100, freq:'Mensal',
-      sim:'Projeção do cenário. Medido no lab: 100113 (brute force) com 0 disparos em 30 dias. Fora da conta: 100001 (exemplo) e as 6 de integridade e defesa, que não se testam em produção.' },
-    { n:'1.3', nome:'VLANs com varredura de vulnerabilidade', form:'VLANs com tarefa no OpenVAS ÷ 6 (VLANs 10 a 60)', hoje:'6 de 6', pct:100, meta:100, freq:'Mensal' },
+    { n:'1.1', nome:'Cobertura dos ativos críticos', form:'Ativos críticos enviando eventos ao Wazuh ÷ 9', hoje:'8 de 9', pct:88.9, meta:95, freq:'Diária' },
+    { n:'1.2', nome:'Regras customizadas validadas', form:'Regras customizadas que já dispararam (tráfego real ou teste) ÷ 30 regras customizadas', hoje:'21 de 30', pct:70, meta:95, freq:'Mensal',
+      sim:'Projeção do cenário. As 9 sem disparo incluem a 100001 (exemplo), as 6 de integridade e defesa, que dependem de teste dedicado, e a 100113 (brute force), com 0 disparos em 30 dias no lab.' },
+    { n:'1.3', nome:'VLANs com varredura de vulnerabilidade', form:'VLANs com tarefa no OpenVAS ÷ 6 (VLANs 10 a 60)', hoje:'6 de 6', pct:100, meta:95, freq:'Mensal' },
   ],
   [
     { n:'2.1', nome:'Tempo até o ticket (MTTD do SOC)', form:'Média de (abertura do ticket no Zammad − alerta no Wazuh)', tempo:true, hojeMin:19, metaMin:5, limMin:15, escala:25, freq:'Diária' },
@@ -226,10 +226,10 @@ const OKRS = [
       sim:'Projeção do cenário até o Zammad ser ligado ao Grafana. Coerente com o tempo até o ticket acima do limite.' },
     { n:'2.3', nome:'Falsos positivos', form:'Tickets fechados como falso positivo ÷ tickets fechados', menor:true, hojePct:7.6, metaPct:20, freq:'Mensal',
       sim:'Projeção do cenário (o painel do Grafana marca como “simulado”): 12,5% (jul) → 10,8% → 9,1% → 7,6% (out).' },
-    { n:'2.4', nome:'Incidentes sem ticket duplicado', form:'Incidentes com um único ticket ÷ incidentes', hoje:'46 de 50', pct:92, meta:100, freq:'Mensal',
-      sim:'Projeção do cenário. A correlação do Cyberappfin junta eventos repetidos; os duplicados vêm de rajadas antes da janela de correlação.' },
-    { n:'2.5', nome:'Incidentes encerrados com conclusão', form:'Tickets fechados com classificação e evidência ÷ tickets fechados', hoje:'36 de 40', pct:90, meta:100, freq:'Mensal',
-      sim:'Projeção do cenário. Os 4 restantes foram fechados sem classificação (real, falso positivo ou inconclusivo).' },
+    { n:'2.4', nome:'Alertas recebidos e tratados', form:'Alertas de nível 10 ou mais tratados (viraram ticket ou foram analisados e fechados) ÷ alertas de nível 10 ou mais recebidos no mês', hoje:'212 de 240', pct:88.3, meta:95, freq:'Mensal',
+      sim:'Projeção do cenário. Mostra o volume que chega ao SOC (240 alertas no mês) e quanto dele a equipe deu conta de tratar (212).' },
+    { n:'2.5', nome:'Atividades da rotina feitas', form:'Atividades feitas no mês ÷ atividades previstas na rotina do SOC (revisão diária dos painéis, triagem dos alertas, varredura semanal do OpenVAS e revisão mensal das regras)', hoje:'26 de 30', pct:86.7, meta:95, freq:'Mensal',
+      sim:'Projeção do cenário. As 4 que faltaram foram revisões diárias de painel em dias sem plantão.' },
   ]
 ];
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');

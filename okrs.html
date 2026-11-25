@@ -157,45 +157,44 @@ const AREAS = [
     okrs:[
       { rot:'OKR 1 — Segmentação', painel:'dashboards/img/web-dmz.jpg', painelTipo:'Painel relacionado no Grafana · Web/DMZ Security', objetivo:'Separar o ambiente em zonas e liberar só o tráfego necessário.',
         just:'Em uma rede plana, quem invade uma estação alcança qualquer servidor. A liberação por origem → destino → porta limita o estrago a uma zona.',
-        partida:'VLANs 10 a 60 implantadas e a VLAN 70 (PCI) só em requisitos. Regras conhecidas apenas no UFW do Firefly; a matriz completa, incluindo o AD, ainda não está consolidada.',
+        partida:'VLANs 10 a 70 em operação, mas a VLAN 70 (PCI) não estava na documentação da rede. Regras do firewall documentadas só em parte: as do UFW do Firefly estão escritas, as do AD ainda não foram comparadas com o que está aplicado.',
         freq:'Semestral',
         kpis:[
-          { n:'1.1', nome:'VLANs implantadas', formula:'VLANs em operação ÷ VLANs planejadas (10, 20, 30, 40, 50, 60 e 70)', hoje:'6 de 7', pct:85.7, meta:100, nota:'Falta a VLAN 70 (PCI), hoje só com requisitos.' },
-          { n:'1.2', nome:'Fluxos documentados na matriz', formula:'Fluxos origem → destino → porta documentados ÷ fluxos em uso', hoje:'16 de 18', pct:88.9, sim:true, meta:100, nota:'Projeção do cenário. Medido no lab: as 5 regras de entrada do Firefly já estão documentadas. Faltam os fluxos do AD.' },
-          { n:'1.3', nome:'Testes ao vivo de firewall', formula:'Testes demonstrados (permitido e bloqueado) ÷ testes planejados para a apresentação', hoje:'2 de 2', pct:100, meta:100, nota:'Medido no lab: NT-003 → Firefly SSH 22 (permitido) e VLAN 40 → Firefly SSH 22 (bloqueado).' },
+          { n:'1.1', nome:'VLANs documentadas', formula:'VLANs com ID, sub-rede, função e regras descritos na documentação ÷ VLANs em operação (10 a 70)', hoje:'6 de 7', pct:85.7, meta:95, nota:'Medido no lab: a VLAN 70 (PCI) está em operação, mas ainda não aparece na documentação da rede. Documentá-la fecha o KPI.' },
+          { n:'1.2', nome:'Regras de firewall documentadas', formula:'Regras aplicadas no firewall que batem com a documentação ÷ regras aplicadas no firewall', hoje:'16 de 18', pct:88.9, sim:true, meta:95, nota:'Projeção do cenário. Compara o documentado com o aplicado, regra a regra. Medido no lab: as 5 regras de entrada do UFW do Firefly batem com a documentação; faltam as regras do AD.' },
+          { n:'1.3', nome:'Testes ao vivo de firewall', formula:'Testes demonstrados (permitido e bloqueado) ÷ testes planejados para a apresentação', hoje:'2 de 2', pct:100, meta:95, nota:'Medido no lab: NT-003 → Firefly SSH 22 (permitido) e VLAN 40 → Firefly SSH 22 (bloqueado).' },
         ] },
       { rot:'OKR 2 — Segurança da rede', painel:'dashboards/img/network-okr2.jpg', painelTipo:'Painel do OKR no Grafana · OKR 2 de Rede', objetivo:'Manter todos os ativos de rede monitorados e detectar problemas rápido.',
         just:'Ativo sem monitoramento é ponto cego: uma queda ou um ataque passa sem ninguém ver.',
         partida:'Números do painel “OKR 2 de Rede” no Grafana, antes da queda do servidor.', freq:'Contínua (painel do Grafana)',
         kpis:[
-          { n:'2.1', nome:'Cobertura de monitoramento', formula:'Ativos de rede com dados no painel ÷ ativos inventariados', hoje:'100%', pct:100, meta:100, nota:'Fonte: painel “OKR 2 de Rede”.' },
+          { n:'2.1', nome:'Cobertura de monitoramento', formula:'Ativos de rede com dados no painel ÷ ativos inventariados', hoje:'90%', pct:90, meta:95, sim:true, nota:'Projeção do cenário. O painel “OKR 2 de Rede” mostra os ativos com dados, mas o firewall é compartilhado com turmas do 3º e 4º semestre: uma mudança feita por eles pode tirar tráfego do monitoramento sem aviso, então não dá para afirmar 100%.' },
           { n:'2.2', nome:'MTTD de rede', formula:'Média de (abertura do ticket no Zammad − alerta)', tempo:true, hojeMin:19, metaMin:5, limMin:15, escala:25, nota:'Medido do mesmo jeito que o SOC.' },
         ] }
     ] },
   { id:'iam', nome:'IAM', cor:'var(--iam)', dono:'Time de IAM', doc:'IAM-OKR-001 · v1.0 · 16/11/2026',
-    visao:'Estar preparada para a certificação ISO/IEC 27001:2022: toda alteração de auditoria, senha, privilégio, conta, grupo e OU no AD detectada, autorizada e tratada a tempo.',
+    visao:'Estar preparada para a certificação ISO/IEC 27001:2022: toda alteração de auditoria, privilégio, conta, grupo e OU no AD detectada, autorizada e conferida, e nenhuma conta comum com acesso de administrador sem explicação.',
     okrs:[
-      { rot:'OKR 1 — Auditoria e reset de senha', objetivo:'Garantir que toda alteração na auditoria e todo reset de senha nos controladores de domínio sejam detectados, autorizados e tratados a tempo.',
-        just:'Quem altera a política de auditoria pode apagar o rastro do que fez, e um reset de senha sem chamado pode indicar uso indevido de conta administrativa. Sem detecção e autorização registradas, nenhum dos dois vale como evidência em auditoria.',
-        partida:'Antes das regras, o IAM não tinha indicadores. Regras criadas pelo time no Wazuh (iam_alteracao_auditoria_reset_senha.xml): 100102, alteração da política de auditoria (evento 4719, só por pessoa), e 100103, reset de senha por administrador (evento 4724).',
+      { rot:'OKR 1 — Auditoria e elevação de privilégio', painel:'okrs/img/iam-pingcastle.jpg', painelTipo:'Relatório PingCastle do domínio cyberappfin.local · 20/11/2026 (quanto menor, melhor)', objetivo:'Garantir que toda alteração na auditoria do AD seja detectada e autorizada, e que nenhuma conta comum tenha acesso de administrador sem explicação.',
+        just:'Quem altera a auditoria pode apagar o rastro do que fez. E uma conta comum que ganha acesso de administrador por fora dos grupos privilegiados (admin local, GPO ou permissão delegada) é o caminho mais curto para comprometer o domínio sem disparar alerta de grupo. Sem detecção, autorização e conferência registradas, nada disso vale como evidência em auditoria.',
+        partida:'Antes das regras, o IAM não tinha indicadores. Regra 100102 no Wazuh: alteração da política de auditoria do AD (evento 4719, só por pessoa). A auditoria do ambiente usa uma GPO única, com GMUD registrada (GMUD-IAM-001). A inclusão em grupos privilegiados é tratada no OKR 2 (regra 100104); aqui entra o acesso de administrador que não passa por esses grupos. Medido no PingCastle (20/11/2026): risco do domínio 85/100, puxado pelas contas privilegiadas (85/100), e a política de auditoria dos dois DCs não coleta eventos-chave como 4688 (processos), 4672 a 4674 (uso de privilégio sensível), 4610 e 4697 (serviços e pacotes do LSASS) e 4692 (DPAPI).',
         freq:'Mensal',
         kpis:[
-          { n:'1.1', nome:'Cobertura de detecção', formula:'(alertas 100102 + 100103) ÷ (eventos 4719 feitos por pessoa + eventos 4724 nos DCs)', hoje:'100%', pct:100, meta:100, sim:true, nota:'Projeção do cenário. Medido no lab: a 100103 já gerou 5 alertas (29/10, Administrator no NT-001).' },
-          { n:'1.2', nome:'Resets autorizados', formula:'Alertas 100103 com chamado no Escalation ÷ alertas 100103', hoje:'80%', pct:80, meta:100, sim:true, nota:'Projeção do cenário. Escalation é o grupo do Zammad onde os pedidos de alteração de acesso são abertos e aprovados (POL-GDI-001, seção 5.8).' },
-          { n:'1.3', nome:'Alterações de auditoria não autorizadas', formula:'Alertas 100102 sem GMUD aprovada', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas da 100102 no período. A mudança de auditoria do ambiente tem GMUD registrada (GMUD-IAM-001, GPO única de auditoria).' },
-          { n:'1.4', nome:'Resposta a alteração de auditoria', formula:'Alertas 100102 analisados em até 1 hora ÷ alertas 100102', hoje:'90%', pct:90, meta:100, sim:true, nota:'Projeção do cenário. Responsável: SOC. Medido no lab: nenhuma alteração de auditoria (100102) no período.' },
-          { n:'1.5', nome:'Conferência de reset', formula:'Alertas 100103 conferidos com o Escalation em até 1 dia útil ÷ alertas 100103', hoje:'90%', pct:90, meta:95, sim:true, nota:'Projeção do cenário.' },
+          { n:'1.1', nome:'Alterações de auditoria detectadas', formula:'Alertas 100102 ÷ alterações da política de auditoria feitas por pessoa nos controladores NT-001 e NT-002 (evento 4719)', hoje:'90%', pct:90, meta:95, sim:true, nota:'Projeção do cenário. Mostra quantas mudanças na auditoria do AD viraram alerta no Wazuh.' },
+          { n:'1.2', nome:'Resposta a alteração de auditoria', formula:'Alertas 100102 analisados em até 1 hora ÷ alertas 100102', hoje:'90%', pct:90, meta:95, sim:true, nota:'Projeção do cenário. Responsável: SOC. Medido no lab: nenhuma alteração de auditoria (100102) no período.' },
+          { n:'1.3', nome:'Alterações não autorizadas nas políticas de auditoria do AD', formula:'Alertas 100102 (mudança na GPO de auditoria e nas configurações de auditoria dos DCs) sem GMUD aprovada', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas da 100102 no período. Vale para a GPO de auditoria e as políticas relacionadas (auditoria avançada e SACL). O PingCastle (20/11) aponta categorias da auditoria avançada ainda sem GPO nos dois DCs: completá-las é uma mudança que passa por GMUD.' },
+          { n:'1.4', nome:'Contas comuns com acesso de administrador explicadas', formula:'Contas comuns com acesso de administrador fora dos grupos privilegiados (admin local, GPO ou permissão delegada) com origem do acesso e chamado registrados ÷ contas comuns com acesso de administrador', hoje:'85%', pct:85, meta:95, sim:true, nota:'Projeção do cenário. Para cada conta, o IAM registra como ela conseguiu o acesso e qual chamado autorizou. As contas dos grupos privilegiados ficam no KPI 2.5.' },
         ] },
-      { rot:'OKR 2 — Privilégios, contas e grupos', painel:'dashboards/img/windows.jpg', painelTipo:'Painel relacionado no Grafana · Windows Security & Identity', objetivo:'Garantir que toda alteração de privilégio, exclusão de conta e alteração ou exclusão de grupo e OU no Active Directory seja detectada, autorizada e tratada a tempo.',
-        just:'Privilégio concedido sem autorização é o caminho mais curto para comprometer o domínio, e a exclusão de contas, grupos ou OUs pode apagar acessos e evidências. Cada mudança precisa ter chamado ou GMUD e resposta no prazo.',
-        partida:'AD com 2 controladores (NT-001 e NT-002), 11 OUs e 18 grupos de segurança por perfil RBAC. Regras do IAM (iam_alteracao_privilegios_contas_grupos.xml): 100104 privilégio (4728, 4732, 4756 e 4704, fora das contas autorizadas), 100105 exclusão de conta (4726), 100106 grupo (4730, 4734, 4758, 4735, 4737 e 4755) e 100107 OU (5136 e 5141).',
+      { rot:'OKR 2 — Privilégios, contas e grupos', painel:'dashboards/img/windows.jpg', painelTipo:'Painel relacionado no Grafana · Windows Security & Identity', objetivo:'Garantir que toda alteração de privilégio, exclusão de conta e alteração ou exclusão de grupo e OU no Active Directory (controladores NT-001 e NT-002) seja detectada no Wazuh, tenha chamado aprovado no Escalation ou GMUD e, para grupos privilegiados, seja conferida mensalmente contra a lista de membros aprovados.',
+        just:'Privilégio concedido sem autorização é o caminho mais curto para comprometer o domínio. Excluir contas, grupos ou OUs pode apagar acessos e evidências. Por isso, toda mudança desse tipo precisa de chamado ou GMUD aprovado, e as mudanças críticas (inclusão em grupo privilegiado e exclusão de conta administrativa) passam também por conferência mensal.',
+        partida:'AD com 2 controladores (NT-001 e NT-002), 11 OUs e 18 grupos de segurança organizados por perfil RBAC. Medido no PingCastle (20/11/2026): Lixeira do AD desativada (uma exclusão não tem volta) e 2 OUs sem proteção contra exclusão acidental (Domain Controllers e Comercial e Customer Success). Regras criadas pelo IAM no Wazuh (iam_alteracao_privilegios_contas_grupos.xml):\n• 100104, privilégio: inclusão em grupo global, local ou universal e atribuição de direito de usuário (eventos 4728, 4732, 4756 e 4704), feitas por contas fora da lista de contas autorizadas.\n• 100105, exclusão de conta: evento 4726.\n• 100106, grupo: exclusão e alteração de grupo global, local e universal (eventos 4730, 4734, 4758, 4735, 4737 e 4755).\n• 100107, OU: alteração e exclusão de objeto de OU (eventos 5136 e 5141).',
         freq:'Mensal',
         kpis:[
-          { n:'2.1', nome:'Cobertura de detecção', formula:'Alertas 100104 a 100107 ÷ eventos equivalentes nos DCs (sem as contas autorizadas)', hoje:'100%', pct:100, meta:100, sim:true, nota:'Projeção do cenário. A 100107 depende da auditoria de Directory Service Changes nos DCs e de SACL de auditoria nas OUs.' },
-          { n:'2.2', nome:'Alterações de privilégio não autorizadas', formula:'Alertas 100104 sem chamado aprovado no Escalation', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas desde a criação da regra (as regras não analisam eventos antigos). Chamado aprovado = ticket aprovado no grupo Escalation do Zammad.' },
-          { n:'2.3', nome:'Exclusões de conta autorizadas', formula:'Alertas 100105 com chamado no Escalation ÷ alertas 100105', hoje:'100%', pct:100, meta:100, sim:true, nota:'Projeção do cenário. Medido no lab: nenhuma conta excluída desde a criação da regra 100105.' },
-          { n:'2.4', nome:'Alterações de grupo e OU autorizadas', formula:'Alertas 100106 e 100107 com chamado ou GMUD ÷ alertas 100106 e 100107', hoje:'85%', pct:85, meta:100, sim:true, nota:'Projeção do cenário. Medido no lab: nenhuma alteração de grupo ou OU desde a criação das regras 100106 e 100107.' },
-          { n:'2.5', nome:'Resposta a alerta crítico', formula:'Alertas 100104 e 100105 analisados em até 1 hora ÷ alertas 100104 e 100105', hoje:'95%', pct:95, meta:100, sim:true, nota:'Projeção do cenário. Responsável: SOC. Medido no lab: nenhum alerta 100104 ou 100105 desde a criação das regras.' },
+          { n:'2.1', nome:'Cobertura de detecção', formula:'Alertas 100104 a 100107 ÷ eventos equivalentes (4728, 4732, 4756, 4704, 4726, 4730, 4734, 4758, 4735, 4737, 4755, 5136 e 5141) nos controladores NT-001 e NT-002, excluindo as contas autorizadas', hoje:'95%', pct:95, meta:95, sim:true, nota:'Projeção do cenário.' },
+          { n:'2.2', nome:'Alterações de privilégio não autorizadas', formula:'Alertas 100104 sem chamado aprovado no Escalation', cont:true, hojeN:0, metaN:0, un:'alertas', nota:'Medido no lab: 0 alertas desde a criação da regra (as regras não analisam eventos antigos).' },
+          { n:'2.3', nome:'Exclusões de conta autorizadas', formula:'Alertas 100105 com chamado aprovado no Escalation ÷ alertas 100105', hoje:'95%', pct:95, meta:95, sim:true, nota:'Projeção do cenário. Medido no lab: nenhuma conta excluída desde a criação da regra 100105.' },
+          { n:'2.4', nome:'Alterações de grupo e OU autorizadas', formula:'Alertas 100106 e 100107 com chamado aprovado no Escalation ou GMUD aprovada ÷ alertas 100106 e 100107', hoje:'85%', pct:85, meta:95, sim:true, nota:'Projeção do cenário.' },
+          { n:'2.5', nome:'Aderência dos grupos privilegiados', formula:'Membros dos grupos privilegiados com aprovação registrada (chamado ou GMUD) ÷ total de membros desses grupos no AD, apurado pelo IAM até o 5º dia útil do mês seguinte', hoje:'1 de 2', pct:50, meta:95, sim:true, nota:'Projeção a partir do PingCastle (20/11): os grupos Domain Admins e Administrators têm 2 membros, o Administrator nativo e a conta de serviço do OpenVAS (svc_openvas), os dois com senha que nunca expira e fora do grupo Protected Users. Falta aprovação registrada para a conta de serviço, que também não deveria ser administradora do domínio.' },
         ] }
     ] },
   { id:'soc', nome:'SOC', cor:'var(--soc)', dono:'Time do SOC', proposta:true,
@@ -206,11 +205,11 @@ const AREAS = [
         partida:'Wazuh 4.14.6 com 30 regras customizadas (29 do ambiente e a 100001, de exemplo). O NT-003 não enviava eventos: o firewall bloqueia as portas 1514 e 1515 da VLAN 60.',
         freq:'Diária e mensal',
         kpis:[
-          { n:'1.1', nome:'Cobertura dos ativos críticos', formula:'Ativos críticos enviando eventos ao Wazuh ÷ 9', hoje:'8 de 9', pct:88.9, meta:100, nota:'Medido no lab · painel SOC KPIs e OKRs.' },
-          { n:'1.2', nome:'Regras customizadas validadas', formula:'Regras que dispararam (tráfego real ou teste) ÷ 23 testáveis', hoje:'21 de 23', pct:91.3, meta:100, sim:true, nota:'Projeção do cenário. Medido no lab: a 100113 (brute force) teve 0 disparos em 30 dias. Fora da conta: 100001 (exemplo) e as 6 de integridade e defesa.' },
-          { n:'1.3', nome:'VLANs com varredura de vulnerabilidade', formula:'VLANs com tarefa no OpenVAS ÷ 6 (VLANs 10 a 60)', hoje:'6 de 6', pct:100, meta:100, nota:'Medido no lab · tarefas do OpenVAS por VLAN.' },
+          { n:'1.1', nome:'Cobertura dos ativos críticos', formula:'Ativos críticos enviando eventos ao Wazuh ÷ 9', hoje:'8 de 9', pct:88.9, meta:95, nota:'Medido no lab · painel SOC KPIs e OKRs.' },
+          { n:'1.2', nome:'Regras customizadas validadas', formula:'Regras customizadas que já dispararam (tráfego real ou teste) ÷ 30 regras customizadas', hoje:'21 de 30', pct:70, meta:95, sim:true, nota:'Projeção do cenário. As 9 sem disparo incluem a 100001 (exemplo), as 6 de integridade e defesa, que dependem de teste dedicado, e a 100113 (brute force), com 0 disparos em 30 dias no lab.' },
+          { n:'1.3', nome:'VLANs com varredura de vulnerabilidade', formula:'VLANs com tarefa no OpenVAS ÷ 6 (VLANs 10 a 60)', hoje:'6 de 6', pct:100, meta:95, nota:'Medido no lab · tarefas do OpenVAS por VLAN.' },
         ] },
-      { rot:'OKR 2 — Resposta', painel:'dashboards/img/kpis-soc.jpg', painelTipo:'Painel do OKR no Grafana · SOC KPIs e OKRs', objetivo:'Transformar cada alerta relevante em incidente tratado, rápido e sem retrabalho.',
+      { rot:'OKR 2 — Resposta', painel:'dashboards/img/kpis-soc.jpg', painelTipo:'Painel do OKR no Grafana · SOC KPIs e OKRs', objetivo:'Tratar os alertas que chegam, rápido e com a rotina do SOC em dia.',
         just:'Quanto mais cedo um alerta vira ticket, menor o dano; a política dá 15 minutos. Ticket duplicado e falso positivo tomam o tempo do analista.',
         partida:'Fluxo Wazuh → Cyberappfin → Zammad funcionando, com caso homologado (GET /.env → 403 → regra 100160). O tempo até o ticket ficou em 19 minutos, acima do limite.',
         freq:'Diária a mensal',
@@ -218,8 +217,8 @@ const AREAS = [
           { n:'2.1', nome:'Tempo até o ticket (MTTD do SOC)', formula:'Média de (abertura do ticket no Zammad − alerta no Wazuh)', tempo:true, hojeMin:19, metaMin:5, limMin:15, escala:25, nota:'Medido no lab · painel SOC KPIs e OKRs.' },
           { n:'2.2', nome:'MTTR', formula:'Média de (fechamento − abertura) dos tickets de incidente', tempo:true, hojeMin:41, metaMin:30, limMin:30, escala:60, sim:true, nota:'Projeção do cenário até o Zammad ser ligado ao Grafana.' },
           { n:'2.3', nome:'Falsos positivos', formula:'Tickets fechados como falso positivo ÷ tickets fechados', menor:true, hojePct:7.6, metaPct:20, sim:true, nota:'Projeção do cenário (o painel do Grafana marca como “simulado”): 12,5% (jul) → 10,8% → 9,1% → 7,6% (out).' },
-          { n:'2.4', nome:'Incidentes sem ticket duplicado', formula:'Incidentes com um único ticket ÷ incidentes', hoje:'46 de 50', pct:92, meta:100, sim:true, nota:'Projeção do cenário. Os duplicados vêm de rajadas antes da janela de correlação.' },
-          { n:'2.5', nome:'Incidentes encerrados com conclusão', formula:'Tickets fechados com classificação e evidência ÷ tickets fechados', hoje:'36 de 40', pct:90, meta:100, sim:true, nota:'Projeção do cenário. Os 4 restantes foram fechados sem classificação.' },
+          { n:'2.4', nome:'Alertas recebidos e tratados', formula:'Alertas de nível 10 ou mais tratados (viraram ticket ou foram analisados e fechados) ÷ alertas de nível 10 ou mais recebidos no mês', hoje:'212 de 240', pct:88.3, meta:95, sim:true, nota:'Projeção do cenário. Mostra o volume que chega ao SOC (240 alertas no mês) e quanto dele a equipe deu conta de tratar (212).' },
+          { n:'2.5', nome:'Atividades da rotina feitas', formula:'Atividades feitas no mês ÷ atividades previstas na rotina do SOC (revisão diária dos painéis, triagem dos alertas, varredura semanal do OpenVAS e revisão mensal das regras)', hoje:'26 de 30', pct:86.7, meta:95, sim:true, nota:'Projeção do cenário. As 4 que faltaram foram revisões diárias de painel em dias sem plantão.' },
         ] }
     ] },
   { id:'endpoint', nome:'Endpoint', cor:'var(--end)', dono:'Time de Endpoint', proposta:true,
@@ -230,18 +229,18 @@ const AREAS = [
         partida:'Estações no domínio recebem senha e bloqueio pelas GPOs. Servidores com ClamAV integrado ao Wazuh (validado com EICAR) e UFW nos Linux, com entrada bloqueada por padrão.',
         freq:'Mensal',
         kpis:[
-          { n:'1.1', nome:'Endpoints com agente Wazuh ativo', formula:'Agentes ativos ÷ endpoints inventariados', hoje:'7 de 10', pct:70, sim:true, meta:100, nota:'Projeção do cenário. Os 7 agentes do Wazuh são reais; as estações da VLAN 40 sem agente são a lacuna.' },
-          { n:'1.2', nome:'Servidores com antivírus integrado', formula:'Servidores com ClamAV reportando ao Wazuh ÷ servidores', hoje:'5 de 6', pct:83.3, sim:true, meta:100, nota:'Projeção do cenário. Medido no lab: detecção validada com o arquivo de teste EICAR.' },
-          { n:'1.3', nome:'Servidores Linux com UFW', formula:'Linux com entrada bloqueada por padrão ÷ servidores Linux', hoje:'6 de 6', pct:100, sim:true, meta:100, nota:'Projeção do cenário. Os slides já mostram UFW com entrada bloqueada por padrão nos Linux.' },
+          { n:'1.1', nome:'Endpoints com agente Wazuh ativo', formula:'Agentes ativos ÷ endpoints inventariados', hoje:'7 de 10', pct:70, sim:true, meta:95, nota:'Projeção do cenário. Os 7 agentes do Wazuh são reais; as estações da VLAN 40 sem agente são a lacuna.' },
+          { n:'1.2', nome:'Servidores com antivírus integrado', formula:'Servidores com ClamAV reportando ao Wazuh ÷ servidores', hoje:'5 de 6', pct:83.3, sim:true, meta:95, nota:'Projeção do cenário. Medido no lab: detecção validada com o arquivo de teste EICAR.' },
+          { n:'1.3', nome:'Servidores Linux com UFW', formula:'Linux com entrada bloqueada por padrão ÷ servidores Linux', hoje:'6 de 6', pct:100, sim:true, meta:95, nota:'Projeção do cenário. Os slides já mostram UFW com entrada bloqueada por padrão nos Linux.' },
         ] },
       { rot:'OKR 2 — Superfície de ataque', painel:'dashboards/img/vulnerabilidades.jpg', painelTipo:'Painel relacionado no Grafana · Vulnerability Management', objetivo:'Reduzir as portas e os serviços expostos sem necessidade.',
         just:'A maior parte dos riscos críticos e altos vem de portas de administração remota (RDP 3389, WinRM 5985, SSH 22) e de TLS desatualizado.',
         partida:'OpenVAS (11/09/2026): 744 ocorrências em 20 hosts, reclassificadas em 167 críticas e 221 altas.',
         freq:'Mensal',
         kpis:[
-          { n:'2.1', nome:'VLANs com varredura própria', formula:'VLANs com tarefa do OpenVAS ÷ VLANs (10 a 60)', hoje:'6 de 6', pct:100, meta:100 },
-          { n:'2.2', nome:'Ativos críticos com baseline', formula:'Ativos com tarefa de baseline no OpenVAS ÷ 7 ativos críticos', hoje:'7 de 7', pct:100, meta:100 },
-          { n:'2.3', nome:'Achados críticos tratados', formula:'Achados críticos corrigidos ou aceitos ÷ 167', hoje:'98 de 167', pct:58.7, sim:true, meta:100, nota:'Projeção do cenário. Partida medida no lab: 167 críticos na reclassificação do OpenVAS (11/09).' },
+          { n:'2.1', nome:'VLANs com varredura própria', formula:'VLANs com tarefa do OpenVAS ÷ VLANs (10 a 60)', hoje:'6 de 6', pct:100, meta:95 },
+          { n:'2.2', nome:'Ativos críticos com baseline', formula:'Ativos com tarefa de baseline no OpenVAS ÷ 7 ativos críticos', hoje:'7 de 7', pct:100, meta:95 },
+          { n:'2.3', nome:'Achados críticos tratados', formula:'Achados críticos corrigidos ou aceitos ÷ 167', hoje:'98 de 167', pct:58.7, sim:true, meta:95, nota:'Projeção do cenário. Partida medida no lab: 167 críticos na reclassificação do OpenVAS (11/09).' },
         ] }
     ] },
   { id:'grc', nome:'GRC', cor:'var(--grc)', dono:'Time de GRC', doc:'GRC-OKR-001 · v1.1 · 26/10/2026',
@@ -251,20 +250,20 @@ const AREAS = [
         just:'Política sem conformidade não tem validade; política que contradiz outra gera dúvida sobre qual regra seguir; e controle sem evidência não é aceito em auditoria.',
         partida:'Nenhuma das 14 políticas tinha revisão de conformidade com normas do mercado.', freq:'Semestral', painel:'okrs/img/grc-okr1.jpg',
         kpis:[
-          { n:'1.1', nome:'Políticas revisadas', formula:'Políticas em conformidade segundo o ValidAI ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
+          { n:'1.1', nome:'Políticas revisadas', formula:'Políticas em conformidade segundo o ValidAI ÷ 14', hoje:'14 de 14', pct:100, meta:95 },
           { n:'1.2', nome:'Achados tratados', formula:'Divergências corrigidas ÷ divergências encontradas', hoje:'6 de 12', pct:50, meta:70 },
           { n:'1.3', nome:'Adequação à ISO 27001', formula:'Políticas adequadas aos requisitos aplicáveis ÷ 14', hoje:'14 de 14', pct:100, meta:80 },
           { n:'1.4', nome:'Período de revisão', formula:'Revisadas dentro do período ÷ previstas para revisão', hoje:'10 de 14', pct:71.4, meta:80 },
-          { n:'1.5', nome:'Políticas sem achados', formula:'Sem achados na avaliação do ValidAI ÷ 14', hoje:'12 de 14', pct:85.7, meta:100 },
+          { n:'1.5', nome:'Políticas sem achados', formula:'Sem achados na avaliação do ValidAI ÷ 14', hoje:'12 de 14', pct:85.7, meta:95 },
         ] },
       { rot:'OKR 2 — Controle de documentos', painelTipo:'Painel do OKR no Grafana · OKR 2 — Controle de documentos', objetivo:'Manter os documentos de segurança da Cyberappfin padronizados, atualizados e acessíveis.',
         just:'Controlar a informação documentada é exigência da ISO/IEC 27001. Documento desatualizado, sem dono ou em versão errada não é aceito em auditoria.',
         partida:'Documentos espalhados entre repositório, Drive e cópias locais, em mais de um modelo; playbooks em duas estruturas e sem uma pasta oficial única.', freq:'Anual', painel:'okrs/img/grc-okr2.jpg',
         kpis:[
-          { n:'2.1', nome:'Documentos padronizados', formula:'Com data, responsável e alterações ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
-          { n:'2.2', nome:'Documentos no modelo oficial', formula:'No modelo visual da PSI ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
-          { n:'2.3', nome:'Documentos publicados', formula:'Publicados na pasta oficial ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
-          { n:'2.4', nome:'Revisão em dia', formula:'Revisados nos últimos 12 meses ÷ 14', hoje:'14 de 14', pct:100, meta:100 },
+          { n:'2.1', nome:'Documentos padronizados', formula:'Com data, responsável e alterações ÷ 14', hoje:'14 de 14', pct:100, meta:95 },
+          { n:'2.2', nome:'Políticas com cobertura de ambiente', formula:'Políticas que cobrem ativos, sistemas e controles que existem no ambiente ÷ 14', hoje:'12 de 14', pct:85.7, meta:95, sim:true, nota:'Projeção do cenário, a confirmar com o GRC. Antes este KPI media o modelo oficial, que é o mesmo que o 2.1 (documentos padronizados).' },
+          { n:'2.3', nome:'Documentos publicados', formula:'Publicados na pasta oficial ÷ 14', hoje:'14 de 14', pct:100, meta:95 },
+          { n:'2.4', nome:'Revisão em dia', formula:'Revisados nos últimos 12 meses ÷ 14', hoje:'14 de 14', pct:100, meta:95 },
           { n:'2.5', nome:'Revisão humana', formula:'Revisados por um membro após o ValidAI ÷ 14', hoje:'14 de 14', pct:100, meta:80 },
         ] }
     ] }
@@ -312,7 +311,7 @@ function kpiHTML(k, i){
   } else {
     barra = k.pct == null ? `<div class="trilho"></div>` : `<div class="trilho"><i style="--p:${k.pct}%;--d:${i*.12}s"></i><span class="marca" style="--m:${k.meta}%"></span></div>`;
     const pct = k.pct == null ? '—' : String(k.pct).replace('.', ',') + '%';
-    nums = `<div><small>Hoje</small><span class="hoje">${k.hoje == null ? '?' : esc(k.hoje)}</span>${k.sim ? '<span class="sim">projeção</span>' : '<span class="sim med">medido</span>'}</div><div><small>%</small>${pct}</div><div><small>Meta</small>${typeof k.meta === 'number' ? k.meta + '%' : esc(k.meta)}</div>${st.gap ? `<div><small>Gap</small>${st.gap}</div>` : ''}`;
+    nums = `<div><small>Hoje</small><span class="hoje">${k.hoje == null ? '?' : esc(k.hoje)}</span>${k.pct == null ? '' : k.sim ? '<span class="sim">projeção</span>' : '<span class="sim med">medido</span>'}</div><div><small>%</small>${pct}</div><div><small>Meta</small>${typeof k.meta === 'number' ? k.meta + '%' : esc(k.meta)}</div>${st.gap ? `<div><small>Gap</small>${st.gap}</div>` : ''}`;
   }
   return `<div class="kpi" style="--s:${st.s}"><span class="num">${esc(k.n)}</span><div><h4>${esc(k.nome)}</h4><div class="formula">${esc(k.formula)}</div></div><span class="pill">${st.txt}</span>
     <div class="linha">${barra}<div class="nums">${nums}</div></div>${k.nota ? `<div class="nota">${esc(k.nota)}</div>` : ''}</div>`;
@@ -321,7 +320,7 @@ function okrHTML(o){
   const reais = o.kpis.filter(k => !k.ex && (k.tempo || k.menor || k.cont || k.pct != null));
   const naMeta = reais.filter(k => status(k).txt.startsWith('Atingido')).length;
   const ex = o.ex;
-  const bloco = (t, v) => `<div class="bloco"><span class="rot">${t}</span><p>${v ? esc(v) : 'A preencher'}</p></div>`;
+  const bloco = (t, v) => `<div class="bloco"><span class="rot">${t}</span><p>${v ? esc(v).replace(/\n/g, '<br>') : 'A preencher'}</p></div>`;
   return `<div class="okr">
     <div class="obj${ex ? ' ex' : ''}"><span class="rot">${esc(o.rot)}</span><h3>${esc(o.objetivo)}</h3>
       ${bloco('Justificativa', o.just)}${bloco('Situação de partida', o.partida)}${bloco('Frequência', o.freq)}</div>

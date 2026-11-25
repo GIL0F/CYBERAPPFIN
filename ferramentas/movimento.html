@@ -1,0 +1,111 @@
+<!-- Camada de movimento da final.html: o gerador (montar-pagina-unica.py) cola este arquivo antes do </body>. Sem efeito para quem pede movimento reduzido. -->
+<style id="movimento">
+/* ===== camada de movimento (prévia) — mesmo estilo "engenharia crua": borda grossa, sombra dura ===== */
+.mv-prog{ position:fixed; left:0; right:0; top:var(--topo); height:6px; z-index:49; display:flex; pointer-events:none; border-bottom:2px solid var(--tinta); background:var(--papel); }
+.mv-prog i{ flex:1; transform-origin:left; transform:scaleX(0); }
+/* abertura */
+.abre h1 > span{ overflow:hidden; padding-bottom:.08em; }
+.mv .abre h1 .w{ display:inline-block; transform:translateY(105%); animation:mvSobe .9s cubic-bezier(.2,.9,.2,1) forwards; animation-delay:calc(var(--i) * 90ms + 150ms); }
+.mv .abre h1 .rec{ animation:mvCarimbo .7s cubic-bezier(.3,1.6,.5,1) both; animation-delay:.75s; }
+.mv .abre > div > p, .mv .abre .fig{ opacity:0; animation:mvAparece .6s ease forwards; animation-delay:1s; }
+.mv .abre .fig{ animation-delay:0s; }
+.mv .legenda-times > a{ opacity:0; animation:mvLinha .5s cubic-bezier(.2,.9,.2,1) forwards; animation-delay:calc(var(--i) * 80ms + 900ms); }
+/* cabeçalho dos capítulos */
+.cap{ position:relative; border-top:none; }
+.cap::before{ content:""; position:absolute; left:0; right:0; top:0; height:3px; background:var(--tinta); transform:scaleX(var(--mv-linha,1)); transform-origin:left; transition:transform 1s cubic-bezier(.7,0,.2,1); }
+.mv .cap:not(.mv-in)::before{ --mv-linha:0; }
+.cap-cab{ position:relative; } .cap-cab .fig{ align-self:flex-start; position:relative; }
+.mv-num{ position:absolute; right:-1vw; top:-6vh; font:700 clamp(140px, 22vw, 380px)/.8 'Space Grotesk', sans-serif; letter-spacing:-.06em; color:transparent;
+         -webkit-text-stroke:3px var(--tinta); opacity:.12; pointer-events:none; user-select:none; will-change:transform; }
+.mv .cap-cab h2 .w{ display:inline-block; transform:translateY(110%); transition:transform .8s cubic-bezier(.2,.9,.2,1); transition-delay:calc(var(--i) * 60ms + 200ms); }
+.mv .cap-cab h2 .l{ display:inline-block; overflow:hidden; vertical-align:top; padding-bottom:.06em; }
+.mv .cap-cab.mv-in h2 .w{ transform:none; }
+.mv .cap-cab .fig{ clip-path:inset(0 100% 0 0); transition:clip-path .6s steps(18); }
+.mv .cap-cab.mv-in .fig{ clip-path:inset(0 0 0 0); }
+/* blocos que "pousam": saem da sombra e assentam */
+.mv .mv-p{ opacity:0; transform:translate(-14px,-14px); transition:opacity .45s ease, transform .6s cubic-bezier(.2,.9,.3,1.25); transition-delay:var(--d,0ms); }
+.mv .mv-p.mv-in{ opacity:1; transform:none; }
+.mv .sala-cab .quem{ transform:rotate(-4deg) scale(.6); opacity:0; transition:transform .5s cubic-bezier(.3,1.7,.5,1), opacity .2s; }
+.mv .sala-cab.mv-in .quem{ transform:none; opacity:1; }
+/* toque: tudo que tem borda responde */
+.card, .chip, .docs a{ transition:transform .14s, box-shadow .14s; }
+.card:hover{ transform:translate(-3px,-3px); box-shadow:6px 6px 0 0 var(--tinta); }
+.chip:hover{ transform:translateY(-2px) rotate(-2deg); background:var(--soc); }
+.docs a:hover{ transform:translate(-4px,-4px) rotate(-.6deg) !important; box-shadow:10px 10px 0 0 var(--tinta) !important; }
+/* menu do topo: pílula que desliza */
+.topo-nav{ position:fixed; }
+.mv-pilula{ position:absolute; top:50%; height:34px; margin-top:-17px; background:var(--tinta); z-index:-1; transition:left .45s cubic-bezier(.6,0,.2,1), width .45s cubic-bezier(.6,0,.2,1); }
+.mv .topo-nav a.ativo:not(.marca){ background:transparent; }
+.topo-nav a{ position:relative; transition:color .3s; }
+/* papel milimetrado com leve paralaxe */
+body::before{ background-position:0 calc(var(--mv-y,0) * -0.15px); }
+@keyframes mvSobe{ to{ transform:none; } }
+@keyframes mvCarimbo{ 0%{ transform:scale(1.5) rotate(-6deg); box-shadow:0 0 0 0 var(--tinta); opacity:0; } 60%{ opacity:1; } 100%{ transform:none; box-shadow:var(--sombra); } }
+@keyframes mvAparece{ to{ opacity:1; } }
+@keyframes mvPousa{ from{ opacity:0; transform:translate(-16px,-24px) rotate(-3deg); box-shadow:0 0 0 0 var(--tinta); } to{ opacity:1; transform:none; box-shadow:5px 5px 0 0 var(--tinta); } }
+@keyframes mvLinha{ from{ opacity:0; transform:translateX(24px); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){ .mv-num{ display:none; } }
+</style>
+<script id="movimento-js">
+(() => {
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const R = document.documentElement; R.classList.add('mv');
+  const cores = ['--net','--iam','--soc','--end','--grc','--brand'];
+  // quebra um título em palavras animáveis
+  const palavras = (el, linha) => {
+    let i = 0;
+    const anda = n => { [...n.childNodes].forEach(c => {
+      if(c.nodeType === 3){ const f = document.createDocumentFragment();
+        c.textContent.split(/(\s+)/).forEach(t => { if(!t) return; if(/^\s+$/.test(t)){ f.append(t); return; }
+          const w = document.createElement('span'); w.className = 'w'; w.style.setProperty('--i', i++); w.textContent = t;
+          if(linha){ const l = document.createElement('span'); l.className = 'l'; l.append(w); f.append(l); } else f.append(w); });
+        c.replaceWith(f);
+      } else if(c.nodeType === 1 && !c.classList.contains('rec')) anda(c); else if(c.nodeType === 1) c.style.setProperty('--i', i++); }); };
+    anda(el);
+  };
+  palavras(document.querySelector('.abre h1'));
+  document.querySelectorAll('.legenda-times > a').forEach((d, i) => d.style.setProperty('--i', i));
+  // barra de progresso nas cores dos times
+  const prog = document.createElement('div'); prog.className = 'mv-prog';
+  cores.forEach(c => { const i = document.createElement('i'); i.style.background = `var(${c})`; prog.append(i); });
+  document.body.append(prog);
+  const segs = [...prog.children];
+  // pílula do menu
+  const nav = document.querySelector('.topo-nav'); const pil = document.createElement('span'); pil.className = 'mv-pilula'; nav.prepend(pil);
+  const movePil = () => { const a = nav.querySelector('a.ativo:not(.marca)'); if(!a){ pil.style.width = 0; return; }
+    pil.style.left = (a.offsetLeft) + 'px'; pil.style.width = a.offsetWidth + 'px'; a.style.color = '#fff'; nav.querySelectorAll('a:not(.ativo)').forEach(x => x.style.color = ''); };
+  new MutationObserver(movePil).observe(nav, { subtree:true, attributes:true, attributeFilter:['class'] });
+  // revelação ao entrar na tela
+  const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add('mv-in'); io.unobserve(e.target); } }), { rootMargin:'0px 0px -12% 0px' });
+  const nums = [];
+  const prepara = () => {
+    document.querySelectorAll('.cap').forEach(c => { if(c.dataset.mv) return; c.dataset.mv = 1; io.observe(c);
+      const cab = c.querySelector('.cap-cab'); if(!cab) return;
+      const rot = (cab.querySelector('.fig').textContent.match(/CAP_(\d+)/) || [])[1];
+      if(rot){ const n = document.createElement('span'); n.className = 'mv-num'; n.textContent = rot; n.setAttribute('aria-hidden','true'); cab.prepend(n); nums.push(n); }
+      palavras(cab.querySelector('h2'), true); io.observe(cab); });
+    document.querySelectorAll('.sala-cab').forEach(el => io.observe(el));
+    const grupos = ['.sala-corpo > *', '.card', '.fim .docs a', '.fim h2', '.mapa-moldura', '.cap .nota'];
+    document.querySelectorAll(grupos.join(',')).forEach(el => { if(el.classList.contains('mv-p') || el.closest('.mapa-cartao')) return;
+      const irmaos = [...el.parentElement.children].filter(x => x.matches(grupos.join(',')));
+      el.style.setProperty('--d', Math.min(irmaos.indexOf(el), 6) * 70 + 'ms'); el.classList.add('mv-p'); io.observe(el); });
+    // números que contam
+    document.querySelectorAll('.card .n').forEach(el => { if(el.dataset.mvn) return; const m = el.textContent.match(/^(\D*)(\d{1,5})(.*)$/s); if(!m) return;
+      el.dataset.mvn = 1; const alvo = +m[2];
+      const ion = new IntersectionObserver(([e]) => { if(!e.isIntersecting) return; ion.disconnect(); const t0 = performance.now();
+        const passo = t => { const p = Math.min(1, (t - t0) / 900), v = Math.round(alvo * (1 - Math.pow(1 - p, 3)));
+          el.textContent = m[1] + v + m[3]; if(p < 1) requestAnimationFrame(passo); }; requestAnimationFrame(passo); });
+      ion.observe(el); });
+  };
+  prepara(); setTimeout(prepara, 1200);
+  // rolagem: barra, paralaxe do número, papel
+  let pedido = false;
+  const rola = () => { pedido = false; const y = scrollY, H = document.documentElement.scrollHeight - innerHeight, p = H > 0 ? y / H : 0;
+    segs.forEach((s, i) => s.style.transform = `scaleX(${Math.min(1, Math.max(0, p * segs.length - i))})`);
+    R.style.setProperty('--mv-y', y);
+    nums.forEach(n => { const r = n.parentElement.getBoundingClientRect(); n.style.transform = `translateY(${(r.top - innerHeight / 2) * -0.25}px)`; });
+  };
+  addEventListener('scroll', () => { if(!pedido){ pedido = true; requestAnimationFrame(rola); } }, { passive:true });
+  addEventListener('resize', movePil); rola(); movePil();
+})();
+</script>
