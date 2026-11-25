@@ -489,7 +489,7 @@ css_pagina = r"""
     border:2px solid currentColor; background:linear-gradient(90deg, currentColor 50%, transparent 50%); box-sizing:border-box; }
   .legenda{ display:flex; gap:18px; font-size:15px; color:var(--cinza); } .legenda b{ color:#15803D; } .legenda b.pend{ color:#A16207; }
   .ordem .bloco{ flex-direction:row; align-items:flex-start; gap:14px; }
-  .ordem .num{ font:700 clamp(28px, 2.4vw, 42px)/1 'Space Grotesk', sans-serif; min-width:1.1em; }
+  .ordem .num{ font:700 clamp(28px, 2.4vw, 42px)/1 'Space Grotesk', sans-serif; min-width:1.1em; white-space:nowrap; letter-spacing:-.04em; flex-shrink:0; }
   .fluxo{ display:flex; align-items:stretch; gap:8px; }
   .fluxo .passo2{ flex:1; border:var(--borda); border-top:8px solid var(--cor, var(--grc)); background:#fff; padding:10px; display:flex; flex-direction:column; gap:4px; }
   .fluxo .passo2 b{ font:700 16px 'Space Grotesk', sans-serif; } .fluxo .passo2 span{ font-size:13px; color:var(--cinza); }

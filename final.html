@@ -242,7 +242,7 @@
     border:2px solid currentColor; background:linear-gradient(90deg, currentColor 50%, transparent 50%); box-sizing:border-box; }
   .legenda{ display:flex; gap:18px; font-size:15px; color:var(--cinza); } .legenda b{ color:#15803D; } .legenda b.pend{ color:#A16207; }
   .ordem .bloco{ flex-direction:row; align-items:flex-start; gap:14px; }
-  .ordem .num{ font:700 clamp(28px, 2.4vw, 42px)/1 'Space Grotesk', sans-serif; min-width:1.1em; }
+  .ordem .num{ font:700 clamp(28px, 2.4vw, 42px)/1 'Space Grotesk', sans-serif; min-width:1.1em; white-space:nowrap; letter-spacing:-.04em; flex-shrink:0; }
   .fluxo{ display:flex; align-items:stretch; gap:8px; }
   .fluxo .passo2{ flex:1; border:var(--borda); border-top:8px solid var(--cor, var(--grc)); background:#fff; padding:10px; display:flex; flex-direction:column; gap:4px; }
   .fluxo .passo2 b{ font:700 16px 'Space Grotesk', sans-serif; } .fluxo .passo2 span{ font-size:13px; color:var(--cinza); }
@@ -1947,8 +1947,8 @@ const PARADAS = [
           <div class="bloco" style="--cor:${COR.iam}"><span class="num">4</span><div><h4>AD e DNS</h4><p>DCs pelo Recovery Media, validados em rede isolada antes de reintegrar.</p></div></div>
           <div class="bloco" style="--cor:${COR.danger}"><span class="num">5</span><div><h4>Aplicações</h4><p>Firefly pela rota própria, com o firewall reaplicado; publicado no proxy só depois de validado.</p></div></div>
           <div class="bloco" style="--cor:${COR.soc}"><span class="num">6</span><div><h4>Wazuh</h4><p>Volta logo após as aplicações e recebe os eventos que os agentes guardaram em fila.</p></div></div>
-          <div class="bloco" style="--cor:${COR.soc}"><span class="num">7</span><div><h4>Observabilidade e ITSM</h4><p>Etapas 7 e 8: Zabbix e Grafana; depois Cyberappfin e Zammad, com o fluxo de tickets.</p></div></div>
-          <div class="bloco" style="--cor:${COR.brand}"><span class="num">9</span><div><h4>Teste e encerramento</h4><p>Etapas 9 e 10: checklist, evento ponta a ponta, backup novo, RPO e RTO reais e RCI em 5 dias úteis.</p></div></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="num">7–8</span><div><h4>Observabilidade e ITSM</h4><p>Zabbix e Grafana; depois Cyberappfin e Zammad, com o fluxo de tickets.</p></div></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="num">9–10</span><div><h4>Teste e encerramento</h4><p>Checklist, evento ponta a ponta, backup novo, RPO e RTO reais e RCI em 5 dias úteis.</p></div></div>
         </div>
         <p class="s-txt"><b>Por que as aplicações vêm antes do Wazuh:</b> são o que o cliente usa e têm o menor tempo de retorno. Nesse intervalo o SOC acompanha os logs locais, e os agentes guardam os eventos em fila até o Wazuh voltar.</p>
         <div class="amb" style="gap:14px">${LINK_DRP}${LINK_RUNBOOK}</div>

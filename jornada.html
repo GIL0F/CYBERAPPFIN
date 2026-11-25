@@ -1470,8 +1470,8 @@ const PARADAS = [
           <div class="bloco" style="--cor:${COR.iam}"><span class="num">4</span><div><h4>AD e DNS</h4><p>DCs pelo Recovery Media, validados em rede isolada antes de reintegrar.</p></div></div>
           <div class="bloco" style="--cor:${COR.danger}"><span class="num">5</span><div><h4>Aplicações</h4><p>Firefly pela rota própria, com o firewall reaplicado; publicado no proxy só depois de validado.</p></div></div>
           <div class="bloco" style="--cor:${COR.soc}"><span class="num">6</span><div><h4>Wazuh</h4><p>Volta logo após as aplicações e recebe os eventos que os agentes guardaram em fila.</p></div></div>
-          <div class="bloco" style="--cor:${COR.soc}"><span class="num">7</span><div><h4>Observabilidade e ITSM</h4><p>Etapas 7 e 8: Zabbix e Grafana; depois Cyberappfin e Zammad, com o fluxo de tickets.</p></div></div>
-          <div class="bloco" style="--cor:${COR.brand}"><span class="num">9</span><div><h4>Teste e encerramento</h4><p>Etapas 9 e 10: checklist, evento ponta a ponta, backup novo, RPO e RTO reais e RCI em 5 dias úteis.</p></div></div>
+          <div class="bloco" style="--cor:${COR.soc}"><span class="num">7–8</span><div><h4>Observabilidade e ITSM</h4><p>Zabbix e Grafana; depois Cyberappfin e Zammad, com o fluxo de tickets.</p></div></div>
+          <div class="bloco" style="--cor:${COR.brand}"><span class="num">9–10</span><div><h4>Teste e encerramento</h4><p>Checklist, evento ponta a ponta, backup novo, RPO e RTO reais e RCI em 5 dias úteis.</p></div></div>
         </div>
         <p class="s-txt"><b>Por que as aplicações vêm antes do Wazuh:</b> são o que o cliente usa e têm o menor tempo de retorno. Nesse intervalo o SOC acompanha os logs locais, e os agentes guardam os eventos em fila até o Wazuh voltar.</p>
         <div class="amb" style="gap:14px">${LINK_DRP}${LINK_RUNBOOK}</div>
