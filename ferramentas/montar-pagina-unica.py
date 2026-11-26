@@ -173,7 +173,7 @@ function blocoMapa(paradas){
   });
   let atual = -1, visivel = false;
   function total(){ return b.offsetHeight - innerHeight; }
-  function irPasso(k){ scrollTo({ top:b.offsetTop + (k + .5) / N * total(), behavior:REDUZIR ? 'auto' : 'smooth' }); }
+  function irPasso(k){ scrollTo({ top:topoDe(b) + (k + .5) / N * total(), behavior:REDUZIR ? 'auto' : 'smooth' }); }
   function mostrar(k){
     const p = mapa.PARADAS[paradas[k] - 1];
     mapa.aplicar(paradas[k] - 1);
@@ -188,7 +188,7 @@ function blocoMapa(paradas){
   }
   function render(){
     if(!visivel) return;
-    const p = Math.min(1, Math.max(0, (scrollY - b.offsetTop) / total()));
+    const p = Math.min(1, Math.max(0, (scrollY - topoDe(b)) / total()));
     q('.barra i').style.width = (p * 100).toFixed(1) + '%';
     const k = Math.min(N - 1, Math.floor(p * N));
     if(k !== atual) mostrar(k);
@@ -202,6 +202,8 @@ function blocoMapa(paradas){
 }
 
 const REDUZIR = matchMedia('(prefers-reduced-motion: reduce)').matches;
+// posição do bloco em relação ao topo da página (offsetTop mede só até o pai posicionado)
+const topoDe = el => el.getBoundingClientRect().top + scrollY;
 CAPS.forEach(c => {
   const sec = document.createElement('section');
   sec.className = 'cap'; sec.id = c.id; sec.dataset.nome = c.nome;
@@ -251,7 +253,7 @@ function blocoDash(sec){
   });
   let di = -1, mi = -1, visivel = false;
   const total = () => b.offsetHeight - innerHeight;
-  const irUnidade = u => scrollTo({ top:b.offsetTop + (u + .5) / N * total(), behavior:REDUZIR ? 'auto' : 'smooth' });
+  const irUnidade = u => scrollTo({ top:topoDe(b) + (u + .5) / N * total(), behavior:REDUZIR ? 'auto' : 'smooth' });
   const reinicia = (el, cls) => { el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); };
   // os números de destaque sobem de zero até o valor
   function contar(el){
@@ -306,7 +308,7 @@ function blocoDash(sec){
   }
   function render(){
     if(!visivel) return;
-    const p = Math.min(1, Math.max(0, (scrollY - b.offsetTop) / total()));
+    const p = Math.min(1, Math.max(0, (scrollY - topoDe(b)) / total()));
     q('.barra i').style.width = (p * 100).toFixed(1) + '%';
     const [i, m] = unidades[Math.min(N - 1, Math.floor(p * N))];
     if(i !== di){ di = i; mi = -1; mostrarDash(i); }
