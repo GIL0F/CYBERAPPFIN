@@ -798,7 +798,7 @@ const AREAS = [
           { n:'1.3', nome:'VLANs com varredura de vulnerabilidade', formula:'VLANs com tarefa no OpenVAS ÷ 6 (VLANs 10 a 60)', hoje:'6 de 6', pct:100, meta:95, nota:'Medido no lab · tarefas do OpenVAS por VLAN.' },
         ] },
       { rot:'OKR 2 — Resposta', painel:'dashboards/img/kpis-soc.jpg', painelTipo:'Painel do OKR no Grafana · SOC KPIs e OKRs', objetivo:'Tratar os alertas que chegam, rápido e com a rotina do SOC em dia.',
-        just:'Quanto mais cedo um alerta vira ticket, menor o dano; a política dá 15 minutos. Ticket duplicado e falso positivo tomam o tempo do analista.',
+        just:'Quanto mais cedo um alerta vira ticket, menor o dano; a política dá 15 minutos. Alerta que chega e ninguém trata é um ataque sem resposta, e falso positivo toma o tempo do analista.',
         partida:'Fluxo Wazuh → Cyberappfin → Zammad funcionando, com caso homologado (GET /.env → 403 → regra 100160). O tempo até o ticket ficou em 19 minutos, acima do limite.',
         freq:'Diária a mensal',
         kpis:[
