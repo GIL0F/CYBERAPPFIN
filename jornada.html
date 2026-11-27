@@ -1048,30 +1048,22 @@ const PARADAS = [
           <div class="bloco" style="--cor:#4ADE80"><span class="rot">Devolve</span><h4>Classificação e resumo</h4><p>Classificação, resumo, nível de confiança e recomendação, que enriquecem o ticket no Zammad.</p></div>
           <div class="bloco" style="--cor:#F87171"><span class="rot">Não faz</span><h4>Nenhuma ação sozinha</h4><p>Não executa comandos no ambiente. Se o modelo cair, o SOC segue operando: o incidente abre do mesmo jeito.</p></div>
         </div>
-        <div class="linha" style="grid-template-columns:1.1fr 1fr; align-items:start">
-          <div class="vk" style="--cor:${COR.soc}">
-            <div class="vk-top"><span class="vk-n">$</span><h4>Demonstração via SSH</h4></div>
-            <div class="vk-cmd"><code>ssh administrador@10.10.50.19</code><code>cd /opt/cyberfin</code>
-              <code class="cmt"># consultar serviços e logs com os comandos já homologados</code>
-              <code class="cmt"># nunca abrir /etc/cyberfin/cyberfin.env (tokens e credenciais)</code></div>
+        <div style="display:flex; flex-direction:column; gap:10px">
+          <p class="s-rot">O caminho de um alerta</p>
+          <div class="wz-fluxo">
+            <span class="nodo" style="--cor:${COR.soc}">Evento</span><span class="seta3">→</span>
+            <span class="nodo" style="--cor:#4ADE80">Correlação</span><span class="seta3">→</span>
+            <span class="nodo" style="--cor:#FB923C">Caso</span><span class="seta3">→</span>
+            <span class="nodo" style="--cor:${COR.brand}">Tarefa da IA</span><span class="seta3">→</span>
+            <span class="nodo" style="--cor:#7DD3FC">Ticket enriquecido</span>
           </div>
-          <div style="display:flex; flex-direction:column; gap:10px">
-            <p class="s-rot">O que mostrar na tela</p>
-            <div class="wz-fluxo">
-              <span class="nodo" style="--cor:${COR.soc}">Evento</span><span class="seta3">→</span>
-              <span class="nodo" style="--cor:#4ADE80">Correlação</span><span class="seta3">→</span>
-              <span class="nodo" style="--cor:#FB923C">Case</span><span class="seta3">→</span>
-              <span class="nodo" style="--cor:${COR.brand}">Tarefa da IA</span><span class="seta3">→</span>
-              <span class="nodo" style="--cor:#7DD3FC">Ticket enriquecido</span>
-            </div>
-            <span class="status-chip">Em evolução: tirar a IA do caminho crítico do Wazuh</span>
-          </div>
+          <span class="status-chip">Em evolução: tirar a IA do caminho crítico do Wazuh</span>
         </div>
       </div>`,
-    notas:'A IA é apoio, não piloto. Ela recebe o alerta já organizado, devolve classificação, resumo, confiança e uma recomendação, e isso entra no ticket. Ela não executa nada no ambiente. Na demonstração, entrar por SSH no cyberfinia e mostrar um evento passando pela correlação, virando caso, gerando a tarefa da IA e enriquecendo o ticket. Cuidado: não abrir o arquivo cyberfin.env, que tem tokens. Ser honesto sobre o que está em evolução: a meta é a IA rodar em paralelo, sem nunca atrasar a abertura do incidente.'
+    notas:'A IA é apoio, não piloto. Ela recebe o alerta já organizado, devolve classificação, resumo, confiança e uma recomendação, e isso entra no ticket. Ela não executa nada no ambiente. O caminho é sempre o mesmo: o evento passa pela correlação, vira caso, gera a tarefa da IA e enriquece o ticket. Ser honesto sobre o que está em evolução: a meta é a IA rodar em paralelo, sem nunca atrasar a abertura do incidente.'
   },
   {
-    quem:P3E, cor:COR.end, titulo:'VLAN 40: as workstations', sub:'Endpoint: onde a maioria dos ataques começa',
+    quem:P3E, cor:COR.end, titulo:'VLAN 40: as estações de trabalho', sub:'Endpoint: onde a maioria dos ataques começa',
     cam:[700, 330, 520, 570], foco:['vlan40', 'barramento'],
     html:`<p>Estações de trabalho dos colaboradores, separadas das máquinas de gerência (VLAN 10).</p>
       <h3>Nas workstations</h3>
